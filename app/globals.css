@@ -1,0 +1,194 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * WAVE design system.
+ *
+ * The product is for people who cannot hear the doorbell, so every signal the
+ * interface sends has to land in the eye. Sound is replaced by motion: the
+ * screen itself rings. Colour is used sparingly so that when amber appears, it
+ * means one thing only — someone is at the door right now.
+ */
+
+:root {
+  --ink: #07080b;
+  --ink-raised: #0d0f14;
+  --ink-card: #12141b;
+  --line: #1e212b;
+  --line-bright: #2b2f3d;
+
+  --text: #f2f4f8;
+  --text-dim: #9aa1b3;
+  --text-faint: #636b7e;
+
+  --signal: #ffb020; /* someone is at the door */
+  --signal-soft: rgba(255, 176, 32, 0.12);
+  --calm: #2dd4bf; /* system is healthy, conversation resolved */
+  --calm-soft: rgba(45, 212, 191, 0.12);
+  --alert: #fb7185; /* needs the resident */
+  --alert-soft: rgba(251, 113, 133, 0.12);
+
+  --radius: 14px;
+}
+
+/* The page is intentionally dark in both schemes: it is a wall display that
+   sits in a hallway, and a white flash at 3am helps nobody. */
+:root:not([data-theme='light']) {
+  color-scheme: dark;
+}
+
+* {
+  border-color: var(--line);
+}
+
+body {
+  background: var(--ink);
+  color: var(--text);
+  font-feature-settings: 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* A soft vignette keeps attention in the middle of a large wall-mounted screen. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 90% at 50% 0%, rgba(255, 176, 32, 0.05), transparent 60%);
+  z-index: 0;
+}
+
+@layer components {
+  .card {
+    background: var(--ink-card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    border: 1px solid var(--line-bright);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* The visual doorbell                                                  */
+/* ------------------------------------------------------------------ */
+
+/*
+ * When the doorbell is pressed, a ring expands out of the door card. This is
+ * the whole accessibility thesis in one animation: the notification is spatial
+ * and impossible to miss from across a room, and it needs no sound at all.
+ */
+@keyframes ring-out {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+.ring-pulse::after,
+.ring-pulse::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: var(--radius);
+  border: 2px solid var(--signal);
+  animation: ring-out 2.4s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+  pointer-events: none;
+}
+
+.ring-pulse::after {
+  animation-delay: 1.2s;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.breathe {
+  animation: breathe 2s ease-in-out infinite;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise 0.34s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+/* Waveform bars that play while the Chime is speaking. Because the resident
+   cannot hear the Chime, this is the only way they know the door spoke. */
+@keyframes bar {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.bar {
+  animation: bar 0.9s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* Everything above is decoration carrying meaning, so it degrades to a static
+   state rather than disappearing when the viewer has asked for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  .ring-pulse::before,
+  .ring-pulse::after,
+  .breathe,
+  .bar,
+  .rise {
+    animation: none !important;
+  }
+  .ring-pulse::before {
+    opacity: 0.6;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line-bright);
+  border-radius: 999px;
+  border: 3px solid var(--ink);
+}

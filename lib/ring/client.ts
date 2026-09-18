@@ -45,24 +45,103 @@ async function ring<T>(path: string, init: RequestInit = {}): Promise<T> {
   return res.json() as Promise<T>
 }
 
+/* ------------------------------------------------------------------ */
+/* JSON:API                                                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Ring speaks JSON:API, so a device arrives as a thin resource object whose
+ * status and capabilities sit in a sibling `included` array, joined by id.
+ * Everything above this line in the app expects a flat device, so the shapes
+ * are reconciled here rather than leaking the envelope into the UI.
+ */
+interface JsonApiResource {
+  type: string
+  id: string
+  attributes?: Record<string, unknown>
+  relationships?: Record<string, { data?: { type: string; id: string } }>
+}
+
+interface JsonApiDoc {
+  data: JsonApiResource[]
+  included?: JsonApiResource[]
+}
+
 export async function listDevices(): Promise<RingDevice[]> {
-  const data = await ring<{ data: RingDevice[] }>(
-    '/v1/devices?include=status,capabilities,location',
-  )
-  return data.data
+  const doc = await ring<JsonApiDoc>('/v1/devices?include=status,capabilities,location')
+  const byId = new Map((doc.included ?? []).map((r) => [r.id, r]))
+
+  return doc.data.map((d) => {
+    const related = (name: string) => {
+      const id = d.relationships?.[name]?.data?.id
+      return id ? byId.get(id)?.attributes : undefined
+    }
+    const status = related('status') as { online?: boolean } | undefined
+    const caps = related('capabilities') as Record<string, unknown> | undefined
+    const attrs = d.attributes as { name?: string; image_url?: string } | undefined
+
+    return {
+      id: d.id,
+      name: attrs?.name ?? d.id,
+      // Ring does not send a device kind, so it is inferred from the artwork
+      // path, which is the only place the model name appears.
+      kind: inferKind(attrs?.image_url),
+      online: status?.online ?? false,
+      capabilities: caps ? flattenCapabilities(caps) : [],
+    }
+  })
+}
+
+function inferKind(imageUrl?: string): RingDevice['kind'] {
+  const s = (imageUrl ?? '').toLowerCase()
+  if (s.includes('chime')) return 'chime'
+  if (s.includes('doorbell') || s.includes('dp')) return 'doorbell'
+  return 'camera'
+}
+
+/** Turn the nested capability object into the flat labels the UI shows. */
+function flattenCapabilities(caps: Record<string, unknown>): string[] {
+  return Object.entries(caps)
+    .filter(([, v]) => v != null)
+    .map(([k]) => k)
 }
 
 export async function deviceStatus(deviceId: string) {
   return ring<{ online: boolean }>(`/v1/devices/${deviceId}/status`)
 }
 
-/** Pull a still frame so the agent has something to look at. */
-export async function downloadSnapshot(deviceId: string, componentId?: number) {
-  const q = componentId != null ? `?component_id=${componentId}` : ''
-  return ring<{ url: string; expires_at: string }>(
-    `/v1/devices/${deviceId}/media/image/download${q}`,
-    { method: 'POST' },
-  )
+/**
+ * Pull a still frame so the agent has something to look at.
+ *
+ * Media downloads are the one place Ring departs from JSON:API: the POST
+ * answers 303 with a pre-signed Location, and the bytes come from a second GET.
+ * The timestamp is epoch milliseconds and is mandatory — a bodyless POST is
+ * rejected with 403, not 400, which reads like an auth failure and is not.
+ */
+export async function downloadSnapshot(
+  deviceId: string,
+  opts: { at?: number; componentId?: string; format?: 'jpeg' | 'png' } = {},
+) {
+  const res = await fetch(`${BASE}/v1/devices/${deviceId}/media/image/download`, {
+    method: 'POST',
+    redirect: 'manual',
+    headers: {
+      Authorization: `Bearer ${process.env.RING_ACCESS_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      type: 'at_timestamp',
+      timestamp: opts.at ?? Date.now(),
+      image_options: { format: opts.format ?? 'jpeg' },
+      ...(opts.componentId ? { components: [{ component_id: opts.componentId }] } : {}),
+    }),
+  })
+
+  const location = res.headers.get('Location')
+  if (res.status !== 303 || !location) {
+    throw new RingError(res.status, `Snapshot failed: ${res.status}`)
+  }
+  return { url: location }
 }
 
 /**
@@ -71,12 +150,19 @@ export async function downloadSnapshot(deviceId: string, componentId?: number) {
  * This is the only audio path Ring exposes — live streams are video only, with
  * no talk-back endpoint. WAVE's entire doorstep conversation leaves the house
  * through here.
+ *
+ * Two things gate it, and neither is available in the Developer Playground:
+ * the app must hold the Chimes scope group with the Chime Controls capability,
+ * and the account must actually own a chime. The Playground issues a single
+ * DoorbellPro whose capabilities report `audio: { supported_actions: null }`,
+ * so this path is written to the documented contract but cannot be exercised
+ * there. See FL-006.
  */
-export async function playOnChime(deviceId: string, audioSlot: number) {
+export async function playOnChime(deviceId: string, audioRef: string) {
   return ring<{ accepted: boolean }>(`/v1/devices/${deviceId}/media/audio/playback`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ audio_slot: audioSlot }),
+    body: JSON.stringify({ audio_ref: audioRef }),
   })
 }
 

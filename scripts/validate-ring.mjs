@@ -55,11 +55,12 @@ Get one at https://developer.amazon.com/ring/console/playground (valid ~30 min).
 
 const results = []
 
-async function probe(label, path, { method = 'GET', body, headers, gate } = {}) {
+async function probe(label, path, { method = 'GET', body, headers, gate, expect } = {}) {
   const started = Date.now()
   try {
     const res = await fetch(`${BASE}${path}`, {
       method,
+      redirect: 'manual',
       headers: {
         Authorization: `Bearer ${TOKEN}`,
         Accept: 'application/json',
@@ -76,7 +77,7 @@ async function probe(label, path, { method = 'GET', body, headers, gate } = {}) 
       json = text.slice(0, 200)
     }
 
-    const ok = res.ok
+    const ok = expect ? res.status === expect : res.ok
     results.push({ label, gate, ok, status: res.status, ms, json })
     const mark = ok ? `${C.green}PASS${C.reset}` : `${C.red}FAIL${C.reset}`
     console.log(
@@ -127,8 +128,18 @@ if (cam) {
 /* ---- G5: snapshot --------------------------------------------------- */
 if (cam) {
   console.log(`\n${C.cyan}G5  snapshot${C.reset}`)
+  // A bodyless POST is rejected 403 "Cannot authorize: empty request body",
+  // which looks like an auth failure and is not. The timestamp is epoch
+  // milliseconds, and success is a 303 carrying a pre-signed Location.
   await probe('POST media/image/download', `/v1/devices/${cam.id}/media/image/download`, {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      type: 'at_timestamp',
+      timestamp: Date.now(),
+      image_options: { format: 'jpeg' },
+    }),
+    expect: 303,
     gate: 'G5',
   })
 }
@@ -172,7 +183,7 @@ if (!chime) {
   await probe('POST media/audio/playback', `/v1/devices/${chime.id}/media/audio/playback`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ audio_slot: 1 }),
+    body: JSON.stringify({ audio_ref: 'wave_greeting' }),
     gate: 'G4',
   })
 }

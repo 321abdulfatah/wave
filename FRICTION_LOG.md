@@ -112,3 +112,51 @@ Submissions with friction logs can earn up to a 10% judging bonus.
      hackathon is advertised as open to all countries excluding standard exceptions, and Syria
      is no longer one of them — but Amazon's own onboarding still refuses Syrian developers,
      which makes three of the four tracks unenterable for them regardless of the contest rules.
+
+---
+
+## FL-006 — The Playground cannot exercise the only audio-out endpoint Ring has
+- **Date:** 2026-09-19
+- **Tool:** Ring Developer Playground / Chimes scope
+- **Task:** Confirm that an app can play audio on a Ring device — the one visitor-facing
+  output channel the Partner API exposes.
+- **Steps:** Generated a Playground token, listed devices, read the device capabilities, then
+  attempted `POST /v1/devices/{id}/media/audio/playback`.
+- **Expected:** Either a simulated chime alongside the simulated doorbell, or a clear statement
+  in the Playground that audio playback is out of scope for it.
+- **Actual:** The Playground issues exactly one device, a DoorbellPro, and its capabilities
+  report `audio: { customizable_slots: null, supported_actions: null }`. There is no chime, no
+  way to add one, and `/v1/chimes` is a 404. Chime Controls is also gated behind a scope group
+  chosen at app-creation time, which the Playground path deliberately skips. The result is that
+  the Playground can exercise motion events, button presses, event history, WHEP live view and
+  image snapshots — everything *inbound* — but **none** of the outbound audio surface.
+- **Severity:** Important
+- **Workaround:** Implement `playOnChime` against the documented contract and mark the step as
+  simulated in the demo. It cannot be verified without buying a Ring Chime and a subscription.
+- **Suggestion:** Add a simulated chime to the Playground device set. Any project that responds
+  to a doorstep event rather than merely logging it needs an output channel, and right now the
+  Playground can prove half a product. A simulated chime that returns 202 and echoes the
+  `audio_ref` would be enough to develop against.
+
+---
+
+## FL-007 — `media/image/download` answers 403 for a schema problem, which reads as an auth failure
+- **Date:** 2026-09-19
+- **Tool:** Ring Partner API — Image Snapshots
+- **Task:** Download a snapshot for the doorbell.
+- **Steps:** `POST /v1/devices/{id}/media/image/download` with a valid bearer token, first with
+  no body, then with several plausible time-range bodies.
+- **Expected:** `400 Bad Request` naming the missing field, as the API's own error table
+  promises for invalid parameters.
+- **Actual:** `403 REQUEST_FORBIDDEN` with `"Cannot authorize: empty request body"`, then
+  `"Cannot authorize: missing required timestamp fields in request body"`. Both are schema
+  errors dressed as authorization failures. With a token that had just succeeded on four other
+  endpoints, the obvious reading was a scope problem, and the time went into re-checking auth
+  instead of the body. The correct shape — `type: "at_timestamp"` with `timestamp` in epoch
+  milliseconds — is documented, but the error never points at it.
+- **Severity:** Important
+- **Workaround:** None needed once the schema is known; it works and returns 303 with a
+  pre-signed Location.
+- **Suggestion:** Return `400` with the offending field named, and reserve `403` for genuine
+  authorization failures. Prefixing a validation message with "Cannot authorize" sends
+  developers to the wrong place entirely.

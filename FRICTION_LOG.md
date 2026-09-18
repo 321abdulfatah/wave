@@ -81,25 +81,34 @@ Submissions with friction logs can earn up to a 10% judging bonus.
 
 ---
 
-## FL-005 — The Ring console's own sign-in redirect lands on a 404, blocking onboarding at step one
+---
+
+## FL-005 — Amazon developer account setup is blocked for Syria, 14 months after the sanctions that justified it were revoked
 - **Date:** 2026-09-19
 - **Tool:** Amazon Developer account registration / Ring Developer Console
 - **Task:** Reach the Ring Developer Console to obtain Playground credentials.
-- **Steps:** From developer.ring.com, followed the "Become a Developer" button, which points at
-  `https://developer.amazon.com/ring/console`. Signed in with a valid Amazon account. The
-  console redirected to
-  `https://developer.amazon.com/settings/console/registration?return_to=/ring/console`.
-- **Expected:** The Amazon Developer registration form, then a return to the Ring console.
-- **Actual:** **404 Page not found.** The account is signed in — the site chrome and the account
-  avatar both render — but the registration step the console itself redirected to does not exist
-  at that URL. The same path *without* the `return_to` query parameter
-  (`https://developer.amazon.com/settings/console/registration`) resolves normally.
+- **Steps:** From developer.ring.com, followed the documented "Become a Developer" button to
+  `https://developer.amazon.com/ring/console`. Signed in with a valid Amazon account. Was
+  redirected to `https://developer.amazon.com/settings/console/registration?return_to=/ring/console`.
+- **Expected:** The developer registration form, or a clear message explaining why registration
+  is unavailable.
+- **Actual:** **404 Page not found**, while signed in, with the account avatar rendering in the
+  header. There is no error message, no country notice and nothing to act on. The real cause is
+  only discoverable three documents away, in *Accepted IDs for Identity Verification*:
+  "Identity verification and Amazon developer account setup isn't currently supported in these
+  countries" — a list that includes **Syria**. A 404 is doing the work of a policy message.
 - **Severity:** Critical
-- **Workaround:** Open `https://developer.amazon.com/settings/console/registration` directly with
-  no query string, complete the developer registration, then navigate to
-  `https://developer.amazon.com/ring/console` as a separate step.
-- **Suggestion:** The `return_to` parameter appears to break the registration route's resolution.
-  Every new Ring developer arriving through the documented "Become a Developer" path hits this,
-  and a 404 at the very first step reads as "this platform is broken" rather than "you need to
-  register". Fix the redirect, and in the meantime add the direct registration URL to the Ring
-  get-started guide.
+- **Workaround:** None. No Amazon developer account means no Ring Developer Console, no Fire TV
+  submission and no Alexa Developer Console. Of the four hackathon tracks, only the Alexa+
+  simulated-experience path remains reachable.
+- **Suggestion:** Two things, in order of urgency.
+  1. **Return a real message, not a 404.** Anyone in the 43 listed territories currently hits a
+     dead page at step one of the documented onboarding path, with no way to learn why.
+  2. **Re-examine the list.** Syria's presence on it predates a substantial change in its legal
+     status: OFAC's comprehensive Syria sanctions were terminated effective 1 July 2025, all
+     Syrian financial institutions were delisted on 30 June 2025, the Caesar Act was repealed on
+     18 December 2025, and the State Sponsor of Terrorism designation was rescinded on
+     24 August 2026. The identity-verification page was last updated 31 July 2025. This
+     hackathon is advertised as open to all countries excluding standard exceptions, and Syria
+     is no longer one of them — but Amazon's own onboarding still refuses Syrian developers,
+     which makes three of the four tracks unenterable for them regardless of the contest rules.

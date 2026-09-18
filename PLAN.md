@@ -2,104 +2,115 @@
 
 > **Your door, answered without a word.**
 > An accessible front-door agent for Deaf, hard-of-hearing, non-verbal and
-> limited-mobility residents. The chime speaks for you; the camera reads gestures back.
+> limited-mobility residents — in the visitor's own language and their own gestures.
 
-- **Primary tracks:** Ring *and* Alexa+ (one project may be entered in both; it can win only
-  one track prize, but that is two shots at a placement for one codebase)
+- **Primary tracks:** Ring *and* Alexa+ (one project, two tracks, two shots at one prize)
 - **Mini challenges:** AWS Builder + Open Source
-- **Deadline:** 2026-10-23, 12:00pm PDT / 10:00pm GMT+3 — judging 9–20 Nov, winners ~3 Dec
+- **Deadline:** 2026-10-23, 12:00pm PDT / 10:00pm GMT+3 · judging 9–20 Nov · winners ~3 Dec
 
 ---
 
-## Why this shape
+## Where it stands (2026-09-19, 34 days out)
 
-Machine audit (2026-09-18) ruled out the obvious choice:
+Ring is connected and live. Four of five validation gates are open.
 
-| Constraint | Consequence |
+| Gate | State | Note |
+|---|---|---|
+| G1 token + devices | ✅ open | `Playground Device`, a DoorbellPro, US/CA |
+| G2 WHEP live view | ✅ open | 201, video plays in the browser |
+| G3 event history | ✅ open | polled every 4s |
+| G5 snapshot | ✅ open | 303 → pre-signed URL |
+| G4 chime speaks | ❌ blocked | no chime in the Playground — FL-006 |
+
+Working end to end: Ring event → poller → decision engine → visual ring → gesture
+read from either the webcam or the Ring WHEP stream → resolution card.
+
+Eight friction-log entries, four of them Critical or Important, all from real blockers hit
+while building. Worth up to a 10% judging bonus.
+
+---
+
+## The thesis, sharpened
+
+Ring's Partner API carries **no inbound audio**. Streams are video only and there is no
+talk-back endpoint. WAVE turns that into the mechanic: audio goes **out** through the Chime,
+intent comes **in** through the camera as gesture.
+
+But a gesture is not a universal token, and this is where the product gets its edge:
+
+> **👍 means "good" in Seattle and something obscene in Baghdad, Athens and Lagos.**
+> **There is no universal sign language. There are more than 300.**
+
+Four of WAVE's five starting gestures are offensive or ambiguous somewhere:
+
+| Gesture | Where it fails |
 |---|---|
-| Windows 11 only, no Mac | Vega SDK unsupported on Windows **and** WSL → Vega path closed |
-| 20 GB free on C: | Vega needs 20 GB minimum; Android/Fire OS needs ~15 GB → both unaffordable |
-| Radeon 780M iGPU, no CUDA | No local GPU inference; browser MediaPipe / ONNX-web or cloud only |
-| Node 22, Python 3.13, Docker, git, adb, VS Code | A web + MCP + cloud stack costs ~2 GB and runs today |
+| 👍 thumbs up | Iraq, Iran, Greece, West Africa, Sardinia — obscene |
+| ✋ open palm | Greece — the *moútza*, one of the oldest insults in Europe |
+| ☝ pointing | rude across much of Asia, the Middle East and Africa |
+| 👋 wave | palm-forward reads as moútza in Greece and Nigeria |
 
-Ring + Alexa+ is the only combination that is fully buildable on this hardware, and it is
-also the least crowded pair of tracks (Ring has the fewest entrants; the $25K tracks draw the
-most). The Ring sample app already ships the exact primitives this idea needs.
+A door agent that misreads a gesture is not merely unhelpful — it insults a stranger on
+someone's doorstep, in their name. So the gesture vocabulary is **per-locale**, not a
+translation layer bolted on at the end. Same for colour (white is mourning in much of East
+Asia; red is luck in China and danger in the West), for reading direction, and for how
+directly a stranger may be addressed.
 
----
-
-## The interaction
-
-Ring's Partner API has no two-way audio — live streams are video only. That limitation is the
-product's core mechanic rather than a workaround:
-
-```
-button_press / motion_detected  ──▶  webhook (HMAC-SHA256 verified)
-        │
-        ├─▶ snapshot + WHEP live stream
-        │        └─▶ vision: person / package / courier / vehicle
-        │        └─▶ MediaPipe Hands: thumbs-up, wave, point, open palm
-        │
-        ├─▶ agent decides (Bedrock): who is this, what do they need, what is the policy
-        │
-        ├─▶ Chime audio playback  ──▶  the door SPEAKS to the visitor
-        │
-        └─▶ visual card to the resident  ──▶  no sound required, ever
-```
-
-Audio goes **out** through the Chime. Intent comes **in** through the camera as gesture.
-A complete doorstep conversation with zero audio input and zero hearing required.
-
-### Alexa+ layer (MCP server, spec 2025-11-25+, Streamable HTTP)
-Tools: `list_door_events`, `who_came_today`, `describe_visitor`, `set_door_policy`,
-`approve_recurring_visitor`. Returns **cards and carousels** with snapshots, and keeps
-**state across sessions** (learns the Tuesday pharmacy courier) — both named in the official
-rules as *creative* Alexa+ examples, versus the "basic MCP wrapper" they call obvious.
+This is the strongest differentiator the project has. Ring ships globally; nobody else in
+this hackathon will have thought about it.
 
 ---
 
-## Validation gates — answer these BEFORE writing product code
+## The 34 days
 
-Nothing is assumed. Each gate can change the architecture.
+### Week 1 · Sep 19–25 — Design and locale foundations
+- Visual identity rebuilt by parallel design agents exploring distinct directions, then
+  one chosen and applied throughout
+- Locale engine: language, gesture set, palette and layout direction resolved per region
+- Gesture vocabulary research: sourced, cited, and reviewed for each launch locale
+- Arabic and English first, both fully RTL/LTR correct
 
-- [ ] **G1** Ring Developer Playground token obtained; `reference/ring-api-helloworld` runs
-      locally and lists devices.
-- [ ] **G2** WHEP live view plays in the browser from the Playground, and the MediaPipe Hands
-      processor detects a gesture on that stream.
-- [ ] **G3** Webhooks reach localhost through a tunnel (cloudflared / ngrok) and the HMAC
-      signature verifies. Playground must be able to fire simulated Package / Vehicle / Motion.
-- [ ] **G4** **Chime audio playback** — is `POST /v1/devices/{id}/media/audio/playback`
-      reachable from the Playground without a physical Chime? *If not, the "door speaks" beat
-      must be demoed another way — decide before week 2.*
-- [ ] **G5** Snapshot download (`media/image/download`) returns a real frame.
-- [ ] **G6** Bedrock reachable from the account, with the $150 credits applied.
-- [ ] **G7** MCP server responds over Streamable HTTP at spec 2025-11-25 through the tunnel.
+### Week 2 · Sep 26–Oct 2 — Vision
+- Visitor classification from Ring snapshots and WHEP frames via Bedrock
+  (Ring gives pixels and no classification — see FL-008, so this is ours to build)
+- Package / person / vehicle / courier-uniform detection
+- Feed confidence into the decision engine instead of the current fixed 0.5
 
-**Gate review: 2026-09-21.** If G1–G3 fail, fall back to the Alexa+ simulated-experience path,
-which the rules explicitly allow and which has no hardware dependency at all.
+### Week 3 · Oct 3–9 — Alexa+ and the agent
+- Self-hosted MCP server, spec 2025-11-25 over Streamable HTTP
+- Tools: `list_door_events`, `who_came_today`, `describe_visitor`, `set_door_policy`
+- Cards and carousels; state carried across sessions
+- AgentCore / Strands for the AWS Builder mini
+
+### Week 4 · Oct 10–16 — Depth and polish
+- Visitor memory that actually learns recurring couriers
+- Accessibility audit: contrast, focus order, reduced motion, screen reader
+- Open-source contribution extracted from the project, with tests
+- Load and failure behaviour: expired token, offline device, network loss
+
+### Week 5 · Oct 17–22 — Submission
+- Demo video, under 3 minutes, best material first
+- README, setup instructions verified from a clean clone
+- Product feedback and the final friction log
+- **Submit 24 hours early.** Not on the deadline.
+
+### Oct 23 — Deadline, nothing but watching.
 
 ---
 
-## Schedule (35 days)
+## Rules compliance
 
-| Window | Focus |
-|---|---|
-| Sep 18–21 | Validation gates G1–G7. AWS credits form submitted. Friction log running. |
-| Sep 22–28 | Fork the sample. Webhook → event pipeline → resident dashboard. Real events end to end. |
-| Sep 29–Oct 5 | Gesture vocabulary on the live stream + visitor classification from snapshots. |
-| Oct 6–12 | Bedrock agent: policy, decisions, memory of recurring visitors. Chime speech-out. |
-| Oct 13–19 | MCP server + Alexa+ cards/carousels. Open-source contribution. Accessibility polish. |
-| Oct 20–23 | **Feature freeze.** Video, README, product feedback, friction log, submit early. |
-
----
-
-## Rules compliance checklist
-
-- [ ] Public GitHub repo with an OSS license visible in the About section
-- [ ] Ring track: repo calls Ring APIs at runtime (not just named in the README)
+- [ ] Public GitHub repo, OSS license visible in the About section
+- [ ] Ring track: Ring APIs called at runtime, not just named in the README ✅ already true
 - [ ] Alexa+ track: MCP server spec 2025-11-25+ over Streamable HTTP, imported and called
 - [ ] Demo video < 3 min, public on YouTube, English, shows the Ring simulator working
-- [ ] Product feedback for every tool/API/SDK used
+- [ ] Product feedback for every tool, API and SDK used
 - [ ] AWS Builder: AWS services named and documented in the feedback answer
 - [ ] Open Source: contribution URL + repo URL + GitHub username + description
-- [ ] Friction log entries (up to 10% bonus) — see FRICTION_LOG.md
+- [ ] Friction log entries — see FRICTION_LOG.md
+
+## Open questions
+
+- Devpost eligibility reply (emailed 2026-09-19) — Syria residency, prize delivery
+- $150 AWS credits — requested, up to 5 business days
+- G4: whether a chime ever becomes testable, or the step stays labelled as simulated

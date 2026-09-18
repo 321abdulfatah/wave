@@ -22,6 +22,12 @@ interface PollerState {
   /** Only events after this are acted on, so startup does not replay history. */
   since: number
   deviceNames: Map<string, string>
+  ticks: number
+  errors: number
+  lastError: string | null
+  lastTickAt: number
+  /** Claimed synchronously so concurrent starts cannot both win. */
+  starting: boolean
 }
 
 const globalPoller = globalThis as unknown as { __wavePoller?: PollerState }
@@ -33,6 +39,11 @@ function state(): PollerState {
       seen: new Set(),
       since: Date.now(),
       deviceNames: new Map(),
+      ticks: 0,
+      errors: 0,
+      lastError: null,
+      lastTickAt: 0,
+      starting: false,
     }
   }
   return globalPoller.__wavePoller
@@ -42,11 +53,42 @@ export function isPolling() {
   return state().timer !== null
 }
 
+/** Diagnostics for /api/ring/poller. */
+export function pollerStatus() {
+  const s = state()
+  return {
+    running: s.timer !== null,
+    ticks: s.ticks,
+    errors: s.errors,
+    lastError: s.lastError,
+    lastTickAt: s.lastTickAt ? new Date(s.lastTickAt).toISOString() : null,
+    since: new Date(s.since).toISOString(),
+    seen: s.seen.size,
+    devices: [...s.deviceNames.values()],
+  }
+}
+
 export async function startPolling(): Promise<{ started: boolean; reason?: string }> {
   const s = state()
   if (s.timer) return { started: true }
   if (isMockMode()) return { started: false, reason: 'No RING_ACCESS_TOKEN' }
 
+  // Every dashboard that opens calls this, and the device lookup below is
+  // awaited — so without a synchronous claim, two concurrent callers both pass
+  // the timer check, both start an interval, and the second assignment orphans
+  // the first one forever. That is how three pollers ended up hammering Ring
+  // at 1.5s instead of one at 4s.
+  if (s.starting) return { started: true }
+  s.starting = true
+
+  try {
+    return await begin(s)
+  } finally {
+    s.starting = false
+  }
+}
+
+async function begin(s: PollerState): Promise<{ started: boolean; reason?: string }> {
   const devices = await listDevices()
   if (devices.length === 0) return { started: false, reason: 'No devices on this account' }
   for (const d of devices) s.deviceNames.set(d.id, d.name)
@@ -58,9 +100,16 @@ export async function startPolling(): Promise<{ started: boolean; reason?: strin
     for (const e of existing) s.seen.add(e.id)
   }
 
+  console.log(`[poller] started, watching ${devices.length} device(s), ${s.seen.size} event(s) already in history`)
+
+  if (s.timer) clearInterval(s.timer)
   s.timer = setInterval(() => {
-    void tick().catch(() => {
-      /* a failed poll is not fatal; the next one will retry */
+    void tick().catch((err) => {
+      // A failed poll is not fatal; the next one retries. But swallowing it
+      // silently once cost an hour of looking in the wrong place.
+      s.errors += 1
+      s.lastError = String(err)
+      console.error('[poller] tick failed:', err)
     })
   }, POLL_MS)
 
@@ -75,6 +124,8 @@ export function stopPolling() {
 
 async function tick() {
   const s = state()
+  s.ticks += 1
+  s.lastTickAt = Date.now()
 
   for (const [deviceId, deviceName] of s.deviceNames) {
     const events = await listRingEvents(deviceId)
@@ -115,6 +166,7 @@ async function tick() {
       }
       door.resolution = decision.resolution
 
+      console.log(`[poller] new Ring event ${e.eventType} -> ${door.id}`)
       upsertEvent(door)
     }
   }

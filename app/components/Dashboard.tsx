@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Conversation from './Conversation'
 import GestureKey from './GestureKey'
+import GestureReader from './GestureReader'
 import type { DoorEvent, Gesture, RingDevice, Resolution, VisitorMemory } from '@/lib/ring/types'
 
 const RESOLUTION_LABEL: Record<Resolution, string> = {
@@ -29,6 +30,7 @@ export default function Dashboard({ mock }: { mock: boolean }) {
   const [expecting, setExpecting] = useState<Gesture[]>([])
   const [rationale, setRationale] = useState<string>('')
   const [connected, setConnected] = useState(false)
+  const [cameraOn, setCameraOn] = useState(false)
   const liveRegion = useRef<HTMLElement | null>(null)
   /** Event ids already seen, so a reconnect's snapshot does not re-announce. */
   const knownIds = useRef<Set<string>>(new Set())
@@ -186,6 +188,33 @@ export default function Dashboard({ mock }: { mock: boolean }) {
 
         {/* ---------------- side rail ---------------- */}
         <aside className="space-y-5">
+          <section className="card p-4">
+            <div className="mb-3 flex items-start justify-between gap-3">
+              <div>
+                <h3 className="text-[13px] font-semibold tracking-tight">Camera</h3>
+                <p className="mt-1 text-[11.5px] leading-relaxed text-faint">
+                  Same pipeline the Ring WHEP stream feeds in production.
+                </p>
+              </div>
+              <button
+                onClick={() => setCameraOn((v) => !v)}
+                className="pill shrink-0 transition"
+                style={{
+                  color: cameraOn ? 'var(--signal)' : 'var(--text-dim)',
+                  background: cameraOn ? 'var(--signal-soft)' : 'transparent',
+                }}
+              >
+                {cameraOn ? 'Stop' : 'Start'}
+              </button>
+            </div>
+            <GestureReader
+              enabled={cameraOn}
+              onGesture={(g, c) => {
+                if (active) sendGesture(g, c)
+              }}
+            />
+          </section>
+
           <Panel
             title="Gesture vocabulary"
             hint="Ring streams carry no audio, so the visitor answers with their hands."

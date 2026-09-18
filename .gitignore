@@ -6,3 +6,8 @@ __pycache__/
 *.pyc
 .venv/
 reference/
+
+# Credential CSVs downloaded from the Ring console
+*credentials*.csv
+*.pem
+*.key

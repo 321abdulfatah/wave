@@ -32,6 +32,7 @@ export default function Dashboard({ mock }: { mock: boolean }) {
   const [connected, setConnected] = useState(false)
   const [cameraOn, setCameraOn] = useState(false)
   const [useRing, setUseRing] = useState(false)
+  const [polling, setPolling] = useState<{ started: boolean; reason?: string } | null>(null)
   const liveRegion = useRef<HTMLElement | null>(null)
   /** Event ids already seen, so a reconnect's snapshot does not re-announce. */
   const knownIds = useRef<Set<string>>(new Set())
@@ -46,6 +47,10 @@ export default function Dashboard({ mock }: { mock: boolean }) {
 
     es.addEventListener('open', () => setConnected(true))
     es.addEventListener('error', () => setConnected(false))
+
+    es.addEventListener('source', (e) => {
+      setPolling(JSON.parse((e as MessageEvent).data))
+    })
 
     es.addEventListener('snapshot', (e) => {
       const list = JSON.parse((e as MessageEvent).data) as DoorEvent[]
@@ -140,7 +145,7 @@ export default function Dashboard({ mock }: { mock: boolean }) {
 
   return (
     <main className="mx-auto max-w-shell px-5 py-7 md:px-8">
-      <Header mock={mock} connected={connected} devices={devices} />
+      <Header mock={mock} connected={connected} devices={devices} polling={polling} />
 
       <div className="mt-7 grid gap-5 lg:grid-cols-[1.55fr_1fr]">
         {/* ---------------- live door ---------------- */}
@@ -326,10 +331,12 @@ function Header({
   mock,
   connected,
   devices,
+  polling,
 }: {
   mock: boolean
   connected: boolean
   devices: RingDevice[]
+  polling: { started: boolean; reason?: string } | null
 }) {
   return (
     <header className="flex flex-wrap items-end justify-between gap-4 border-b pb-5">
@@ -354,8 +361,15 @@ function Header({
           <span className={connected ? 'breathe' : ''}>●</span>
           {connected ? 'Live' : 'Reconnecting'}
         </span>
-        <span className="pill" style={{ color: 'var(--text-dim)' }}>
-          {mock ? 'Mock data' : 'Ring Playground'}
+        <span
+          className="pill"
+          style={{
+            color: polling?.started ? 'var(--signal)' : 'var(--text-dim)',
+            background: polling?.started ? 'var(--signal-soft)' : 'transparent',
+          }}
+          title={polling?.reason}
+        >
+          {mock ? 'Mock data' : polling?.started ? 'Watching Ring' : 'Ring Playground'}
         </span>
         <span className="pill" style={{ color: 'var(--text-dim)' }}>
           {devices.length} devices

@@ -1,4 +1,5 @@
 import { listEvents, subscribe } from '@/lib/store'
+import { startPolling } from '@/lib/ring/poller'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,6 +13,10 @@ export const dynamic = 'force-dynamic'
 export async function GET(req: Request) {
   const encoder = new TextEncoder()
 
+  // Kick the Ring poller off the first time anyone opens the dashboard. It is
+  // idempotent, and there is no point polling a doorbell nobody is watching.
+  const polling = await startPolling().catch((e) => ({ started: false, reason: String(e) }))
+
   const stream = new ReadableStream({
     start(controller) {
       const send = (event: string, data: unknown) => {
@@ -19,6 +24,7 @@ export async function GET(req: Request) {
       }
 
       send('snapshot', listEvents())
+      send('source', polling)
 
       const unsubscribe = subscribe((e) => send('door', e))
 

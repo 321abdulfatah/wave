@@ -45,28 +45,6 @@ async function ring<T>(path: string, init: RequestInit = {}): Promise<T> {
   return res.json() as Promise<T>
 }
 
-/* ------------------------------------------------------------------ */
-/* JSON:API                                                            */
-/* ------------------------------------------------------------------ */
-
-/**
- * Ring speaks JSON:API, so a device arrives as a thin resource object whose
- * status and capabilities sit in a sibling `included` array, joined by id.
- * Everything above this line in the app expects a flat device, so the shapes
- * are reconciled here rather than leaking the envelope into the UI.
- */
-interface JsonApiResource {
-  type: string
-  id: string
-  attributes?: Record<string, unknown>
-  relationships?: Record<string, { data?: { type: string; id: string } }>
-}
-
-interface JsonApiDoc {
-  data: JsonApiResource[]
-  included?: JsonApiResource[]
-}
-
 export async function listDevices(): Promise<RingDevice[]> {
   const doc = await ring<JsonApiDoc>('/v1/devices?include=status,capabilities,location')
   const byId = new Map((doc.included ?? []).map((r) => [r.id, r]))
@@ -106,8 +84,68 @@ function flattenCapabilities(caps: Record<string, unknown>): string[] {
     .map(([k]) => k)
 }
 
+/* ------------------------------------------------------------------ */
+/* JSON:API                                                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Ring speaks JSON:API, so a device arrives as a thin resource object whose
+ * status and capabilities sit in a sibling `included` array, joined by id.
+ * Everything above this line in the app expects a flat device, so the shapes
+ * are reconciled here rather than leaking the envelope into the UI.
+ */
+interface JsonApiResource {
+  type: string
+  id: string
+  attributes?: Record<string, unknown>
+  relationships?: Record<string, { data?: { type: string; id: string } }>
+}
+
+interface JsonApiDoc {
+  data: JsonApiResource[]
+  included?: JsonApiResource[]
+}
+
 export async function deviceStatus(deviceId: string) {
   return ring<{ online: boolean }>(`/v1/devices/${deviceId}/status`)
+}
+
+export interface RingHistoryEvent {
+  id: string
+  /** Epoch milliseconds. */
+  start: number
+  end: number
+  /** 'on_demand' for anything the Playground simulates. See FL-008. */
+  eventType: string
+  /** Ring's own computer-vision detections. Always empty in the Playground. */
+  detections: { type: string; id: string }[]
+}
+
+/**
+ * Recent events for a device, newest first.
+ *
+ * The documented `?event_type=` and `?filter[event_type]=` parameters are
+ * silently ignored — the same rows come back either way — so filtering is done
+ * here rather than asked of the API.
+ */
+export async function listEvents(deviceId: string): Promise<RingHistoryEvent[]> {
+  const doc = await ring<JsonApiDoc>(`/v1/history/devices/${deviceId}/events`)
+
+  return doc.data
+    .map((e) => {
+      const a = (e.attributes ?? {}) as { start?: number; end?: number; event_type?: string }
+      const rel = e.relationships?.cv_detections as unknown as
+        | { data?: { type: string; id: string }[] }
+        | undefined
+      return {
+        id: e.id,
+        start: a.start ?? 0,
+        end: a.end ?? 0,
+        eventType: a.event_type ?? 'unknown',
+        detections: rel?.data ?? [],
+      }
+    })
+    .sort((x, y) => y.start - x.start)
 }
 
 /**

@@ -78,3 +78,28 @@ Submissions with friction logs can earn up to a 10% judging bonus.
   subscription and no physical device — but this needs to be signposted for non-US entrants.
 - **Suggestion:** Call out the Playground as the explicit supported path for non-US developers
   in the hackathon Ring resources, and publish a region roadmap.
+
+---
+
+## FL-005 — The Ring console's own sign-in redirect lands on a 404, blocking onboarding at step one
+- **Date:** 2026-09-19
+- **Tool:** Amazon Developer account registration / Ring Developer Console
+- **Task:** Reach the Ring Developer Console to obtain Playground credentials.
+- **Steps:** From developer.ring.com, followed the "Become a Developer" button, which points at
+  `https://developer.amazon.com/ring/console`. Signed in with a valid Amazon account. The
+  console redirected to
+  `https://developer.amazon.com/settings/console/registration?return_to=/ring/console`.
+- **Expected:** The Amazon Developer registration form, then a return to the Ring console.
+- **Actual:** **404 Page not found.** The account is signed in — the site chrome and the account
+  avatar both render — but the registration step the console itself redirected to does not exist
+  at that URL. The same path *without* the `return_to` query parameter
+  (`https://developer.amazon.com/settings/console/registration`) resolves normally.
+- **Severity:** Critical
+- **Workaround:** Open `https://developer.amazon.com/settings/console/registration` directly with
+  no query string, complete the developer registration, then navigate to
+  `https://developer.amazon.com/ring/console` as a separate step.
+- **Suggestion:** The `return_to` parameter appears to break the registration route's resolution.
+  Every new Ring developer arriving through the documented "Become a Developer" path hits this,
+  and a 404 at the very first step reads as "this platform is broken" rather than "you need to
+  register". Fix the redirect, and in the meantime add the direct registration URL to the Ring
+  get-started guide.

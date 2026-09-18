@@ -160,3 +160,36 @@ Submissions with friction logs can earn up to a 10% judging bonus.
 - **Suggestion:** Return `400` with the offending field named, and reserve `403` for genuine
   authorization failures. Prefixing a validation message with "Cannot authorize" sends
   developers to the wrong place entirely.
+
+---
+
+## FL-008 — The Playground's Package / Vehicle / Motion buttons all emit the same undifferentiated event
+- **Date:** 2026-09-19
+- **Tool:** Ring Developer Playground — "Simulate live view event"
+- **Task:** Produce the three event kinds the Playground advertises, so an app can be developed
+  against realistic doorstep signals.
+- **Steps:** Clicked **Package**, then **Vehicle**, then **Motion**. Polled
+  `GET /v1/history/devices/{id}/events` after each.
+- **Expected:** Three distinguishable events — at minimum `motion_detected` carrying
+  `attributes.sub_type` of `package`, `vehicle` and `human`, which is exactly the shape the
+  webhook documentation describes and the only thing that makes the three buttons different
+  from one button.
+- **Actual:** All three produce an identical record:
+  `event_type: "on_demand"`, `cv_detections: { data: [] }`, no `sub_type`, no classification of
+  any kind. The three buttons are indistinguishable downstream. `?include=cv_detections` returns
+  an empty `included` array every time, and neither `?event_type=` nor `?filter[event_type]=`
+  has any effect — the same six rows come back regardless.
+- **Severity:** Important
+- **Workaround:** Classify the visitor ourselves from the WHEP frames and snapshots rather than
+  reading Ring's classification. Workable, and arguably the better architecture, but it means
+  the entire `sub_type` branch of the code is written blind against documentation and cannot be
+  tested before submission.
+- **Suggestion:** Three things.
+  1. Make the buttons emit `motion_detected` with the matching `sub_type`. A simulator whose
+     three options are identical is teaching developers nothing about the real event shape.
+  2. Populate `cv_detections` on simulated events, even with one canned detection. The
+     relationship exists on every event and is documented nowhere in the main API reference;
+     right now there is no way to learn its payload shape short of owning a real device.
+  3. Either implement the event-history query parameters or reject unknown ones. Silently
+     ignoring `?event_type=` reads as "this device has only on_demand events" rather than
+     "this filter does nothing", which is a slow and avoidable misunderstanding.

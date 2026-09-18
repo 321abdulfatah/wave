@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { classifyLandmarks, gestureSpec } from '@/lib/gestures/vocabulary'
+import { openWhepSession } from '@/lib/ring/whep'
 import type { Gesture } from '@/lib/ring/types'
 
 /**
@@ -21,9 +22,13 @@ const COOLDOWN_MS = 2500
 
 export default function GestureReader({
   enabled,
+  ringDeviceId,
   onGesture,
 }: {
   enabled: boolean
+  /** When set, frames come from this Ring camera's WHEP live view instead of
+   *  the local webcam. Same landmarks, same classifier, same everything after. */
+  ringDeviceId?: string
   onGesture: (g: Gesture, confidence: number) => void
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -111,7 +116,6 @@ export default function GestureReader({
     ;(async () => {
       try {
         const { Hands } = await import('@mediapipe/hands')
-        const { Camera } = await import('@mediapipe/camera_utils')
         if (cancelled) return
 
         const hands = new Hands({
@@ -130,26 +134,54 @@ export default function GestureReader({
         const video = videoRef.current
         if (!video) return
 
-        const camera = new Camera(video, {
-          onFrame: async () => {
-            await hands.send({ image: video })
-          },
-          width: 480,
-          height: 360,
-        })
-
-        await camera.start()
-        if (cancelled) {
-          camera.stop()
-          return
+        // Either source ends up as a MediaStream on the same <video>, so the
+        // inference loop below does not care which one it is.
+        let closeSource: () => Promise<void> | void
+        if (ringDeviceId) {
+          const session = await openWhepSession(ringDeviceId)
+          if (cancelled) {
+            await session.close()
+            return
+          }
+          video.srcObject = session.stream
+          closeSource = session.close
+        } else {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { width: 480, height: 360 },
+          })
+          if (cancelled) {
+            for (const t of stream.getTracks()) t.stop()
+            return
+          }
+          video.srcObject = stream
+          closeSource = () => {
+            for (const t of stream.getTracks()) t.stop()
+          }
         }
+
+        await video.play()
         setStatus('live')
 
+        // A rAF loop rather than @mediapipe/camera_utils, because that helper
+        // owns getUserMedia itself and cannot be pointed at a WebRTC stream.
+        let frame = 0
+        let inFlight = false
+        const tick = async () => {
+          frame = requestAnimationFrame(tick)
+          if (inFlight || video.readyState < 2) return
+          inFlight = true
+          try {
+            await hands.send({ image: video })
+          } finally {
+            inFlight = false
+          }
+        }
+        frame = requestAnimationFrame(tick)
+
         cleanupRef.current = () => {
-          camera.stop()
+          cancelAnimationFrame(frame)
           hands.close()
-          const tracks = (video.srcObject as MediaStream | null)?.getTracks() ?? []
-          for (const t of tracks) t.stop()
+          void closeSource()
           video.srcObject = null
         }
       } catch (err) {
@@ -164,7 +196,7 @@ export default function GestureReader({
       cleanupRef.current?.()
       cleanupRef.current = null
     }
-  }, [enabled, handleResults])
+  }, [enabled, ringDeviceId, handleResults])
 
   const spec = reading ? gestureSpec(reading.gesture) : undefined
 
@@ -175,7 +207,7 @@ export default function GestureReader({
         style={{ background: 'var(--ink-raised)' }}
       >
         <video ref={videoRef} className="hidden" playsInline muted />
-        <canvas ref={canvasRef} className="h-full w-full -scale-x-100 object-cover" />
+        <canvas ref={canvasRef} className={`h-full w-full object-cover ${ringDeviceId ? '' : '-scale-x-100'}`} />
 
         {status !== 'live' && (
           <div className="absolute inset-0 grid place-items-center px-6 text-center">
@@ -183,7 +215,10 @@ export default function GestureReader({
               {status === 'idle' && 'Starts when a conversation opens.'}
               {status === 'loading' && 'Starting camera…'}
               {status === 'denied' && 'Camera permission denied. Allow it and reopen.'}
-              {status === 'error' && 'No camera available on this machine.'}
+              {status === 'error' &&
+                (ringDeviceId
+                  ? 'Could not open the Ring live view. The token may have expired.'
+                  : 'No camera available on this machine.')}
             </p>
           </div>
         )}
@@ -226,7 +261,9 @@ export default function GestureReader({
       </div>
 
       <p className="text-[11px] leading-relaxed text-faint">
-        Frames are read in the browser. Only the gesture label is sent — no video leaves this page.
+        {ringDeviceId
+          ? 'Ring live view over WHEP. Frames are read in the browser; only the gesture label is stored.'
+          : 'Frames are read in the browser. Only the gesture label is sent — no video leaves this page.'}
       </p>
     </div>
   )

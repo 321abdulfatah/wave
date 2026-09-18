@@ -31,6 +31,7 @@ export default function Dashboard({ mock }: { mock: boolean }) {
   const [rationale, setRationale] = useState<string>('')
   const [connected, setConnected] = useState(false)
   const [cameraOn, setCameraOn] = useState(false)
+  const [useRing, setUseRing] = useState(false)
   const liveRegion = useRef<HTMLElement | null>(null)
   /** Event ids already seen, so a reconnect's snapshot does not re-announce. */
   const knownIds = useRef<Set<string>>(new Set())
@@ -103,6 +104,9 @@ export default function Dashboard({ mock }: { mock: boolean }) {
   )
 
   const active = selected?.resolution === 'in_progress'
+
+  /** The first non-chime device, which is what a live view can be opened on. */
+  const liveDevice = useMemo(() => devices.find((d) => d.kind !== 'chime'), [devices])
 
   /* ---- actions -------------------------------------------------------- */
   const sendGesture = useCallback(
@@ -193,7 +197,7 @@ export default function Dashboard({ mock }: { mock: boolean }) {
               <div>
                 <h3 className="text-[13px] font-semibold tracking-tight">Camera</h3>
                 <p className="mt-1 text-[11.5px] leading-relaxed text-faint">
-                  Same pipeline the Ring WHEP stream feeds in production.
+                  {useRing ? 'Ring live view over WHEP.' : 'Local webcam, same pipeline.'}
                 </p>
               </div>
               <button
@@ -207,8 +211,34 @@ export default function Dashboard({ mock }: { mock: boolean }) {
                 {cameraOn ? 'Stop' : 'Start'}
               </button>
             </div>
+
+            {/* Both sources run the identical landmark pipeline, so switching
+                between them is a fair test of the classifier, not a fallback. */}
+            <div className="mb-3 grid grid-cols-2 gap-1 rounded-lg border p-1" style={{ background: 'var(--ink-raised)' }}>
+              {(
+                [
+                  [false, 'Webcam'],
+                  [true, 'Ring live'],
+                ] as const
+              ).map(([val, label]) => (
+                <button
+                  key={label}
+                  onClick={() => setUseRing(val)}
+                  disabled={val && !liveDevice}
+                  className="rounded-md px-2 py-1.5 text-[11px] font-semibold transition disabled:opacity-35"
+                  style={{
+                    background: useRing === val ? 'var(--signal-soft)' : 'transparent',
+                    color: useRing === val ? 'var(--signal)' : 'var(--text-dim)',
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
             <GestureReader
               enabled={cameraOn}
+              ringDeviceId={useRing ? liveDevice?.id : undefined}
               onGesture={(g, c) => {
                 if (active) sendGesture(g, c)
               }}

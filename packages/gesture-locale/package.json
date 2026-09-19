@@ -1,0 +1,17 @@
+{
+  "name": "gesture-locale",
+  "version": "0.1.0",
+  "description": "Culturally safe hand-gesture vocabularies for computer-vision interfaces. A gesture is not universal — thumbs-up is obscene in Iran, the open palm is the moútza in Greece, and a closed fist reads as a threat to 98% of the world.",
+  "keywords": ["gesture", "mediapipe", "i18n", "l10n", "accessibility", "computer-vision", "culture"],
+  "license": "MIT",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": { ".": "./src/index.js" },
+  "files": ["src", "README.md", "SOURCES.md", "LICENSE"],
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "repository": { "type": "git", "url": "https://github.com/321abdulfatah/gesture-locale" },
+  "engines": { "node": ">=18" }
+}

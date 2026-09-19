@@ -1,5 +1,6 @@
 import { listEvents, subscribe } from '@/lib/store'
 import { startPolling } from '@/lib/ring/poller'
+import { localiseEvent } from '@/lib/ring/mock'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,6 +13,7 @@ export const dynamic = 'force-dynamic'
  */
 export async function GET(req: Request) {
   const encoder = new TextEncoder()
+  const locale = new URL(req.url).searchParams.get('locale') ?? 'en-US'
 
   // Kick the Ring poller off the first time anyone opens the dashboard. It is
   // idempotent, and there is no point polling a doorbell nobody is watching.
@@ -23,10 +25,10 @@ export async function GET(req: Request) {
         controller.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`))
       }
 
-      send('snapshot', listEvents())
+      send('snapshot', listEvents().map((e) => localiseEvent(e, locale)))
       send('source', polling)
 
-      const unsubscribe = subscribe((e) => send('door', e))
+      const unsubscribe = subscribe((e) => send('door', localiseEvent(e, locale)))
 
       // Proxies drop idle connections; a comment every 25s keeps the pipe warm
       // without showing up as an event on the client.

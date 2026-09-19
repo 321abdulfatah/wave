@@ -36,25 +36,33 @@ export interface TranscriberStatus {
   explanation: string
 }
 
-export function transcriberStatus(): TranscriberStatus {
+const EXPLAIN = {
+  en: {
+    aws: 'Amazon Transcribe streaming. Audio from the doorbell is sent to AWS in the configured region and discarded after transcription; only the text is kept.',
+    none: 'No transcription backend configured, so nothing is captioned and no audio leaves this machine. Set AWS_REGION and AWS_ACCESS_KEY_ID to enable Amazon Transcribe.',
+  },
+  ar: {
+    aws: 'خدمة Amazon Transcribe. يُرسَل صوت الجرس إلى AWS في المنطقة المُعدّة ثم يُحذف بعد الكتابة؛ يبقى النص وحده.',
+    none: 'لا توجد خدمة كتابة مُعدّة، فلا يُكتب شيء ولا يغادر أي صوت هذا الجهاز. اضبطوا AWS_REGION و AWS_ACCESS_KEY_ID لتفعيل Amazon Transcribe.',
+  },
+}
+
+export function transcriberStatus(locale = 'en-US'): TranscriberStatus {
+  const e = locale.startsWith('ar') ? EXPLAIN.ar : EXPLAIN.en
   const hasAws = Boolean(process.env.AWS_REGION && process.env.AWS_ACCESS_KEY_ID)
 
   if (hasAws) {
     return {
       backend: 'aws-transcribe',
       available: true,
-      explanation:
-        'Amazon Transcribe streaming. Audio from the doorbell is sent to AWS in the configured ' +
-        'region and discarded after transcription; only the text is kept.',
+      explanation: e.aws,
     }
   }
 
   return {
     backend: 'none',
     available: false,
-    explanation:
-      'No transcription backend configured, so nothing is captioned and no audio leaves this ' +
-      'machine. Set AWS_REGION and AWS_ACCESS_KEY_ID to enable Amazon Transcribe.',
+    explanation: e.none,
   }
 }
 

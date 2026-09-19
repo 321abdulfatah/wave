@@ -53,7 +53,7 @@ export default function Dashboard({ mock }: { mock: boolean }) {
 
   /* ---- live event feed ------------------------------------------------ */
   useEffect(() => {
-    const es = new EventSource('/api/ring/events')
+    const es = new EventSource(`/api/ring/events?locale=${locale}`)
 
     es.addEventListener('open', () => setConnected(true))
     es.addEventListener('error', () => setConnected(false))
@@ -91,23 +91,23 @@ export default function Dashboard({ mock }: { mock: boolean }) {
         // A brand new event always takes focus — that is the whole point of the
         // product: the resident cannot hear it happen.
         setSelectedId(incoming.id)
-        announce(`Someone is at the ${incoming.deviceName}`)
+        announce(t.isAtThe(t.visitor.unknown, incoming.deviceName))
       }
     })
 
     return () => es.close()
-  }, [])
+  }, [locale])
 
   useEffect(() => {
-    fetch('/api/ring/devices')
+    fetch(`/api/ring/devices?locale=${locale}`)
       .then((r) => r.json())
       .then((d) => setDevices(d.devices ?? []))
       .catch(() => setDevices([]))
-    fetch('/api/memory')
+    fetch(`/api/memory?locale=${locale}`)
       .then((r) => r.json())
       .then((d) => setMemory(d.memory ?? []))
       .catch(() => setMemory([]))
-  }, [])
+  }, [locale])
 
   const announce = (text: string) => {
     if (liveRegion.current) liveRegion.current.textContent = text
@@ -130,7 +130,7 @@ export default function Dashboard({ mock }: { mock: boolean }) {
       const res = await fetch('/api/agent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ eventId: selected.id, gesture, confidence }),
+        body: JSON.stringify({ eventId: selected.id, gesture, confidence, locale }),
       })
       if (!res.ok) return
       const { event, decision } = await res.json()
@@ -139,7 +139,7 @@ export default function Dashboard({ mock }: { mock: boolean }) {
       setRationale(decision.rationale)
       announce(decision.speak || resolutionLabel(event.resolution as Resolution, t))
     },
-    [selected],
+    [selected, locale],
   )
 
   const onLocale = useCallback((code: string, d: 'ltr' | 'rtl') => {
@@ -151,12 +151,12 @@ export default function Dashboard({ mock }: { mock: boolean }) {
     const res = await fetch('/api/simulate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ visitor }),
+      body: JSON.stringify({ visitor, locale }),
     })
     const { decision } = await res.json()
     setExpecting(decision.expecting)
     setRationale(decision.rationale)
-  }, [])
+  }, [locale])
 
   return (
     <I18nProvider locale={locale}>
@@ -173,8 +173,10 @@ export default function Dashboard({ mock }: { mock: boolean }) {
                   <div>
                     <div className="eyebrow">{selected.deviceName}</div>
                     <h2 className="display mt-1 text-[28px] font-semibold leading-[1.15]">
-                      {selected.visitorLabel ?? visitorTitle(selected.visitor)}
-                      <span className="text-ink-3"> is at the {selected.deviceName}.</span>
+                      {t.isAtThe(
+                        selected.visitorLabel ?? visitorTitle(selected.visitor, t),
+                        selected.deviceName,
+                      )}
                     </h2>
                     <p className="mt-1 text-xs text-faint">
                       {timeAgo(selected.startedAt)} · {t.triggeredBy}{' '}
@@ -273,25 +275,25 @@ export default function Dashboard({ mock }: { mock: boolean }) {
           </section>
 
           <Panel
-            title="{t.gestureVocabulary}"
-            hint="{t.gestureSubtitle}"
+            title={t.gestureVocabulary}
+            hint={t.gestureSubtitle}
           >
             <GestureKey expecting={expecting} disabled={!active} onSend={sendGesture} />
             {!active && (
               <p className="mt-3 text-[11px] leading-relaxed text-faint">
-                Enabled while a conversation is open. Start one below to try it.
+                {t.enabledWhileOpen}
               </p>
             )}
           </Panel>
 
-          <Panel title="{t.ringTheDoorbell}" hint="{t.gestureSubtitle}">
+          <Panel title={t.ringTheDoorbell} hint={t.simSubtitle}>
             <div className="grid grid-cols-2 gap-2">
               {(
                 [
-                  ['courier', '📦 Courier'],
-                  ['stranger', '🧍 Stranger'],
-                  ['known', '🤝 Known visitor'],
-                  ['vehicle', '🚗 Vehicle'],
+                  ['courier', t.sim.courier],
+                  ['stranger', t.sim.stranger],
+                  ['known', t.sim.known],
+                  ['vehicle', t.sim.vehicle],
                 ] as const
               ).map(([kind, label]) => (
                 <button
@@ -306,7 +308,7 @@ export default function Dashboard({ mock }: { mock: boolean }) {
             </div>
           </Panel>
 
-          <Panel title="{t.whoWaveRemembers}" hint="{t.whoWaveRemembers}">
+          <Panel title={t.whoWaveRemembers}>
             <ul className="space-y-2.5">
               {memory.map((m) => (
                 <li key={m.label} className="rounded-lg border p-3" style={{ background: 'var(--ink-raised)' }}>
@@ -319,7 +321,7 @@ export default function Dashboard({ mock }: { mock: boolean }) {
                   )}
                 </li>
               ))}
-              {memory.length === 0 && <li className="text-xs text-faint">Nobody yet.</li>}
+              {memory.length === 0 && <li className="text-xs text-faint">{t.nobodyYet}</li>}
             </ul>
           </Panel>
 
@@ -484,7 +486,7 @@ function History({
                   }}
                 />
                 <span className="min-w-0 flex-1 truncate text-[13px]">
-                  {e.visitorLabel ?? visitorTitle(e.visitor)}
+                  {e.visitorLabel ?? visitorTitle(e.visitor, t)}
                   <span className="ms-2 text-faint">{e.deviceName}</span>
                 </span>
                 <span className="shrink-0 font-mono text-[10.5px] text-faint">
@@ -512,16 +514,8 @@ function Empty() {
   )
 }
 
-function visitorTitle(kind: string) {
-  return (
-    {
-      courier: 'Delivery at the door',
-      known: 'Someone you know',
-      stranger: 'Unrecognised visitor',
-      vehicle: 'Vehicle detected',
-      unknown: 'Someone at the door',
-    }[kind] ?? 'Someone at the door'
-  )
+function visitorTitle(kind: string, t: ReturnType<typeof stringsFor>) {
+  return t.visitor[kind as keyof typeof t.visitor] ?? t.visitor.unknown
 }
 
 function timeAgo(iso: string) {

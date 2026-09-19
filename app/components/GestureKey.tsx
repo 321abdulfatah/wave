@@ -2,6 +2,7 @@
 
 import { GESTURES } from '@/lib/gestures/vocabulary'
 import type { Gesture } from '@/lib/ring/types'
+import { useT } from '@/lib/i18n/context'
 
 /**
  * The gesture vocabulary, shown as a key.
@@ -19,18 +20,20 @@ export default function GestureKey({
   disabled: boolean
   onSend: (g: Gesture, confidence: number) => void
 }) {
+  const t = useT()
   return (
     <div className="grid grid-cols-5 gap-2">
       {GESTURES.map((g) => {
         const isExpected = expecting.includes(g.id)
+        const loc = t.gestures[g.id] ?? { label: g.label, meaning: g.meaning }
         return (
           <button
             key={g.id}
             type="button"
             disabled={disabled}
             onClick={() => onSend(g.id, 0.93)}
-            title={g.meaning}
-            aria-label={`${g.label} — ${g.meaning}`}
+            title={loc.meaning}
+            aria-label={`${loc.label} — ${loc.meaning}`}
             className="group flex flex-col items-center gap-1.5 rounded-xl border px-2 py-3 transition
                        disabled:cursor-not-allowed disabled:opacity-35 enabled:hover:-translate-y-0.5"
             style={{
@@ -43,13 +46,13 @@ export default function GestureKey({
               style={{ borderColor: 'currentColor' }}
               aria-hidden
             >
-              {g.label.slice(0, 2).toUpperCase()}
+              {loc.label.slice(0, 2)}
             </span>
             <span
               className="text-center text-[10px] font-semibold leading-tight"
               style={{ color: isExpected ? 'var(--signal)' : 'var(--text-dim)' }}
             >
-              {g.label}
+              {loc.label}
             </span>
           </button>
         )

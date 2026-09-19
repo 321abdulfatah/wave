@@ -77,6 +77,25 @@ export interface Strings {
   gesturesSafe: (n: number) => string
   withheld: (n: number) => string
 
+  // gesture names and meanings, shown wherever a gesture is named
+  gestures: Record<string, { label: string; meaning: string }>
+
+  // who is at the door
+  visitor: Record<'courier' | 'known' | 'stranger' | 'vehicle' | 'unknown', string>
+
+  // the simulate panel
+  sim: Record<'courier' | 'stranger' | 'known' | 'vehicle', string>
+
+  // regions in the locale switcher
+  regions: Record<string, string>
+
+  nobodyYet: string
+  noAudioTrack: string
+  startsWhenOpen: string
+  enabledWhileOpen: string
+  noVideoLeaves: string
+  simSubtitle: string
+
   // what the door says to a visitor
   door: {
     greetCourier: string
@@ -142,6 +161,39 @@ const en: Strings = {
     'you pick.',
   gesturesSafe: (n) => `${n} gestures safe`,
   withheld: (n) => `${n} withheld`,
+
+  gestures: {
+    nod: { label: 'Nod', meaning: 'Yes' },
+    shake: { label: 'Head shake', meaning: 'No' },
+    thumbs_up: { label: 'Thumbs up', meaning: 'Good — acknowledged' },
+    thumbs_down: { label: 'Thumbs down', meaning: 'No' },
+    open_palm: { label: 'Open palm', meaning: 'Wait' },
+    present: { label: 'Presenting hand', meaning: 'Leaving it here' },
+    purse: { label: 'Purse hand', meaning: 'Wait' },
+    index_up: { label: 'Raised index', meaning: 'One moment' },
+    wave: { label: 'Wave', meaning: 'Hello — I am a person, not a delivery' },
+  },
+  visitor: {
+    courier: 'Delivery at the door',
+    known: 'Someone you know',
+    stranger: 'Unrecognised visitor',
+    vehicle: 'Vehicle detected',
+    unknown: 'Someone at the door',
+  },
+  sim: { courier: 'Courier', stranger: 'Stranger', known: 'Known visitor', vehicle: 'Vehicle' },
+  regions: {
+    Europe: 'Europe',
+    Americas: 'Americas',
+    'Middle East': 'Middle East',
+    Asia: 'Asia',
+    Africa: 'Africa',
+  },
+  nobodyYet: 'Nobody yet.',
+  noAudioTrack: 'No audio track on this stream yet.',
+  startsWhenOpen: 'Starts when a conversation opens.',
+  enabledWhileOpen: 'Enabled while a conversation is open. Start one below to try it.',
+  noVideoLeaves: 'Frames are read in the browser. Only the gesture label is sent — no video leaves this page.',
+  simSubtitle: 'Stands in for a Playground event.',
 
   door: {
     greetCourier:
@@ -211,6 +263,39 @@ const ar: Strings = {
     'ثم يستخدم الإشارات الآمنة لدى كل من اخترتم فقط.',
   gesturesSafe: (n) => `${n} إشارات آمنة`,
   withheld: (n) => `حُجبت ${n}`,
+
+  gestures: {
+    nod: { label: 'إيماءة', meaning: 'نعم' },
+    shake: { label: 'هزّ الرأس', meaning: 'لا' },
+    thumbs_up: { label: 'إبهام لأعلى', meaning: 'جيّد — فهمت' },
+    thumbs_down: { label: 'إبهام لأسفل', meaning: 'لا' },
+    open_palm: { label: 'كفّ مفتوحة', meaning: 'انتظروا' },
+    present: { label: 'يد مُقدِّمة', meaning: 'سأتركه هنا' },
+    purse: { label: 'تجميع الأصابع', meaning: 'انتظروا' },
+    index_up: { label: 'سبّابة مرفوعة', meaning: 'لحظة واحدة' },
+    wave: { label: 'تلويح', meaning: 'أهلاً — أنا شخص، لا توصيلة' },
+  },
+  visitor: {
+    courier: 'توصيلة عند الباب',
+    known: 'شخص تعرفونه',
+    stranger: 'زائر غير معروف',
+    vehicle: 'رُصدت مركبة',
+    unknown: 'أحدهم عند الباب',
+  },
+  sim: { courier: 'ساعي توصيل', stranger: 'غريب', known: 'زائر معروف', vehicle: 'مركبة' },
+  regions: {
+    Europe: 'أوروبا',
+    Americas: 'الأمريكتان',
+    'Middle East': 'الشرق الأوسط',
+    Asia: 'آسيا',
+    Africa: 'أفريقيا',
+  },
+  nobodyYet: 'لا أحد بعد.',
+  noAudioTrack: 'لا مسار صوتي في هذا البث بعد.',
+  startsWhenOpen: 'يبدأ عند فتح محادثة.',
+  enabledWhileOpen: 'يعمل أثناء المحادثة. ابدأوا واحدة من الأسفل للتجربة.',
+  noVideoLeaves: 'تُقرأ الإطارات في المتصفح. تُرسَل تسمية الإشارة فقط — لا يغادر أي فيديو هذه الصفحة.',
+  simSubtitle: 'يقوم مقام حدث من الـ Playground.',
 
   door: {
     // No religiously-marked greeting: the door does not know who is arriving.

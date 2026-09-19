@@ -51,6 +51,56 @@ export const MOCK_MEMORY: VisitorMemory[] = [
 
 const ago = (min: number) => new Date(Date.now() - min * 60_000).toISOString()
 
+/**
+ * Demo data, localised.
+ *
+ * A real Ring device name is typed by the resident in the Ring app, so it is
+ * correctly left untranslated in production. This is our scripted scenario
+ * though, and a headline that reads "Pharmacy courier عند Front Door" mixes
+ * scripts mid-sentence — which is exactly the tell that a product was
+ * translated rather than localised.
+ */
+const AR_DEVICE: Record<string, string> = {
+  dev_front_door: 'الباب الأمامي',
+  dev_hallway_chime: 'جرس الممر',
+  dev_side_gate: 'البوابة الجانبية',
+}
+
+/** Swap the demo names inside a live event record. */
+export function localiseEvent<T extends { deviceId: string; deviceName: string; visitorLabel?: string }>(
+  event: T,
+  locale: string,
+): T {
+  if (!locale.startsWith('ar')) return event
+  return {
+    ...event,
+    deviceName: AR_DEVICE[event.deviceId] ?? event.deviceName,
+    visitorLabel: event.visitorLabel
+      ? event.visitorLabel.includes('Pharmacy')
+        ? 'ساعي الصيدلية'
+        : 'أحمد (الجار)'
+      : undefined,
+  }
+}
+
+export function localiseMock(locale: string) {
+  if (!locale.startsWith('ar')) return { devices: MOCK_DEVICES, memory: MOCK_MEMORY }
+  return {
+    devices: MOCK_DEVICES.map((d) => ({
+      ...d,
+      name: AR_DEVICE[d.id] ?? d.name,
+    })),
+    memory: MOCK_MEMORY.map((m) => ({
+      ...m,
+      label: m.kind === 'courier' ? 'ساعي الصيدلية' : 'أحمد (الجار)',
+      policy:
+        m.kind === 'courier'
+          ? 'اتركوا الأدوية عند الباب. أكّدوا دائماً بصورة.'
+          : 'أبلغوني دائماً، ولا تصرفوه أبداً.',
+    })),
+  }
+}
+
 export const MOCK_EVENTS: DoorEvent[] = [
   {
     id: 'evt_1042',

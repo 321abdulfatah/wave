@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server'
 import { isMockMode, listDevices, RingError } from '@/lib/ring/client'
-import { MOCK_DEVICES } from '@/lib/ring/mock'
+import { MOCK_DEVICES, localiseMock } from '@/lib/ring/mock'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET() {
+export async function GET(req: Request) {
+  const locale = new URL(req.url).searchParams.get('locale') ?? 'en-US'
+  const mockDevices = localiseMock(locale).devices
   if (isMockMode()) {
-    return NextResponse.json({ devices: MOCK_DEVICES, mock: true })
+    return NextResponse.json({ devices: mockDevices, mock: true })
   }
   try {
     return NextResponse.json({ devices: await listDevices(), mock: false })
@@ -15,7 +17,7 @@ export async function GET() {
     // Fall back rather than blanking the wall display — a hallway screen that
     // goes empty when the network blips is worse than one showing stale devices.
     return NextResponse.json(
-      { devices: MOCK_DEVICES, mock: true, error: (err as Error).message },
+      { devices: mockDevices, mock: true, error: (err as Error).message },
       { status: status === 401 ? 200 : status },
     )
   }

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { classifyLandmarks, gestureSpec } from '@/lib/gestures/vocabulary'
 import { openWhepSession } from '@/lib/ring/whep'
 import type { Gesture } from '@/lib/ring/types'
+import { useT } from '@/lib/i18n/context'
 
 /**
  * Live gesture reader.
@@ -34,6 +35,7 @@ export default function GestureReader({
   /** Surfaces the live stream so the caption layer can read its audio track. */
   onStream?: (s: MediaStream | null) => void
 }) {
+  const t = useT()
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const streakRef = useRef<{ gesture: Gesture; count: number }>({ gesture: 'none', count: 0 })
@@ -218,7 +220,7 @@ export default function GestureReader({
         {status !== 'live' && (
           <div className="absolute inset-0 grid place-items-center px-6 text-center">
             <p className="text-xs leading-relaxed text-faint">
-              {status === 'idle' && 'Starts when a conversation opens.'}
+              {status === 'idle' && t.startsWhenOpen}
               {status === 'loading' && 'Starting camera…'}
               {status === 'denied' && 'Camera permission denied. Allow it and reopen.'}
               {status === 'error' &&
@@ -235,11 +237,11 @@ export default function GestureReader({
             style={{ background: 'rgba(7,8,11,.82)', borderColor: 'rgba(255,176,32,.4)' }}
           >
             <span className="text-[11px] font-bold uppercase tracking-wide" aria-hidden>
-              {spec.label}
+              {t.gestures[reading!.gesture]?.label ?? spec.label}
             </span>
             <div className="min-w-0 flex-1">
               <div className="truncate text-[12px] font-semibold" style={{ color: 'var(--signal)' }}>
-                {spec.label}
+                {t.gestures[reading!.gesture]?.label ?? spec.label}
               </div>
               {/* Filling this bar is the visitor's only feedback that the door
                   has understood them — they cannot hear a confirmation tone. */}
@@ -267,9 +269,7 @@ export default function GestureReader({
       </div>
 
       <p className="text-[11px] leading-relaxed text-faint">
-        {ringDeviceId
-          ? 'Ring live view over WHEP. Frames are read in the browser; only the gesture label is stored.'
-          : 'Frames are read in the browser. Only the gesture label is sent — no video leaves this page.'}
+        {t.noVideoLeaves}
       </p>
     </div>
   )

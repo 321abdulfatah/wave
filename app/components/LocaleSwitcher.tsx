@@ -126,7 +126,7 @@ export default function LocaleSwitcher({
               {LOCALE_GROUPS.map((group) => (
                 <div key={group.label}>
                   <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-faint">
-                    {group.label}
+                    {t.regions[group.label] ?? group.label}
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {group.codes.map((code) => {
@@ -169,7 +169,7 @@ export default function LocaleSwitcher({
                 <ul className="mt-2.5 space-y-1">
                   {res.excluded.map((e) => (
                     <li key={e.gesture} className="text-[11.5px] leading-relaxed text-faint">
-                      <span className="line-through">{gestureSpec(e.gesture)?.label ?? e.gesture}</span>
+                      <span className="line-through">{t.gestures[e.gesture]?.label ?? gestureSpec(e.gesture)?.label ?? e.gesture}</span>
                       {' — '}
                       {e.because}
                     </li>

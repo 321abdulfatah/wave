@@ -1,4 +1,5 @@
 import type { DoorEvent, Gesture, Resolution, Turn, VisitorKind, VisitorMemory } from '@/lib/ring/types'
+import { stringsFor } from '@/lib/i18n/strings'
 
 /**
  * WAVE's doorstep conversation engine.
@@ -20,6 +21,9 @@ export interface AgentContext {
   turns: Turn[]
   /** Local hour, 0–23 — WAVE is quieter late at night. */
   hour: number
+  /** Which language the door speaks. The register research is prescriptive
+   *  here: Arabic uses plural-as-respect and phrases refusal as deferral. */
+  locale?: string
 }
 
 export interface AgentDecision {
@@ -35,13 +39,14 @@ export interface AgentDecision {
   rationale: string
 }
 
-const OPENERS: Record<VisitorKind, string> = {
-  courier:
-    'Hello. The resident here is Deaf and cannot come to the door. I can help — are you delivering something?',
-  known: 'Hello again. The resident is not able to come to the door, but I will let them know you are here.',
-  stranger: 'Hello. Nobody can come to the door right now. Are you expected?',
-  vehicle: '',
-  unknown: 'Hello. The resident here is Deaf. Give me a moment and I will help.',
+function openers(t: ReturnType<typeof stringsFor>): Record<VisitorKind, string> {
+  return {
+    courier: t.door.greetCourier,
+    known: t.door.greetKnown,
+    stranger: t.door.greetStranger,
+    vehicle: '',
+    unknown: t.door.greetUnknown,
+  }
 }
 
 /**
@@ -54,6 +59,7 @@ export function decide(ctx: AgentContext): AgentDecision {
   const lastVisitorTurn = [...ctx.turns].reverse().find((t) => t.from === 'visitor')
   const gesture = lastVisitorTurn?.gesture ?? 'none'
   const known = ctx.memory.find((m) => m.label === ctx.visitorLabel)
+  const t = stringsFor(ctx.locale ?? 'en-US')
 
   // A vehicle with nobody approaching is not a conversation. Log it and stop.
   if (ctx.visitor === 'vehicle') {
@@ -69,7 +75,7 @@ export function decide(ctx: AgentContext): AgentDecision {
   // Opening move: nothing has been said yet.
   if (ctx.turns.length === 0) {
     return {
-      speak: OPENERS[ctx.visitor],
+      speak: openers(t)[ctx.visitor],
       expecting: ['nod', 'thumbs_up', 'shake'],
       resolution: 'in_progress',
       notifyResident: ctx.visitor === 'known',
@@ -85,8 +91,7 @@ export function decide(ctx: AgentContext): AgentDecision {
     case 'nod':
     case 'thumbs_up':
       return {
-        speak:
-          'Thank you. Please leave it inside the porch, out of the rain, and show me an open hand once it is placed.',
+        speak: t.door.directToDropPoint,
         expecting: ['present', 'open_palm'],
         resolution: 'in_progress',
         notifyResident: false,
@@ -95,7 +100,7 @@ export function decide(ctx: AgentContext): AgentDecision {
 
     case 'present':
       return {
-        speak: 'Got it, I have a photo. Have a good day.',
+        speak: t.door.confirmed,
         expecting: [],
         resolution: 'left_at_door',
         notifyResident: true,
@@ -104,8 +109,7 @@ export function decide(ctx: AgentContext): AgentDecision {
 
     case 'wave':
       return {
-        speak:
-          'Understood. I have saved a clip and the resident will see it. Thank you for waiting.',
+        speak: t.door.messageSaved,
         expecting: [],
         resolution: 'message_taken',
         notifyResident: true,
@@ -114,7 +118,7 @@ export function decide(ctx: AgentContext): AgentDecision {
 
     case 'open_palm':
       return {
-        speak: 'No problem, take your time. I am still here.',
+        speak: t.door.holdOn,
         expecting: ['nod', 'present', 'shake'],
         resolution: 'in_progress',
         notifyResident: false,
@@ -124,7 +128,7 @@ export function decide(ctx: AgentContext): AgentDecision {
     case 'shake':
     case 'thumbs_down':
       return {
-        speak: 'Alright, nothing to do here. Take care.',
+        speak: t.door.closeDeclined,
         expecting: [],
         resolution: 'declined',
         notifyResident: false,
@@ -135,7 +139,7 @@ export function decide(ctx: AgentContext): AgentDecision {
       // No readable gesture. Ask once more, then escalate rather than loop.
       if (ctx.turns.filter((t) => t.from === 'door').length >= 2) {
         return {
-          speak: 'I could not read a reply. I have saved a clip for the resident. Goodbye.',
+          speak: t.door.givingUp,
           expecting: [],
           resolution: 'message_taken',
           notifyResident: true,
@@ -146,7 +150,7 @@ export function decide(ctx: AgentContext): AgentDecision {
         // Re-prompt with the head, not the hand: nod and shake are the two
         // highest-recognition emblems measured anywhere, and they work for
         // someone holding a parcel in both hands.
-        speak: 'I could not see that. Nod for yes, or shake your head for no.',
+        speak: t.door.notUnderstood,
         expecting: ['nod', 'shake', 'wave'],
         resolution: 'in_progress',
         notifyResident: false,

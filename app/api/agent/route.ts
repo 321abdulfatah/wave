@@ -21,6 +21,7 @@ const Body = z.object({
     'none',
   ]),
   confidence: z.number().min(0).max(1),
+  locale: z.string().optional(),
 })
 
 /**
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
   }
-  const { eventId, gesture, confidence } = parsed.data
+  const { eventId, gesture, confidence, locale } = parsed.data
 
   const event = getEvent(eventId)
   if (!event) return NextResponse.json({ error: 'unknown event' }, { status: 404 })
@@ -71,6 +72,7 @@ export async function POST(req: Request) {
     memory: listMemory(),
     turns: withVisitor.turns,
     hour: new Date().getHours(),
+    locale,
   })
 
   const next = applyDecision(withVisitor, decision)

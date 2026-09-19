@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { downsample, floatToPcm16, TRANSCRIBE_SAMPLE_RATE } from '@/lib/captions/transcriber'
 import type { CaptionChunk, TranscriberStatus } from '@/lib/captions/transcriber'
-import { useT } from '@/lib/i18n/context'
+import { useT, useLocale } from '@/lib/i18n/context'
 
 /**
  * Live captions for the visitor's speech.
@@ -28,15 +28,16 @@ export default function CaptionTrack({
   const [status, setStatus] = useState<TranscriberStatus | null>(null)
   const [listening, setListening] = useState(false)
   const t = useT()
+  const locale = useLocale()
   const scrollRef = useRef<HTMLDivElement>(null)
   const startedAt = useRef(0)
 
   useEffect(() => {
-    fetch('/api/captions/status')
+    fetch(`/api/captions/status?locale=${locale}`)
       .then((r) => r.json())
       .then(setStatus)
       .catch(() => setStatus(null))
-  }, [])
+  }, [locale])
 
   useEffect(() => {
     if (!stream || !active || !status?.available) return
@@ -157,7 +158,7 @@ export default function CaptionTrack({
               : !status.available
                 ? status.explanation
                 : !hasAudio
-                  ? 'No audio track on this stream yet.'
+                  ? t.noAudioTrack
                   : t.nothingSaidYet}
           </p>
         )}

@@ -35,6 +35,7 @@ function TurnRow({ turn }: { turn: Turn }) {
   const t = useT()
   const isDoor = turn.from === 'door'
   const spec = turn.gesture ? gestureSpec(turn.gesture) : undefined
+  const loc = turn.gesture ? t.gestures[turn.gesture] : undefined
 
   return (
     <div className={`flex gap-3 ${isDoor ? '' : 'flex-row-reverse'}`}>

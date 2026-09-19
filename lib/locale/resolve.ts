@@ -62,6 +62,23 @@ export function seedResidentLocale(preferred: readonly string[]): string {
   return DEFAULT_RESIDENT
 }
 
+const EXPLAIN = {
+  en: {
+    open: (n: number) =>
+      `No visitor languages configured, so the door uses only the gestures that are safe in all ${n} ` +
+      `locales it knows. Narrow this and more become available.`,
+    scoped: (names: string, n: number) =>
+      `Safe across ${names}. ` + (n ? `${n} gesture${n === 1 ? '' : 's'} withheld.` : 'Nothing withheld.'),
+  },
+  ar: {
+    open: (n: number) =>
+      `لم تُحدَّد لغات الزوار، فيستخدم الباب الإشارات الآمنة في اللغات الـ${n} التي يعرفها جميعاً. ` +
+      `ضيّقوا الاختيار لتتاح إشارات أكثر.`,
+    scoped: (names: string, n: number) =>
+      `آمنة لدى ${names}. ` + (n ? `حُجبت ${n} إشارة.` : 'لم يُحجب شيء.'),
+  },
+}
+
 export function resolve(residentCode: string, visitorCodes: string[]): LocaleResolution {
   const resident = LOCALES[residentCode] ?? LOCALES[DEFAULT_RESIDENT]
 
@@ -88,14 +105,14 @@ export function resolve(residentCode: string, visitorCodes: string[]): LocaleRes
     }
   }
 
+  const e = residentCode.startsWith('ar') ? EXPLAIN.ar : EXPLAIN.en
   const explanation =
     visitorCodes.length === 0
-      ? `No visitor languages configured, so the door uses only the gestures that are safe in all ` +
-        `${visitorLocales.length} locales it knows. Narrow this and more become available.`
-      : `Safe across ${visitorLocales.map((l) => l.name).join(', ')}. ` +
-        (excluded.length
-          ? `${excluded.length} gesture${excluded.length === 1 ? '' : 's'} withheld.`
-          : 'Nothing withheld.')
+      ? e.open(visitorLocales.length)
+      : e.scoped(
+          visitorLocales.map((l) => (residentCode.startsWith('ar') ? l.nativeName : l.name)).join('، '),
+          excluded.length,
+        )
 
   return { resident, visitorLocales, safeGestures, excluded, explanation }
 }

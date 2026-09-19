@@ -10,6 +10,7 @@ export const dynamic = 'force-dynamic'
 const Body = z.object({
   visitor: z.enum(['courier', 'known', 'stranger', 'vehicle', 'unknown']).default('courier'),
   deviceId: z.string().default('dev_front_door'),
+  locale: z.string().optional(),
 })
 
 /**
@@ -21,7 +22,7 @@ const Body = z.object({
  */
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}))
-  const { visitor, deviceId } = Body.parse(body)
+  const { visitor, deviceId, locale } = Body.parse(body)
 
   const device = MOCK_DEVICES.find((d) => d.id === deviceId) ?? MOCK_DEVICES[0]
   const memory = listMemory()
@@ -48,6 +49,7 @@ export async function POST(req: Request) {
     memory,
     turns: [],
     hour: new Date().getHours(),
+    locale,
   })
 
   if (decision.speak) {

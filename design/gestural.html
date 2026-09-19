@@ -132,6 +132,11 @@ ol,ul{ list-style:none; padding:0; }
 /* signal mode — hand printed in the alert colour */
 .glyph--signal{ --mass:var(--signal); --lineC:var(--signal-ink); --jt:var(--signal-ink); }
 
+/* ghost mode — a shape not yet in the vocabulary */
+.glyph--ghost{ --mass:transparent; --lineC:var(--rule); --jt:var(--rule); }
+.glyph--ghost .g-mass{ display:none; }
+.glyph--ghost .g-line{ stroke-width:2; stroke-dasharray:5 6; opacity:1; }
+
 /* ============================================================
    MASTHEAD
    ============================================================ */
@@ -556,6 +561,10 @@ ol,ul{ list-style:none; padding:0; }
   font-size:.64rem; letter-spacing:.18em; font-weight:600;
   color:var(--signal);
 }
+/* the sixth cell keeps the plate square at 2 and 3 columns */
+.keycard--blank .keycard__no,
+.keycard--blank .keycard__name{ color:var(--paper-dim); }
+@media (min-width:1100px){ .keycard--blank{ display:none; } }
 .keycard__art{
   margin:clamp(8px,1.2vw,14px) 0 clamp(12px,1.4vw,18px);
   padding:0 4%;
@@ -1151,6 +1160,18 @@ ol,ul{ list-style:none; padding:0; }
         <h3 class="keycard__name">Closed fist</h3>
         <span class="keycard__mean">No</span>
         <p class="keycard__note">Declines. The door thanks them and the event closes without entry.</p>
+      </li>
+
+      <li class="keycard keycard--blank">
+        <span class="keycard__no">06</span>
+        <div class="keycard__art">
+          <svg class="glyph glyph--ghost" viewBox="-16 -16 272 272" aria-hidden="true">
+            <use class="g-line" href="#hand-palm"/>
+            <use class="g-dots" href="#jt-palm"/>
+          </svg>
+        </div>
+        <h3 class="keycard__name">Reserved</h3>
+        <p class="keycard__note">The set grows from the doorstep &mdash; shapes visitors actually invent get added here.</p>
       </li>
 
     </ol>

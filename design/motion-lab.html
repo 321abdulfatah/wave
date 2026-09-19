@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="en" data-compare="1" data-rm="0" data-noflash="0" data-paused="0">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WAVE — Motion Lab</title>
+<meta name="description" content="Live reference implementation of the WAVE motion system. Every animation is a sound the resident cannot hear.">
+<style>
+/* ==========================================================================
+   WAVE — MOTION LAB
+   Reference implementation of docs/motion.md
+   Motion here is the notification channel, not decoration.
+   ========================================================================== */
+
+:root{
+  /* --- surface ------------------------------------------------------- */
+  --ink:      #07080A;
+  --ink-2:    #0B0D10;
+  --ink-3:    #101419;
+  --ink-4:    #171C23;
+  --line:     #232830;
+  --line-2:   #333B46;
+
+  /* --- type ---------------------------------------------------------- */
+  --bone:     #F2EFE8;
+  --muted:    #9BA3AC;
+  --faint:    #6C737B;
+
+  /* --- semantic ------------------------------------------------------ */
+  --signal:   #FFB020;   /* R/(R+G+B) = 0.55 — under the WCAG red-flash 0.8 */
+  --calm:     #6FD3AC;
+  --deny:     #E86A5A;   /* R/(R+G+B) = 0.54 */
+  --offline:  #8A93A0;
+
+  /* --- easing (IBM Carbon derived) ----------------------------------- */
+  --ease-door:   cubic-bezier(.2,0,.38,.9);
+  --ease-enter:  cubic-bezier(0,0,.3,1);
+  --ease-exit:   cubic-bezier(.4,.14,1,1);
+  --ease-breath: cubic-bezier(.37,0,.63,1);
+  --ease-swell:  cubic-bezier(.16,.72,.31,1);
+  --ease-settle: cubic-bezier(.34,1.26,.64,1);
+
+  /* --- duration ------------------------------------------------------ */
+  --d-tap:80ms; --d-quick:140ms; --d-base:220ms;
+  --d-considered:360ms; --d-deliberate:560ms; --d-arrival:900ms;
+
+  /* --- loop periods (the safety-critical ones) ----------------------- */
+  --loop-ring:    1200ms;  /* 0.83 Hz */
+  --loop-offline: 2400ms;  /* 0.42 Hz */
+  --loop-indet:   1400ms;  /* 0.71 Hz */
+  --loop-syl:      240ms;  /* 4.17 Hz — small-area exemption only */
+
+  --r-sm:8px; --r-md:14px; --r-lg:20px;
+  --sans: 'Inter','Segoe UI Variable','Segoe UI',system-ui,-apple-system,sans-serif;
+  --mono: ui-monospace,'Cascadia Code','SF Mono',Consolas,monospace;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+html,body{max-width:100%;overflow-x:hidden}
+body{
+  margin:0;
+  background:var(--ink);
+  color:var(--bone);
+  font-family:var(--sans);
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:4px}
+
+/* Global pause — satisfies WCAG 2.2.2 for this page, which loops everything. */
+html[data-paused="1"] *,
+html[data-paused="1"] *::before,
+html[data-paused="1"] *::after{animation-play-state:paused !important}
+
+/* ==========================================================================
+   Chrome
+   ========================================================================== */
+.wrap{max-width:1440px;margin:0 auto;padding:0 clamp(14px,3vw,32px) 80px}
+
+header.top{
+  position:sticky;top:0;z-index:20;
+  background:linear-gradient(to bottom,var(--ink) 72%,rgba(7,8,10,.86));
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+  padding:18px 0 14px;
+  margin-bottom:22px;
+}
+.brand{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.brand h1{font-size:clamp(20px,3vw,27px);margin:0;letter-spacing:-.02em;font-weight:600}
+.brand .sub{color:var(--signal);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.lede{color:var(--muted);max-width:74ch;margin:10px 0 0;font-size:14px}
+.lede b{color:var(--bone);font-weight:600}
+
+.controls{
+  display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;align-items:center;
+}
+.ctl{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--ink-3);border:1px solid var(--line);
+  color:var(--bone);border-radius:999px;
+  padding:7px 14px;font-size:12.5px;font-family:var(--sans);
+  cursor:pointer;
+  transition:border-color var(--d-base) var(--ease-door),
+             background-color var(--d-base) var(--ease-door),
+             color var(--d-base) var(--ease-door);
+}
+.ctl:hover{border-color:var(--line-2)}
+.ctl[aria-pressed="true"]{background:var(--signal);border-color:var(--signal);color:#08090B;font-weight:600}
+.ctl .dot{width:7px;height:7px;border-radius:50%;background:var(--faint)}
+.ctl[aria-pressed="true"] .dot{background:#08090B}
+.ctl.ghost[aria-pressed="true"]{background:var(--ink-4);border-color:var(--line-2);color:var(--bone)}
+.ctl.ghost[aria-pressed="true"] .dot{background:var(--signal)}
+.ctl:disabled{opacity:.4;cursor:not-allowed}
+
+.warnbar{
+  margin-top:12px;padding:9px 13px;border-radius:var(--r-sm);
+  background:rgba(255,176,32,.07);border:1px solid rgba(255,176,32,.24);
+  color:#F3D79A;font-size:12.5px;
+}
+
+/* ==========================================================================
+   Cards
+   ========================================================================== */
+.cards{
+  display:grid;gap:18px;
+  grid-template-columns:repeat(auto-fill,minmax(min(560px,100%),1fr));
+}
+.card{
+  background:var(--ink-2);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  padding:18px;
+  display:flex;flex-direction:column;gap:14px;
+}
+.card.wide{grid-column:1/-1}
+.card-h{display:flex;flex-direction:column;gap:6px}
+.card-h .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tier{
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+  padding:3px 7px;border-radius:5px;border:1px solid var(--line-2);color:var(--muted);
+}
+.tier.t0{color:var(--signal);border-color:rgba(255,176,32,.45);background:rgba(255,176,32,.08)}
+.tier.t1{color:var(--offline);border-color:rgba(138,147,160,.4)}
+.tier.t2{color:var(--calm);border-color:rgba(111,211,172,.35)}
+.tier.t3{color:var(--muted)}
+.tier.ref{color:var(--faint)}
+.card-h h2{margin:0;font-size:17.5px;font-weight:600;letter-spacing:-.01em}
+.card-h .job{margin:0;color:var(--muted);font-size:13.5px;max-width:70ch}
+.card-h .job b{color:var(--bone);font-weight:600}
+
+/* --- stages --- */
+.stages{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(250px,100%),1fr))}
+.stagewrap{display:flex;flex-direction:column;gap:6px;min-width:0}
+.stage-tag{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--faint);display:flex;align-items:center;gap:6px;
+}
+.stage-tag i{width:5px;height:5px;border-radius:50%;background:var(--calm);font-style:normal}
+.stagewrap.rmw .stage-tag i{background:var(--offline)}
+.stage{
+  position:relative;overflow:hidden;
+  background:#08090B;
+  border:1px solid var(--line);
+  border-radius:var(--r-md);
+  min-height:184px;
+  display:flex;align-items:center;justify-content:center;
+  isolation:isolate;
+}
+html:not([data-compare="1"]) .stagewrap.rmw{display:none}
+
+/* --- meta table --- */
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;margin:0;
+  background:var(--line);border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden}
+.meta > div{background:var(--ink-2);padding:8px 10px;margin:0}
+.meta dt{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin:0 0 3px}
+.meta dd{margin:0;font-size:12.5px;color:var(--bone);line-height:1.35}
+.meta dd.mono{font-family:var(--mono);font-size:11.5px}
+.meta dd.safe{color:var(--calm)}
+.meta dd.warn{color:var(--signal)}
+
+.cardfoot{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{
+  background:var(--ink-3);border:1px solid var(--line);color:var(--bone);
+  border-radius:999px;padding:6px 13px;font-size:12px;font-family:var(--sans);cursor:pointer;
+  transition:border-color var(--d-base) var(--ease-door),background-color var(--d-base) var(--ease-door);
+}
+.btn:hover{border-color:var(--line-2);background:var(--ink-4)}
+.btn[aria-pressed="true"]{border-color:var(--signal);color:var(--signal)}
+.note{font-size:12px;color:var(--faint);margin:0}
+.note b{color:var(--muted);font-weight:500}
+
+/* ==========================================================================
+   1 · THE RING  — the visual doorbell
+   ========================================================================== */
+.sc-ring{background:radial-gradient(120% 90% at 50% 0%,#0C0E12 0%,#08090B 70%)}
+.alertfx{position:absolute;inset:0;transition:opacity 2000ms var(--ease-breath)}
+.sc-ring.deesc .alertfx{opacity:.55}
+
+.doorpt{position:absolute;left:50%;top:26%;width:0;height:0}
+.rings i{
+  position:absolute;left:50%;top:26%;
+  width:56px;height:56px;margin:-28px 0 0 -28px;
+  border:2px solid var(--signal);border-radius:50%;
+  opacity:0;transform:scale(.06);
+  animation:ring-out var(--loop-ring) var(--ease-swell) infinite;
+  will-change:transform,opacity;
+}
+.rings i:nth-child(2){animation-delay:160ms}
+.rings i:nth-child(3){animation-delay:320ms;border-width:1px}
+@keyframes ring-out{
+  0%  {transform:scale(.06);opacity:0}
+  4%  {opacity:.92}
+  62% {transform:scale(7.4);opacity:0}
+  100%{transform:scale(7.4);opacity:0}
+}
+
+/* Edge bloom + field swell: pure opacity, ΔL held under 0.10 */
+.bloom{
+  position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  box-shadow:inset 0 0 0 3px var(--signal), inset 0 0 44px 6px rgba(255,176,32,.42);
+  opacity:.15;
+  animation:swell var(--loop-ring) infinite;
+}
+.field{
+  position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(130% 100% at 50% 26%,rgba(255,176,32,.20) 0%,rgba(255,176,32,0) 68%);
+  opacity:.15;
+  animation:swell var(--loop-ring) infinite;
+}
+@keyframes swell{            /* rise 420ms (35%) · fall 780ms (65%) */
+  0%  {opacity:.15;animation-timing-function:var(--ease-breath)}
+  35% {opacity:1;  animation-timing-function:var(--ease-breath)}
+  100%{opacity:.15}
+}
+
+.doorglyph{
+  position:absolute;left:50%;top:26%;transform:translate(-50%,-50%);
+  width:34px;height:46px;border:2px solid rgba(255,176,32,.85);border-radius:3px 3px 1px 1px;
+}
+.doorglyph::after{content:"";position:absolute;right:5px;top:50%;width:4px;height:4px;border-radius:50%;background:var(--signal)}
+.ringcopy{
+  position:absolute;left:0;right:0;bottom:14px;text-align:center;z-index:3;
+}
+.ringcopy strong{display:block;font-size:15px;letter-spacing:.06em;color:var(--bone)}
+.ringcopy span{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--signal);text-transform:uppercase}
+.rmbar{
+  display:none;position:absolute;left:10px;right:10px;bottom:10px;z-index:4;
+  background:var(--signal);color:#08090B;font-weight:700;letter-spacing:.04em;
+  text-align:center;padding:9px;border-radius:var(--r-sm);font-size:13px;
+}
+
+/* reduced: no scale, no travel — crossfade only */
+:is(.stage.rm,html[data-rm="1"] .stage) .rings{display:none}
+:is(.stage.rm,html[data-rm="1"] .stage) .ringcopy{display:none}
+:is(.stage.rm,html[data-rm="1"] .stage) .rmbar{display:block}
+/* level 3: no flashing at all — static, compensated with size + contrast */
+html[data-noflash="1"] .stage.rm .bloom{animation:none;opacity:1}
+html[data-noflash="1"] .stage.rm .field{animation:none;opacity:.8}
+html[data-noflash="1"] .stage.rm .rmbar{padding:16px;font-size:16px}
+
+/* ==========================================================================
+   2 · UTTERANCE — the door speaking
+   ========================================================================== */
+.sc-speak{flex-direction:column;gap:16px;padding:18px 16px}
+.bars{display:flex;align-items:flex-end;gap:6px;height:62px}
+.bars i{
+  display:block;width:7px;height:100%;border-radius:4px;
+  background:linear-gradient(to top,rgba(111,211,172,.45),var(--calm));
+  transform:scaleY(.08);transform-origin:bottom;
+  animation:speak 3840ms var(--ease-breath) infinite;
+}
+.bars i:nth-child(1){animation-delay:0ms}
+.bars i:nth-child(2){animation-delay:-40ms}
+.bars i:nth-child(3){animation-delay:-80ms}
+.bars i:nth-child(4){animation-delay:-120ms}
+.bars i:nth-child(5){animation-delay:-80ms}
+.bars i:nth-child(6){animation-delay:-40ms}
+.bars i:nth-child(7){animation-delay:0ms}
+@keyframes speak{ /* 16 beats × 240ms; the flat runs are phrase gaps */
+  0%  {transform:scaleY(.08)}
+  6%  {transform:scaleY(.62)}
+  12% {transform:scaleY(.30)}
+  18% {transform:scaleY(.88)}
+  24% {transform:scaleY(.38)}
+  30% {transform:scaleY(1)}
+  36% {transform:scaleY(.44)}
+  42% {transform:scaleY(.08)}
+  50% {transform:scaleY(.08)}
+  56% {transform:scaleY(.70)}
+  62% {transform:scaleY(.34)}
+  68% {transform:scaleY(.92)}
+  74% {transform:scaleY(.30)}
+  80% {transform:scaleY(.56)}
+  86% {transform:scaleY(.16)}
+  92% {transform:scaleY(.08)}
+  100%{transform:scaleY(.08)}
+}
+.caption{margin:0;text-align:center;font-size:14.5px;line-height:1.5;max-width:30ch;color:var(--faint)}
+.caption span{opacity:.16;transition:opacity 110ms var(--ease-door);color:var(--bone)}
+.caption span.on{opacity:1}
+.speaktag{
+  position:absolute;top:12px;left:12px;font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.13em;color:var(--calm);
+}
+.steps{display:none;gap:5px}
+.steps i{width:22px;height:6px;border-radius:3px;background:var(--ink-4);border:1px solid var(--line-2)}
+.steps i.on{background:var(--calm);border-color:var(--calm)}
+:is(.stage.rm,html[data-rm="1"] .stage) .bars i{animation:none}
+:is(.stage.rm,html[data-rm="1"] .stage) .bars i:nth-child(1){transform:scaleY(.30)}
+:is(.stage.rm,html[data-rm="1"] .stage) .bars i:nth-child(2){transform:scaleY(.55)}
+:is(.stage.rm,html[data-rm="1"] .stage) .bars i:nth-child(3){transform:scaleY(.42)}
+:is(.stage.rm,html[data-rm="1"] .stage) .bars i:nth-child(4){transform:scaleY(.70)}
+:is(.stage.rm,html[data-rm="1"] .stage) .bars i:nth-child(5){transform:scaleY(.38)}
+:is(.stage.rm,html[data-rm="1"] .stage) .bars i:nth-child(6){transform:scaleY(.50)}
+:is(.stage.rm,html[data-rm="1"] .stage) .bars i:nth-child(7){transform:scaleY(.26)}
+:is(.stage.rm,html[data-rm="1"] .stage) .bars{opacity:.45}
+:is(.stage.rm,html[data-rm="1"] .stage) .steps{display:flex}
+
+/* ==========================================================================
+   3 · CONFIDENCE BUILD — a gesture being read
+   ========================================================================== */
+.sc-gest{flex-direction:column;gap:12px}
+.gring{width:126px;height:126px;position:relative}
+.gring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.gring .trk{fill:none;stroke:var(--ink-4);stroke-width:2}
+.gring .arc{
+  fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round;
+  stroke-dasharray:289.03;stroke-dashoffset:289.03;
+  transition:stroke-dashoffset var(--d-quick) var(--ease-door),
+             stroke var(--d-quick) var(--ease-door),
+             stroke-width 180ms var(--ease-door);
+}
+.gring.locked .arc{stroke:var(--signal);stroke-width:3}
+.gring .val{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:1px;
+}
+.gring .val b{font-size:23px;font-variant-numeric:tabular-nums;font-weight:600;letter-spacing:-.02em}
+.gring .val em{font-style:normal;font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--faint);text-transform:uppercase}
+.gring.locked .val em{color:var(--signal)}
+.handglyph{font-size:26px;line-height:1}
+.gestnote{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--faint);text-transform:uppercase}
+:is(.stage.rm,html[data-rm="1"] .stage) .gring .arc{transition:none}
+
+/* ==========================================================================
+   4 · SEAL — accepted     5 · REFUSE — rejected
+   ========================================================================== */
+.sc-res{flex-direction:column;gap:14px}
+.resbox{width:108px;height:108px;position:relative;display:grid;place-items:center}
+.resring{
+  position:absolute;inset:0;border-radius:50%;border:3px solid var(--calm);
+}
+.resdisc{
+  width:108px;height:108px;border-radius:50%;background:var(--calm);
+  display:grid;place-items:center;transform:scale(0);opacity:0;
+}
+.resdisc svg{width:44px;height:44px}
+.release{
+  position:absolute;inset:0;border-radius:50%;border:2px solid var(--calm);
+  opacity:0;transform:scale(1);
+}
+.stage.run .resdisc{animation:seal-collapse 280ms var(--ease-settle) forwards}
+.stage.run .release{animation:seal-release 520ms var(--ease-exit) 280ms forwards}
+.stage.run .resring{animation:seal-ring 280ms var(--ease-door) forwards}
+@keyframes seal-collapse{0%{transform:scale(1.04);opacity:0}45%{opacity:1}100%{transform:scale(1);opacity:1}}
+@keyframes seal-ring{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.92)}}
+@keyframes seal-release{0%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(1.6)}}
+
+.reswrap{display:grid;place-items:center}
+.brokenring{
+  width:108px;height:108px;border-radius:50%;
+  border:3px solid var(--deny);
+  border-top-color:transparent;
+  transform:rotate(-30deg);
+  opacity:0;
+}
+.stage.run .brokenring{animation:refuse-break 120ms var(--ease-door) forwards}
+.stage.run .reswrap{animation:refuse-shake 320ms var(--ease-door) 120ms}
+.stage.run .refusemark{animation:refuse-settle 240ms var(--ease-exit) 440ms forwards}
+@keyframes refuse-break{0%{opacity:0}100%{opacity:1}}
+@keyframes refuse-shake{      /* 3 decaying oscillations · ±5 → 3 → 1.5px */
+  0%  {transform:translateX(0)}
+  16.6%{transform:translateX(-5px)}
+  33.3%{transform:translateX(5px)}
+  50% {transform:translateX(-3px)}
+  66.6%{transform:translateX(3px)}
+  83.3%{transform:translateX(-1.5px)}
+  100%{transform:translateX(0)}
+}
+@keyframes refuse-settle{to{opacity:.55;border-style:dashed}}
+.refusemark{position:absolute;inset:0;border-radius:50%;border:3px dashed var(--deny);opacity:0}
+.reslabel{font-size:14px;font-weight:600;letter-spacing:.04em}
+.reslabel.ok{color:var(--calm)}
+.reslabel.no{color:var(--deny)}
+.reslabel small{display:block;font-weight:400;color:var(--faint);font-size:11.5px;letter-spacing:0}
+
+/* reduced: crossfade only — shape carries the distinction */
+:is(.stage.rm,html[data-rm="1"] .stage) .resdisc{
+  animation:none !important;transform:scale(1);opacity:0;transition:opacity 120ms var(--ease-door)}
+:is(.stage.rm,html[data-rm="1"] .stage).run .resdisc{opacity:1}
+:is(.stage.rm,html[data-rm="1"] .stage) .resring{animation:none !important;transition:opacity 120ms var(--ease-door)}
+:is(.stage.rm,html[data-rm="1"] .stage).run .resring{opacity:0}
+:is(.stage.rm,html[data-rm="1"] .stage) .release{animation:none !important;opacity:0}
+:is(.stage.rm,html[data-rm="1"] .stage) .reswrap{animation:none !important}
+:is(.stage.rm,html[data-rm="1"] .stage) .brokenring{animation:none !important;opacity:0;transition:opacity 120ms var(--ease-door)}
+:is(.stage.rm,html[data-rm="1"] .stage).run .brokenring{opacity:1}
+:is(.stage.rm,html[data-rm="1"] .stage) .refusemark{animation:none !important;opacity:0}
+
+/* ==========================================================================
+   6 · SLIP-IN — a new event arriving
+   ========================================================================== */
+.sc-list{align-items:stretch;justify-content:flex-start;flex-direction:column;padding:10px;gap:0}
+.listhead{
+  display:flex;align-items:center;justify-content:space-between;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--faint);
+  padding:2px 6px 8px;text-transform:uppercase;
+}
+.newpill{
+  background:var(--ink-4);border:1px solid var(--line-2);color:var(--signal);
+  border-radius:999px;padding:3px 9px;font-size:9.5px;letter-spacing:.1em;
+  opacity:0;transition:opacity 200ms var(--ease-door);
+}
+.newpill.on{opacity:1}
+.evlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;overflow:hidden}
+.evlist li{
+  display:flex;align-items:center;gap:9px;
+  background:var(--ink-3);border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:9px 11px;font-size:12.5px;position:relative;overflow:hidden;
+  height:40px;flex:none;
+}
+.evlist li .who{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.evlist li .ago{font-family:var(--mono);font-size:10px;color:var(--faint)}
+.evlist li .kind{width:6px;height:6px;border-radius:50%;background:var(--calm);flex:none}
+.evlist li .tagnew{
+  font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;color:var(--signal);
+  border:1px solid rgba(255,176,32,.4);border-radius:4px;padding:1px 5px;display:none;
+}
+.evlist li.enter{animation:slipin var(--d-considered) var(--ease-enter)}
+.evlist li.fresh::before{
+  content:"";position:absolute;inset:0;background:rgba(255,176,32,.14);pointer-events:none;
+  animation:freshfade 2000ms var(--ease-breath) forwards;
+}
+@keyframes slipin{
+  0%  {opacity:0;transform:translateY(-12px);height:0;padding-top:0;padding-bottom:0;margin-bottom:-6px}
+  60% {opacity:1}
+  100%{opacity:1;transform:translateY(0);height:40px}
+}
+@keyframes freshfade{from{opacity:1}to{opacity:0}}
+:is(.stage.rm,html[data-rm="1"] .stage) .evlist li.enter{animation:none}
+:is(.stage.rm,html[data-rm="1"] .stage) .evlist li.fresh::before{animation:none;opacity:0}
+:is(.stage.rm,html[data-rm="1"] .stage) .evlist li.fresh .tagnew{display:inline-block}
+:is(.stage.rm,html[data-rm="1"] .stage) .newpill{transition:none}
+
+/* ==========================================================================
+   7 · RESOLVE — in progress → resolved
+   ========================================================================== */
+.sc-prog{flex-direction:column;gap:14px;width:100%;padding:0 20px}
+.track{position:relative;width:100%;height:8px;border-radius:5px;background:var(--ink-4);overflow:hidden}
+.sheen{
+  position:absolute;top:0;bottom:0;width:42%;border-radius:5px;
+  background:linear-gradient(90deg,rgba(111,211,172,0),var(--calm),rgba(111,211,172,0));
+  animation:sheen var(--loop-indet) var(--ease-breath) infinite;
+}
+@keyframes sheen{0%{left:-45%}100%{left:100%}}
+.fill{
+  position:absolute;left:0;top:0;bottom:0;width:0;border-radius:5px;background:var(--calm);
+  transition:width var(--d-base) var(--ease-door);
+}
+.sc-prog.resolved .sheen{opacity:0;transition:opacity 120ms var(--ease-door)}
+.sc-prog.resolved .fill{width:100%}
+.proglabel{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+  transition:color 160ms var(--ease-door),opacity 160ms var(--ease-door)}
+.sc-prog.resolved .proglabel{color:var(--calm)}
+/* reduced: no travelling sheen — permitted opacity crossfade at the same period */
+:is(.stage.rm,html[data-rm="1"] .stage) .sheen{
+  left:0;width:100%;background:rgba(111,211,172,.4);
+  animation:indetfade var(--loop-indet) var(--ease-breath) infinite;
+}
+@keyframes indetfade{0%,100%{opacity:.25}50%{opacity:.8}}
+html[data-noflash="1"] .stage.rm .sheen{
+  animation:none;opacity:.35;
+  background:repeating-linear-gradient(115deg,rgba(111,211,172,.55) 0 4px,transparent 4px 9px);
+}
+
+/* ==========================================================================
+   8 · SIGNAL LOST / RESTORED
+   ========================================================================== */
+.sc-sig{flex-direction:column;gap:12px}
+.cam{
+  position:relative;width:min(200px,74%);aspect-ratio:16/10;border-radius:var(--r-sm);
+  border:1px solid var(--line-2);overflow:hidden;
+  background:linear-gradient(160deg,#1C2530 0%,#101820 55%,#0B1016 100%);
+  filter:saturate(1);
+  transition:filter var(--d-deliberate) var(--ease-exit),opacity var(--d-deliberate) var(--ease-exit);
+}
+.cam .porch{position:absolute;left:14%;bottom:0;width:34%;height:62%;background:rgba(255,176,32,.16);border-radius:3px 3px 0 0}
+.cam .sky{position:absolute;inset:0 0 62% 0;background:rgba(111,211,172,.07)}
+.hatch{
+  position:absolute;inset:0;opacity:0;
+  background:repeating-linear-gradient(135deg,rgba(138,147,160,.30) 0 6px,transparent 6px 14px);
+  transition:opacity var(--d-deliberate) var(--ease-exit);
+}
+.sc-sig.off .cam{filter:saturate(.15);opacity:.62}
+.sc-sig.off .hatch{opacity:1}
+.sigrow{display:flex;align-items:center;gap:9px;font-size:13px}
+.sigdot{width:9px;height:9px;border-radius:50%;background:var(--calm);position:relative;flex:none;
+  transition:background-color var(--d-deliberate) var(--ease-exit)}
+.sc-sig.off .sigdot{background:var(--offline);animation:offbreathe var(--loop-offline) var(--ease-breath) infinite}
+@keyframes offbreathe{0%,100%{opacity:1}50%{opacity:.35}}
+.sigdot .pulse{position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--calm);opacity:0}
+.sc-sig.restored .sigdot .pulse{animation:onepulse 520ms var(--ease-exit) forwards}
+@keyframes onepulse{0%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(2.4)}}
+.siglabel{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--calm)}
+.sc-sig.off .siglabel{color:var(--offline)}
+.sigsub{font-size:11.5px;color:var(--faint)}
+:is(.stage.rm,html[data-rm="1"] .stage) .sc-sig.restored .sigdot .pulse{animation:none}
+html[data-noflash="1"] .stage.rm .sc-sig.off .sigdot{animation:none;opacity:1}
+
+/* ==========================================================================
+   9 · ATTENTION HIERARCHY
+   ========================================================================== */
+.sc-hier{flex-direction:column;gap:8px;padding:12px;align-items:stretch;justify-content:center}
+.lane{
+  display:flex;align-items:center;gap:10px;padding:9px 11px;
+  border:1px solid var(--line);border-radius:var(--r-sm);background:var(--ink-3);
+  font-size:12px;position:relative;overflow:hidden;
+}
+.lane .lt{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--faint);width:22px;flex:none}
+.lane .lname{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lane .state{font-family:var(--mono);font-size:9px;letter-spacing:.09em;color:var(--faint);text-transform:uppercase}
+.lane .lampwrap{width:40px;height:16px;position:relative;flex:none}
+.lamp{position:absolute;inset:0;border-radius:9px;border:1px solid var(--line-2);background:var(--ink-4)}
+.lamp.amber{animation:lampswell var(--loop-ring) var(--ease-breath) infinite;
+  box-shadow:inset 0 0 0 1px var(--signal);background:rgba(255,176,32,.35)}
+.lamp.grey{animation:lampswell var(--loop-offline) var(--ease-breath) infinite;
+  box-shadow:inset 0 0 0 1px var(--offline);background:rgba(138,147,160,.3)}
+.lamp.mint{background:rgba(111,211,172,.3);box-shadow:inset 0 0 0 1px var(--calm)}
+.lamp.mint.ping{animation:lampping var(--d-considered) var(--ease-enter)}
+@keyframes lampswell{0%,100%{opacity:.22}45%{opacity:1}}
+@keyframes lampping{0%{opacity:.2;transform:translateY(-6px)}100%{opacity:1;transform:translateY(0)}}
+.lane.frozen .lamp{animation:none !important;opacity:.85}
+.lane.frozen .lamp.grey{background:repeating-linear-gradient(135deg,rgba(138,147,160,.34) 0 4px,transparent 4px 10px)}
+.lane.frozen .state{color:var(--muted)}
+.hierrule{
+  font-size:11.5px;color:var(--muted);padding:8px 11px;border-radius:var(--r-sm);
+  background:rgba(255,176,32,.06);border:1px solid rgba(255,176,32,.2);
+}
+.hierrule.bad{background:rgba(232,106,90,.07);border-color:rgba(232,106,90,.28);color:#F0B3A9}
+
+/* ==========================================================================
+   0 · EASING REFERENCE
+   ========================================================================== */
+.sc-ease{flex-direction:column;gap:9px;align-items:stretch;padding:14px 16px;justify-content:center}
+.erow{display:flex;align-items:center;gap:10px}
+.erow .en{font-family:var(--mono);font-size:10px;color:var(--muted);width:96px;flex:none}
+.etrack{position:relative;flex:1;height:2px;background:var(--ink-4);border-radius:2px}
+.etrack i{
+  position:absolute;top:50%;left:0;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;
+  background:var(--signal);animation:travel 2200ms infinite;
+}
+@keyframes travel{0%{left:0}36%{left:100%}70%{left:100%}70.01%{left:0;opacity:0}74%{opacity:0}100%{left:0;opacity:1}}
+.erow:nth-child(1) .etrack i{animation-timing-function:var(--ease-door)}
+.erow:nth-child(2) .etrack i{animation-timing-function:var(--ease-enter)}
+.erow:nth-child(3) .etrack i{animation-timing-function:var(--ease-exit)}
+.erow:nth-child(4) .etrack i{animation-timing-function:var(--ease-breath)}
+.erow:nth-child(5) .etrack i{animation-timing-function:var(--ease-swell)}
+.erow:nth-child(6) .etrack i{animation-timing-function:var(--ease-settle)}
+:is(.stage.rm,html[data-rm="1"] .stage) .etrack i{animation:none;left:100%;opacity:.45}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+footer.foot{margin-top:34px;padding-top:20px;border-top:1px solid var(--line);color:var(--faint);font-size:12.5px}
+footer.foot a{color:var(--muted)}
+footer.foot p{max-width:80ch}
+
+@media (max-width:420px){
+  .card{padding:14px;border-radius:var(--r-md)}
+  .stage{min-height:168px}
+  .meta{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="brand">
+    <h1>WAVE — Motion Lab</h1>
+    <span class="sub">your door, answered without a word</span>
+  </div>
+  <p class="lede">
+    The resident cannot hear. Every animation below is doing the job a sound does in an ordinary
+    doorbell, and each one is labelled with <b>the sound it replaces</b>. Nothing here is decorative:
+    if an animation has no audio counterpart and no informational job, it was cut.
+    Full spec and research: <b>docs/motion.md</b>.
+  </p>
+  <div class="controls">
+    <button class="ctl ghost" id="t-compare" aria-pressed="true"><span class="dot"></span>Show reduced-motion state side by side</button>
+    <button class="ctl" id="t-rm" aria-pressed="false"><span class="dot"></span>Force reduced motion everywhere</button>
+    <button class="ctl ghost" id="t-noflash" aria-pressed="false"><span class="dot"></span>…and no flashing at all</button>
+    <button class="ctl ghost" id="t-pause" aria-pressed="false"><span class="dot"></span>Pause all motion</button>
+    <button class="btn" id="b-replay">Replay all</button>
+  </div>
+  <div class="warnbar" id="warn" hidden></div>
+  <div class="warnbar" style="background:rgba(155,163,172,.06);border-color:var(--line-2);color:var(--muted)">
+    This page deliberately breaks the product’s own rule that only one loop may run at a time (§9),
+    so that every animation can be inspected at once. The product never does this.
+  </div>
+</header>
+
+<main class="cards">
+
+  <!-- ============================= 1 · THE RING ============================= -->
+  <article class="card" data-card="ring">
+    <div class="card-h">
+      <div class="row"><span class="tier t0">T0 · DOOR LIVE</span><h2>The Ring</h2></div>
+      <p class="job">
+        Someone is at the door <b>right now</b>. Must be caught in peripheral vision from across a room,
+        must never approach seizure territory, must sustain for the whole live event without becoming
+        punishing. Three expanding rings leave the door position; the display edge blooms; the field swells.
+        Expansion is used instead of frequency because looming motion captures attention regardless of where
+        the eye is pointed — and it is safe at 0.83 Hz, which flicker is not.
+      </p>
+    </div>
+    <div class="stages">
+      <div class="stagewrap"><span class="stage-tag"><i></i>full motion</span>
+        <div class="stage run">
+          <div class="sc-ring stage" style="position:absolute;inset:-1px;border:0">
+            <div class="alertfx">
+              <div class="field"></div>
+              <div class="rings"><i></i><i></i><i></i></div>
+              <div class="bloom"></div>
+            </div>
+            <div class="doorglyph"></div>
+            <div class="ringcopy"><strong>At the door</strong><span>live · 00:06</span></div>
+            <div class="rmbar">AT THE DOOR NOW</div>
+          </div>
+        </div>
+      </div>
+      <div class="stagewrap rmw"><span class="stage-tag"><i></i>reduced motion</span>
+        <div class="stage rm run">
+          <div class="sc-ring stage" style="position:absolute;inset:-1px;border:0">
+            <div class="alertfx">
+              <div class="field"></div>
+              <div class="rings"><i></i><i></i><i></i></div>
+              <div class="bloom"></div>
+            </div>
+            <div class="doorglyph"></div>
+            <div class="ringcopy"><strong>At the door</strong><span>live · 00:06</span></div>
+            <div class="rmbar">AT THE DOOR NOW</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <dl class="meta">
+      <div><dt>Loop</dt><dd class="mono">1200 ms · 0.83 Hz</dd></div>
+      <div><dt>Easing</dt><dd class="mono">--ease-swell<br>--ease-breath</dd></div>
+      <div><dt>Distance</dt><dd class="mono">scale .06 → 7.4<br>stagger 0/160/320</dd></div>
+      <div><dt>Replaces</dt><dd>the chime</dd></div>
+      <div><dt>Safety</dt><dd class="safe">3.6× under WCAG 2.3.1; below the 3 Hz clinical floor; ΔL ≤ 0.10; amber R-ratio 0.55</dd></div>
+    </dl>
+    <div class="cardfoot">
+      <button class="btn js-replay">Replay</button>
+      <button class="btn js-deesc" aria-pressed="false">Simulate 20 s+ (55 % amplitude)</button>
+      <p class="note"><b>Reduced:</b> rings and travel removed; the edge crossfades on the same 1200 ms bar (opacity is not motion) and a permanent solid bar carries the words. The alert is never deleted — it changes modality.</p>
+    </div>
+  </article>
+
+  <!-- ============================= 2 · UTTERANCE ============================= -->
+  <article class="card" data-card="speak">
+    <div class="card-h">
+      <div class="row"><span class="tier t2">T2 · CONVERSATION</span><h2>Utterance</h2></div>
+      <p class="job">
+        The Chime is speaking to the visitor and the resident cannot hear it. The caption carries
+        <b>what</b> is said; the bars carry <b>that it is being said, now, at this pace</b> — which matters
+        because the visitor is reacting in real time. The flat runs are phrase gaps: the silences are the
+        information. Bars are driven by TTS word-boundary events, not by a random equalizer.
+      </p>
+    </div>
+    <div class="stages">
+      <div class="stagewrap"><span class="stage-tag"><i></i>full motion</span>
+        <div class="stage run">
+          <div class="sc-speak stage" style="position:absolute;inset:-1px;border:0">
+            <span class="speaktag">CHIME SPEAKING</span>
+            <div class="bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="steps"><i></i><i></i><i></i><i></i><i></i></div>
+            <p class="caption"></p>
+          </div>
+        </div>
+      </div>
+      <div class="stagewrap rmw"><span class="stage-tag"><i></i>reduced motion</span>
+        <div class="stage rm run">
+          <div class="sc-speak stage" style="position:absolute;inset:-1px;border:0">
+            <span class="speaktag">CHIME SPEAKING</span>
+            <div class="bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="steps"><i></i><i></i><i></i><i></i><i></i></div>
+            <p class="caption"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <dl class="meta">
+      <div><dt>Beat</dt><dd class="mono">240 ms · 4.17 Hz</dd></div>
+      <div><dt>Cycle</dt><dd class="mono">3840 ms (16 beats)</dd></div>
+      <div><dt>Easing</dt><dd class="mono">--ease-breath</dd></div>
+      <div><dt>Replaces</dt><dd>hearing the voice, and its rhythm</dd></div>
+      <div><dt>Safety</dt><dd class="warn">Above 3 Hz — permitted only by the area exemption (&lt; 2 % of viewport, no large-field luminance change). Scaled to full screen, this beat must drop to ≤ 2 Hz.</dd></div>
+    </dl>
+    <div class="cardfoot">
+      <button class="btn js-replay">Replay</button>
+      <p class="note"><b>Reduced:</b> bars freeze at a static profile, a five-block indicator steps once per word with no tween, and the caption still reveals word by word — text appearing is not motion, so the rhythm survives as a step function.</p>
+    </div>
+  </article>
+
+  <!-- ========================= 3 · CONFIDENCE BUILD ========================= -->
+  <article class="card" data-card="gest">
+    <div class="card-h">
+      <div class="row"><span class="tier t2">T2 · CONVERSATION</span><h2>Confidence Build</h2></div>
+      <p class="job">
+        The camera is building confidence toward recognising a hand. This is the visitor’s
+        <b>only</b> cue that they have been understood, and they are standing outside in the cold.
+        The arc is bound to the recogniser’s confidence value and nothing else — watch it
+        <b>retreat</b> at ~1.4 s when confidence drops. A ring that fills smoothly and then rejects is
+        worse than no feedback: it teaches the visitor that the feedback is theatre.
+      </p>
+    </div>
+    <div class="stages">
+      <div class="stagewrap"><span class="stage-tag"><i></i>full motion</span>
+        <div class="stage run">
+          <div class="sc-gest stage" style="position:absolute;inset:-1px;border:0">
+            <div class="handglyph" aria-hidden="true">🖐</div>
+            <div class="gring">
+              <svg viewBox="0 0 100 100" aria-hidden="true">
+                <circle class="trk" cx="50" cy="50" r="46"></circle>
+                <circle class="arc" cx="50" cy="50" r="46"></circle>
+              </svg>
+              <div class="val"><b>0%</b><em>reading</em></div>
+            </div>
+            <span class="gestnote">10 Hz samples · 140 ms tween</span>
+          </div>
+        </div>
+      </div>
+      <div class="stagewrap rmw"><span class="stage-tag"><i></i>reduced motion</span>
+        <div class="stage rm run">
+          <div class="sc-gest stage" style="position:absolute;inset:-1px;border:0">
+            <div class="handglyph" aria-hidden="true">🖐</div>
+            <div class="gring">
+              <svg viewBox="0 0 100 100" aria-hidden="true">
+                <circle class="trk" cx="50" cy="50" r="46"></circle>
+                <circle class="arc" cx="50" cy="50" r="46"></circle>
+              </svg>
+              <div class="val"><b>0%</b><em>reading</em></div>
+            </div>
+            <span class="gestnote">10 % steps · no tween</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <dl class="meta">
+      <div><dt>Sample</dt><dd class="mono">100 ms (10 Hz)</dd></div>
+      <div><dt>Tween</dt><dd class="mono">140 ms --ease-door</dd></div>
+      <div><dt>Lock</dt><dd class="mono">c ≥ 0.85 → 2→3 px, hue shift, 180 ms</dd></div>
+      <div><dt>Replaces</dt><dd>“mm-hm” — the noise a listener makes</dd></div>
+      <div><dt>Rule</dt><dd class="safe">A display of data, never a timer. It must be allowed to go backwards.</dd></div>
+    </dl>
+    <div class="cardfoot">
+      <button class="btn js-replay">Replay</button>
+      <p class="note"><b>Reduced:</b> tween removed, value quantised to 10 % steps with the number rendered. Position change without interpolation is not motion, and the digits carry the signal exactly.</p>
+    </div>
+  </article>
+
+  <!-- ============================== 4 · SEAL ================================ -->
+  <article class="card" data-card="seal">
+    <div class="card-h">
+      <div class="row"><span class="tier t2">T2 · RESOLUTION</span><h2>Seal — accepted</h2></div>
+      <p class="job">
+        The gesture was understood. <b>Radial, centred, one outward release</b> — the latch clunking home,
+        then a single ripple of confirmation. Distinguished from rejection by axis and duration,
+        not by colour, because peripheral colour discrimination is poor and some Deaf users are also
+        colour-blind.
+      </p>
+    </div>
+    <div class="stages">
+      <div class="stagewrap"><span class="stage-tag"><i></i>full motion</span>
+        <div class="stage run">
+          <div class="sc-res stage" style="position:absolute;inset:-1px;border:0">
+            <div class="resbox">
+              <div class="resring"></div>
+              <div class="release"></div>
+              <div class="resdisc"><svg viewBox="0 0 24 24" fill="none" stroke="#07080A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.2 5.2L20 7"/></svg></div>
+            </div>
+            <div class="reslabel ok">Accepted<small>“Leave it with the neighbour” sent</small></div>
+          </div>
+        </div>
+      </div>
+      <div class="stagewrap rmw"><span class="stage-tag"><i></i>reduced motion</span>
+        <div class="stage rm run">
+          <div class="sc-res stage" style="position:absolute;inset:-1px;border:0">
+            <div class="resbox">
+              <div class="resring"></div>
+              <div class="release"></div>
+              <div class="resdisc"><svg viewBox="0 0 24 24" fill="none" stroke="#07080A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.2 5.2L20 7"/></svg></div>
+            </div>
+            <div class="reslabel ok">Accepted<small>“Leave it with the neighbour” sent</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <dl class="meta">
+      <div><dt>Total</dt><dd class="mono">800 ms</dd></div>
+      <div><dt>Collapse</dt><dd class="mono">280 ms --ease-settle<br>+4 % overshoot (capped)</dd></div>
+      <div><dt>Release</dt><dd class="mono">520 ms --ease-exit<br>scale 1 → 1.6</dd></div>
+      <div><dt>Replaces</dt><dd>the latch / the confirmation tone</dd></div>
+      <div><dt>Safety</dt><dd class="safe">Single non-repeating pulse; the only overshoot in the system</dd></div>
+    </dl>
+    <div class="cardfoot">
+      <button class="btn js-replay">Replay</button>
+      <p class="note"><b>Reduced:</b> 120 ms crossfade to the filled disc. The shape difference does all the work — which is why the shapes were made different in the first place.</p>
+    </div>
+  </article>
+
+  <!-- ============================= 5 · REFUSE =============================== -->
+  <article class="card" data-card="refuse">
+    <div class="card-h">
+      <div class="row"><span class="tier t2">T2 · RESOLUTION</span><h2>Refuse — rejected</h2></div>
+      <p class="job">
+        The gesture was not understood. <b>Lateral, decaying, never completes</b> — the head-shake made
+        physical. The decay is what makes it read as friction rather than a rendering fault, and the ring
+        is left visibly <b>broken</b> so the state survives the animation ending.
+      </p>
+    </div>
+    <div class="stages">
+      <div class="stagewrap"><span class="stage-tag"><i></i>full motion</span>
+        <div class="stage run">
+          <div class="sc-res stage" style="position:absolute;inset:-1px;border:0">
+            <div class="resbox"><div class="reswrap"><div class="brokenring"></div><div class="refusemark"></div></div></div>
+            <div class="reslabel no">Not understood<small>Hold your hand still and try again</small></div>
+          </div>
+        </div>
+      </div>
+      <div class="stagewrap rmw"><span class="stage-tag"><i></i>reduced motion</span>
+        <div class="stage rm run">
+          <div class="sc-res stage" style="position:absolute;inset:-1px;border:0">
+            <div class="resbox"><div class="reswrap"><div class="brokenring"></div><div class="refusemark"></div></div></div>
+            <div class="reslabel no">Not understood<small>Hold your hand still and try again</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <dl class="meta">
+      <div><dt>Total</dt><dd class="mono">680 ms</dd></div>
+      <div><dt>Shake</dt><dd class="mono">320 ms --ease-door<br>±5 → 3 → 1.5 px</dd></div>
+      <div><dt>Settle</dt><dd class="mono">240 ms --ease-exit → dashed</dd></div>
+      <div><dt>Replaces</dt><dd>“sorry, what?”</dd></div>
+      <div><dt>Safety</dt><dd class="warn">~9 Hz positional oscillation — no luminance flash, small element, amplitude capped at 5 px. Removed entirely under reduced motion.</dd></div>
+    </dl>
+    <div class="cardfoot">
+      <button class="btn js-replay">Replay</button>
+      <p class="note"><b>Reduced:</b> no shake at all — a 120 ms crossfade to the broken ring plus the label. Shake is the one animation here that is a genuine vestibular risk, so it is the one that fully disappears.</p>
+    </div>
+  </article>
+
+  <!-- ============================= 6 · SLIP-IN ============================== -->
+  <article class="card" data-card="list">
+    <div class="card-h">
+      <div class="row"><span class="tier t3">T3 · AMBIENT</span><h2>Slip-in</h2></div>
+      <p class="job">
+        A new event lands in the list. It must <b>not</b> steal focus — a Deaf resident reading a transcript
+        is spending their only sensory channel on it. Travel is held to 12 px because small displacement is
+        deliberately low-salience. Turn on <b>“resident is reading”</b> to see anchor-preserving insertion:
+        the row arrives with no animation at all and a static pill appears instead.
+      </p>
+    </div>
+    <div class="stages">
+      <div class="stagewrap"><span class="stage-tag"><i></i>full motion</span>
+        <div class="stage run">
+          <div class="sc-list stage" style="position:absolute;inset:-1px;border:0">
+            <div class="listhead"><span>Today</span><span class="newpill">1 NEW</span></div>
+            <ul class="evlist"></ul>
+          </div>
+        </div>
+      </div>
+      <div class="stagewrap rmw"><span class="stage-tag"><i></i>reduced motion</span>
+        <div class="stage rm run">
+          <div class="sc-list stage" style="position:absolute;inset:-1px;border:0">
+            <div class="listhead"><span>Today</span><span class="newpill">1 NEW</span></div>
+            <ul class="evlist"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <dl class="meta">
+      <div><dt>Enter</dt><dd class="mono">360 ms --ease-enter</dd></div>
+      <div><dt>Distance</dt><dd class="mono">translateY 12 px</dd></div>
+      <div><dt>Fresh tint</dt><dd class="mono">2000 ms decay, .14 → 0</dd></div>
+      <div><dt>Replaces</dt><dd>the soft blip you may ignore</dd></div>
+      <div><dt>Rule</dt><dd class="safe">Motion only happens where the eye is not reading</dd></div>
+    </dl>
+    <div class="cardfoot">
+      <button class="btn js-replay">Insert now</button>
+      <button class="btn js-reading" aria-pressed="false">Resident is reading this list</button>
+      <p class="note"><b>Reduced:</b> no slide, no height animation. The row is simply present on the next paint with a persistent <b>NEW</b> tag that lasts until it is opened — findability moves from motion to a durable label.</p>
+    </div>
+  </article>
+
+  <!-- ============================= 7 · RESOLVE ============================== -->
+  <article class="card" data-card="prog">
+    <div class="card-h">
+      <div class="row"><span class="tier t3">T3 · AMBIENT</span><h2>Resolve</h2></div>
+      <p class="job">
+        An indeterminate process ends. For a hearing user this was the moment a sound <b>stopped</b> —
+        and silence is invisible. So the loop is never allowed to simply vanish: it snaps into a
+        determinate shape, and the label changes with it. A loop that just disappears cannot be told
+        apart from a crash.
+      </p>
+    </div>
+    <div class="stages">
+      <div class="stagewrap"><span class="stage-tag"><i></i>full motion</span>
+        <div class="stage run">
+          <div class="sc-prog stage" style="position:absolute;inset:-1px;border:0">
+            <div class="track"><div class="fill"></div><div class="sheen"></div></div>
+            <span class="proglabel">Listening at the door…</span>
+          </div>
+        </div>
+      </div>
+      <div class="stagewrap rmw"><span class="stage-tag"><i></i>reduced motion</span>
+        <div class="stage rm run">
+          <div class="sc-prog stage" style="position:absolute;inset:-1px;border:0">
+            <div class="track"><div class="fill"></div><div class="sheen"></div></div>
+            <span class="proglabel">Listening at the door…</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <dl class="meta">
+      <div><dt>Indeterminate</dt><dd class="mono">1400 ms loop --ease-breath</dd></div>
+      <div><dt>Resolve</dt><dd class="mono">240 ms --ease-door</dd></div>
+      <div><dt>Label</dt><dd class="mono">160 ms crossfade</dd></div>
+      <div><dt>Replaces</dt><dd>the moment a sound stops</dd></div>
+      <div><dt>Rule</dt><dd class="safe">An indeterminate loop must resolve into a determinate shape</dd></div>
+    </dl>
+    <div class="cardfoot">
+      <button class="btn js-replay">Replay</button>
+      <p class="note"><b>Reduced:</b> no travelling sheen — the track crossfades opacity on the same 1400 ms period (permitted), then fills. With <b>no flashing at all</b>, the loop becomes a static hatch and only the label moves.</p>
+    </div>
+  </article>
+
+  <!-- =========================== 8 · SIGNAL LOST ============================ -->
+  <article class="card" data-card="sig">
+    <div class="card-h">
+      <div class="row"><span class="tier t1">T1 · SYSTEM BLIND</span><h2>Signal Lost / Restored</h2></div>
+      <p class="job">
+        The most dangerous state in the product: if the camera is offline the resident is not being told
+        about their door <b>and does not know it</b>. So offline is not a quiet grey — it is the one
+        condition besides the doorbell allowed to persist. Colour drains over 560 ms (a loss gesture),
+        a static hatch lands, and the dot breathes at 0.42 Hz. Recovery gets <b>exactly one</b> pulse.
+      </p>
+    </div>
+    <div class="stages">
+      <div class="stagewrap"><span class="stage-tag"><i></i>full motion</span>
+        <div class="stage run">
+          <div class="sc-sig stage" style="position:absolute;inset:-1px;border:0">
+            <div class="cam"><div class="sky"></div><div class="porch"></div><div class="hatch"></div></div>
+            <div class="sigrow"><span class="sigdot"><span class="pulse"></span></span><span class="siglabel">ONLINE</span></div>
+            <span class="sigsub">Front door · Ring Battery Doorbell</span>
+          </div>
+        </div>
+      </div>
+      <div class="stagewrap rmw"><span class="stage-tag"><i></i>reduced motion</span>
+        <div class="stage rm run">
+          <div class="sc-sig stage" style="position:absolute;inset:-1px;border:0">
+            <div class="cam"><div class="sky"></div><div class="porch"></div><div class="hatch"></div></div>
+            <div class="sigrow"><span class="sigdot"><span class="pulse"></span></span><span class="siglabel">ONLINE</span></div>
+            <span class="sigsub">Front door · Ring Battery Doorbell</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <dl class="meta">
+      <div><dt>Into offline</dt><dd class="mono">560 ms --ease-exit<br>saturate 1 → .15</dd></div>
+      <div><dt>Persist</dt><dd class="mono">2400 ms · 0.42 Hz</dd></div>
+      <div><dt>Recovery</dt><dd class="mono">360 ms --ease-enter + one 520 ms pulse</dd></div>
+      <div><dt>Replaces</dt><dd>the dead-air hiss of a dropped line</dd></div>
+      <div><dt>Safety</dt><dd class="safe">Static hatch keeps the state legible when motion is off, paused, or screenshotted</dd></div>
+    </dl>
+    <div class="cardfoot">
+      <button class="btn js-replay">Replay cycle</button>
+      <p class="note"><b>Reduced:</b> the recovery pulse is dropped; colour drain and the breathe become pure crossfades. With <b>no flashing at all</b>, the hatch and the word OFFLINE carry the state alone.</p>
+    </div>
+  </article>
+
+  <!-- ========================= 9 · ATTENTION HIERARCHY ====================== -->
+  <article class="card wide" data-card="hier">
+    <div class="card-h">
+      <div class="row"><span class="tier t0">T0</span><span class="tier t1">T1</span><span class="tier t3">T3</span><h2>Attention hierarchy</h2></div>
+      <p class="job">
+        Three things want attention at once: the door is live, the camera dropped earlier, and a delivery
+        was just logged. Two sounds mix and you still hear both — <b>two competing loops and you read
+        neither</b>. Toggle the rule off to see what the unmanaged version costs.
+      </p>
+    </div>
+    <div class="stages">
+      <div class="stagewrap"><span class="stage-tag"><i></i>full motion</span>
+        <div class="stage run">
+          <div class="sc-hier stage" style="position:absolute;inset:-1px;border:0">
+            <div class="lane" data-lane="t0"><span class="lt">T0</span><span class="lname">Someone at the door</span><span class="lampwrap"><span class="lamp amber"></span></span><span class="state">looping</span></div>
+            <div class="lane frozen" data-lane="t1"><span class="lt">T1</span><span class="lname">Side camera offline</span><span class="lampwrap"><span class="lamp grey"></span></span><span class="state">frozen · static badge</span></div>
+            <div class="lane frozen" data-lane="t3"><span class="lt">T3</span><span class="lname">Parcel logged 2 min ago</span><span class="lampwrap"><span class="lamp mint"></span></span><span class="state">inserted silently</span></div>
+            <p class="hierrule">Rule 1 — one loop at a time, globally. Rule 3 — nothing outranks T0, so the T3 arrival gets no enter animation.</p>
+          </div>
+        </div>
+      </div>
+      <div class="stagewrap rmw"><span class="stage-tag"><i></i>reduced motion</span>
+        <div class="stage rm run">
+          <div class="sc-hier stage" style="position:absolute;inset:-1px;border:0">
+            <div class="lane" data-lane="t0"><span class="lt">T0</span><span class="lname">Someone at the door</span><span class="lampwrap"><span class="lamp amber"></span></span><span class="state">crossfade only</span></div>
+            <div class="lane frozen" data-lane="t1"><span class="lt">T1</span><span class="lname">Side camera offline</span><span class="lampwrap"><span class="lamp grey"></span></span><span class="state">frozen · static badge</span></div>
+            <div class="lane frozen" data-lane="t3"><span class="lt">T3</span><span class="lname">Parcel logged 2 min ago</span><span class="lampwrap"><span class="lamp mint"></span></span><span class="state">static NEW tag</span></div>
+            <p class="hierrule">The hierarchy is unchanged by reduced motion — only the encoding of the top tier changes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <dl class="meta">
+      <div><dt>Rule 1</dt><dd>One looping animation at a time, globally</dd></div>
+      <div><dt>Rule 2</dt><dd>One-shots stagger by ≥ 120 ms — closer than ~100 ms and two onsets fuse into one</dd></div>
+      <div><dt>Rule 3</dt><dd>Nothing outranks T0; arrivals during a live door event are silent</dd></div>
+      <div><dt>Rule 4</dt><dd>Escalation may interrupt; de-escalation always plays its ≥ 240 ms resolve</dd></div>
+      <div><dt>Rule 5</dt><dd>Peripheral budget: one element, T0 or T1 only</dd></div>
+    </dl>
+    <div class="cardfoot">
+      <button class="btn js-hier" aria-pressed="true">Hierarchy enforced</button>
+      <p class="note">With the rule off, all three lanes loop at once at three different periods. Nothing reads as urgent because everything does.</p>
+    </div>
+  </article>
+
+  <!-- =========================== 0 · EASING REFERENCE ======================= -->
+  <article class="card" data-card="ease">
+    <div class="card-h">
+      <div class="row"><span class="tier ref">REFERENCE</span><h2>The six curves</h2></div>
+      <p class="job">
+        Documentation, not product. Five curves are borrowed from IBM Carbon; <b>--ease-settle</b> is the only
+        overshoot in the system and is rationed to a single moment (acceptance), capped at +4 %.
+        <b>--ease-breath</b> is symmetric on purpose: a sustained loop must not spike attention on every cycle.
+      </p>
+    </div>
+    <div class="stages">
+      <div class="stagewrap"><span class="stage-tag"><i></i>full motion</span>
+        <div class="stage run">
+          <div class="sc-ease stage" style="position:absolute;inset:-1px;border:0">
+            <div class="erow"><span class="en">--ease-door</span><span class="etrack"><i></i></span></div>
+            <div class="erow"><span class="en">--ease-enter</span><span class="etrack"><i></i></span></div>
+            <div class="erow"><span class="en">--ease-exit</span><span class="etrack"><i></i></span></div>
+            <div class="erow"><span class="en">--ease-breath</span><span class="etrack"><i></i></span></div>
+            <div class="erow"><span class="en">--ease-swell</span><span class="etrack"><i></i></span></div>
+            <div class="erow"><span class="en">--ease-settle</span><span class="etrack"><i></i></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="stagewrap rmw"><span class="stage-tag"><i></i>reduced motion</span>
+        <div class="stage rm run">
+          <div class="sc-ease stage" style="position:absolute;inset:-1px;border:0">
+            <div class="erow"><span class="en">--ease-door</span><span class="etrack"><i></i></span></div>
+            <div class="erow"><span class="en">--ease-enter</span><span class="etrack"><i></i></span></div>
+            <div class="erow"><span class="en">--ease-exit</span><span class="etrack"><i></i></span></div>
+            <div class="erow"><span class="en">--ease-breath</span><span class="etrack"><i></i></span></div>
+            <div class="erow"><span class="en">--ease-swell</span><span class="etrack"><i></i></span></div>
+            <div class="erow"><span class="en">--ease-settle</span><span class="etrack"><i></i></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <dl class="meta">
+      <div><dt>--ease-door</dt><dd class="mono">.2, 0, .38, .9</dd></div>
+      <div><dt>--ease-enter</dt><dd class="mono">0, 0, .3, 1</dd></div>
+      <div><dt>--ease-exit</dt><dd class="mono">.4, .14, 1, 1</dd></div>
+      <div><dt>--ease-breath</dt><dd class="mono">.37, 0, .63, 1</dd></div>
+      <div><dt>--ease-swell</dt><dd class="mono">.16, .72, .31, 1</dd></div>
+      <div><dt>--ease-settle</dt><dd class="mono">.34, 1.26, .64, 1</dd></div>
+    </dl>
+    <div class="cardfoot">
+      <button class="btn js-replay">Replay</button>
+      <p class="note"><b>Reduced:</b> the demo dots park at their end state. This card is the only one whose reduced version carries less information — because it is reference material, not a notification.</p>
+    </div>
+  </article>
+
+</main>
+
+<footer class="foot">
+  <p><b>Every animation on this page answers one question:</b> what would this have been if the user could
+  hear? The doorbell is the chime. Utterance is the voice. Confidence Build is “mm-hm”. Seal is the latch.
+  Refuse is “sorry, what?”. Resolve is the moment the sound stopped. Signal Lost is dead air. Anything with
+  no audio counterpart — hover bloom, staggered reveals, parallax, skeleton shimmer, a spinner during the
+  gesture read — was cut.</p>
+  <p>Constraints that set the numbers: WCAG 2.3.1/2.3.2 (three flashes per second), the clinical
+  photoparoxysmal floor of 3 Hz with a peak near 16 Hz, WCAG 2.2.2 (pause/stop/hide), NFPA 72 visible
+  notification appliances at 1–2 Hz, and the finding that looming expansion captures attention regardless of
+  where the eye is pointed. Full citations in <b>docs/motion.md</b>.</p>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var root = document.documentElement;
+  var $  = function(s,c){ return (c||document).querySelector(s); };
+  var $$ = function(s,c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); };
+
+  /* ---------------------------------------------------------------
+     Global controls
+     --------------------------------------------------------------- */
+  function toggle(btn, attr, onChange){
+    if(!btn) return;
+    btn.addEventListener('click', function(){
+      var next = btn.getAttribute('aria-pressed') !== 'true';
+      btn.setAttribute('aria-pressed', String(next));
+      root.setAttribute(attr, next ? '1' : '0');
+      if(onChange) onChange(next);
+    });
+  }
+  toggle($('#t-compare'), 'data-compare');
+  toggle($('#t-rm'), 'data-rm');
+  toggle($('#t-noflash'), 'data-noflash');
+  toggle($('#t-pause'), 'data-paused');
+
+  /* Honour the OS setting on load, and say so. */
+  var mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if(mq.matches){
+    root.setAttribute('data-rm','1');
+    var b = $('#t-rm'); if(b) b.setAttribute('aria-pressed','true');
+    var w = $('#warn');
+    if(w){
+      w.hidden = false;
+      w.textContent = 'Your system asks for reduced motion, so this page started in reduced mode. ' +
+        'Every alert is still present — it is re-encoded, not removed. Turn the toggle off to compare.';
+    }
+  }
+
+  /* ---------------------------------------------------------------
+     Virtual clock — stops when the page is paused, so JS-driven
+     cards honour the same pause button as the CSS animations.
+     --------------------------------------------------------------- */
+  var T = 0, last = performance.now(), ticks = [];
+  function frame(now){
+    var dt = Math.min(now - last, 100); last = now;
+    if(root.getAttribute('data-paused') !== '1') T += dt;
+    for(var i=0;i<ticks.length;i++) ticks[i](T);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  function isRM(stage){
+    return stage.classList.contains('rm') || root.getAttribute('data-rm') === '1';
+  }
+  function restart(el){
+    el.classList.remove('run');
+    void el.offsetWidth;          /* force reflow so the animation re-fires */
+    el.classList.add('run');
+  }
+
+  /* Card registry: each card gets a local t0 so Replay resets just that card. */
+  var cards = {};
+  $$('.card').forEach(function(card){
+    cards[card.getAttribute('data-card')] = { el: card, t0: 0, stages: $$('.stage.run', card) };
+  });
+  function local(name){ return T - cards[name].t0; }
+  function resetCard(name){
+    var c = cards[name]; if(!c) return;
+    c.t0 = T;
+    c.stages.forEach(restart);
+  }
+  $$('.js-replay').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      resetCard(btn.closest('.card').getAttribute('data-card'));
+    });
+  });
+  $('#b-replay').addEventListener('click', function(){
+    Object.keys(cards).forEach(resetCard);
+  });
+
+  /* ---------------------------------------------------------------
+     1 · The Ring — de-escalation after 20 s
+     --------------------------------------------------------------- */
+  var deescBtn = $('.js-deesc');
+  if(deescBtn){
+    deescBtn.addEventListener('click', function(){
+      var on = deescBtn.getAttribute('aria-pressed') !== 'true';
+      deescBtn.setAttribute('aria-pressed', String(on));
+      $$('.sc-ring').forEach(function(s){ s.classList.toggle('deesc', on); });
+    });
+  }
+
+  /* ---------------------------------------------------------------
+     2 · Utterance — caption revealed on word-boundary events
+     --------------------------------------------------------------- */
+  var WORDS = [
+    ['There’s',0],['someone',1],['at',2],['your',3],['front',4],['door.',5],
+    ['They',8],['say',9],['it’s',10],['a',11],['delivery.',12]
+  ];
+  var SPEAK_CYCLE = 3840, BEAT = 240;
+  $$('.sc-speak').forEach(function(scene){
+    var cap = $('.caption', scene);
+    cap.innerHTML = WORDS.map(function(w){ return '<span>'+w[0]+'</span>'; }).join(' ');
+  });
+  ticks.push(function(){
+    var t = local('speak') % SPEAK_CYCLE;
+    var beat = Math.floor(t / BEAT);
+    $$('.sc-speak').forEach(function(scene){
+      var stage = scene.closest('.stage');
+      var spans = $$('.caption span', scene);
+      var shown = 0;
+      for(var i=0;i<WORDS.length;i++){
+        var on = beat >= WORDS[i][1];
+        if(on) shown++;
+        spans[i].classList.toggle('on', on);
+      }
+      if(isRM(stage)){
+        var blocks = $$('.steps i', scene);
+        var lit = Math.round(shown / WORDS.length * blocks.length);
+        blocks.forEach(function(b,i){ b.classList.toggle('on', i < lit); });
+      }
+    });
+  });
+
+  /* ---------------------------------------------------------------
+     3 · Confidence Build — arc bound to the recogniser's value.
+     Note the deliberate retreat at ~1.4 s: the arc is data, not a timer.
+     --------------------------------------------------------------- */
+  var C = 289.03, GEST_CYCLE = 5200;
+  function lerp(a,b,k){ return a + (b-a) * Math.max(0, Math.min(1,k)); }
+  function confidenceAt(ms){
+    var c;
+    if(ms < 300)        c = 0;
+    else if(ms < 1200)  c = lerp(0,   0.42, (ms-300)/900);
+    else if(ms < 1750)  c = lerp(0.42,0.26, (ms-1200)/550);   /* it drops. tell the truth. */
+    else if(ms < 3000)  c = lerp(0.26,0.97, (ms-1750)/1250);
+    else if(ms < 4300)  c = 0.97;
+    else                c = 0;
+    if(c > 0 && c < 0.97) c += 0.018 * Math.sin(ms/130);       /* live jitter */
+    return Math.max(0, Math.min(1, c));
+  }
+  ticks.push(function(){
+    var t = local('gest') % GEST_CYCLE;
+    var sampled = Math.floor(t / 100) * 100;                   /* 10 Hz sample-and-hold */
+    var c = confidenceAt(sampled);
+    $$('.sc-gest').forEach(function(scene){
+      var stage = scene.closest('.stage');
+      var v = isRM(stage) ? Math.round(c*10)/10 : c;
+      var ring = $('.gring', scene);
+      $('.arc', scene).style.strokeDashoffset = (C * (1 - v)).toFixed(2);
+      ring.classList.toggle('locked', v >= 0.85);
+      $('.val b', scene).textContent = Math.round(v*100) + '%';
+      $('.val em', scene).textContent = v >= 0.85 ? 'locked' : (v > 0 ? 'reading' : 'waiting');
+    });
+  });
+
+  /* ---------------------------------------------------------------
+     4 & 5 · Seal / Refuse — one-shots, auto-replayed so they stay live
+     --------------------------------------------------------------- */
+  function autoOneShot(name, period){
+    var lastCycle = -1;
+    ticks.push(function(){
+      var n = Math.floor(local(name) / period);
+      if(n !== lastCycle){ lastCycle = n; cards[name].stages.forEach(restart); }
+    });
+  }
+  autoOneShot('seal', 3200);
+  autoOneShot('refuse', 3200);
+
+  /* ---------------------------------------------------------------
+     6 · Slip-in
+     --------------------------------------------------------------- */
+  var VISITORS = [
+    ['Delivery — parcel left','now'], ['Neighbour — Ruth','4m'],
+    ['Unrecognised visitor','19m'], ['Delivery — signed for','1h'], ['Postal service','2h']
+  ];
+  var vIdx = 0, reading = false, listCycle = -1;
+  function rowHTML(v, fresh){
+    return '<span class="kind"></span><span class="who">'+v[0]+'</span>'+
+           (fresh ? '<span class="tagnew">NEW</span>' : '')+
+           '<span class="ago">'+v[1]+'</span>';
+  }
+  function seedList(){
+    $$('.sc-list').forEach(function(scene){
+      var ul = $('.evlist', scene);
+      ul.innerHTML = '';
+      for(var i=1;i<4;i++){
+        var li = document.createElement('li');
+        li.innerHTML = rowHTML(VISITORS[i], false);
+        ul.appendChild(li);
+      }
+      $('.newpill', scene).classList.remove('on');
+    });
+  }
+  seedList();
+  function insertEvent(){
+    vIdx = (vIdx + 1) % VISITORS.length;
+    var v = VISITORS[vIdx];
+    $$('.sc-list').forEach(function(scene){
+      var ul = $('.evlist', scene);
+      var li = document.createElement('li');
+      li.innerHTML = rowHTML(v, true);
+      li.classList.add('fresh');
+      /* Rule: motion only where the eye is not reading. */
+      if(!reading) li.classList.add('enter');
+      ul.insertBefore(li, ul.firstChild);
+      while(ul.children.length > 4) ul.removeChild(ul.lastChild);
+      var pill = $('.newpill', scene);
+      pill.classList.toggle('on', reading);
+    });
+  }
+  ticks.push(function(){
+    var n = Math.floor(local('list') / 3600);
+    if(n !== listCycle){ if(listCycle !== -1) insertEvent(); listCycle = n; }
+  });
+  var readBtn = $('.js-reading');
+  readBtn.addEventListener('click', function(){
+    reading = readBtn.getAttribute('aria-pressed') !== 'true';
+    readBtn.setAttribute('aria-pressed', String(reading));
+  });
+
+  /* ---------------------------------------------------------------
+     7 · Resolve
+     --------------------------------------------------------------- */
+  ticks.push(function(){
+    var t = local('prog') % 5000;
+    var resolved = t >= 2600;
+    $$('.sc-prog').forEach(function(scene){
+      scene.classList.toggle('resolved', resolved);
+      $('.proglabel', scene).textContent = resolved ? 'Resolved — parcel left with neighbour' : 'Listening at the door…';
+    });
+  });
+
+  /* ---------------------------------------------------------------
+     8 · Signal Lost / Restored
+     --------------------------------------------------------------- */
+  ticks.push(function(){
+    var t = local('sig') % 10000;
+    var off = (t >= 2600 && t < 7600);
+    var restored = (t >= 7600 && t < 8200);
+    $$('.sc-sig').forEach(function(scene){
+      scene.classList.toggle('off', off);
+      scene.classList.toggle('restored', restored);
+      $('.siglabel', scene).textContent = off ? 'OFFLINE' : 'ONLINE';
+      $('.sigsub', scene).textContent = off
+        ? 'No one is watching the door'
+        : 'Front door · Ring Battery Doorbell';
+    });
+  });
+
+  /* ---------------------------------------------------------------
+     9 · Attention hierarchy
+     --------------------------------------------------------------- */
+  var hierBtn = $('.js-hier'), enforced = true, hierCycle = -1;
+  hierBtn.addEventListener('click', function(){
+    enforced = hierBtn.getAttribute('aria-pressed') !== 'true';
+    hierBtn.setAttribute('aria-pressed', String(enforced));
+    hierBtn.textContent = enforced ? 'Hierarchy enforced' : 'Hierarchy OFF — everything loops';
+    $$('.sc-hier').forEach(function(scene){
+      $$('.lane', scene).forEach(function(lane){
+        if(lane.getAttribute('data-lane') === 't0') return;
+        lane.classList.toggle('frozen', enforced);
+      });
+      var t1 = $('.lane[data-lane="t1"] .state', scene);
+      var t3 = $('.lane[data-lane="t3"] .state', scene);
+      t1.textContent = enforced ? 'frozen · static badge' : 'looping — competing';
+      t3.textContent = enforced ? 'inserted silently' : 'looping — competing';
+      var rule = $('.hierrule', scene);
+      rule.classList.toggle('bad', !enforced);
+      rule.textContent = enforced
+        ? 'Rule 1 — one loop at a time, globally. Rule 3 — nothing outranks T0, so the T3 arrival gets no enter animation.'
+        : 'Three loops, three periods, no winner. Nothing reads as urgent because everything does.';
+    });
+  });
+  ticks.push(function(){
+    if(enforced) return;                       /* silent insertion under the rule */
+    var n = Math.floor(local('hier') / 2800);
+    if(n !== hierCycle){
+      hierCycle = n;
+      $$('.sc-hier .lamp.mint').forEach(function(l){
+        l.classList.remove('ping'); void l.offsetWidth; l.classList.add('ping');
+      });
+    }
+  });
+
+})();
+</script>
+</body>
+</html>

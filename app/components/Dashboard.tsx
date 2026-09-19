@@ -5,6 +5,7 @@ import Conversation from './Conversation'
 import GestureKey from './GestureKey'
 import GestureReader from './GestureReader'
 import CaptionTrack from './CaptionTrack'
+import LocaleSwitcher from './LocaleSwitcher'
 import type { DoorEvent, Gesture, RingDevice, Resolution, VisitorMemory } from '@/lib/ring/types'
 
 const RESOLUTION_LABEL: Record<Resolution, string> = {
@@ -34,6 +35,7 @@ export default function Dashboard({ mock }: { mock: boolean }) {
   const [cameraOn, setCameraOn] = useState(false)
   const [useRing, setUseRing] = useState(false)
   const [liveStream, setLiveStream] = useState<MediaStream | null>(null)
+  const [dir, setDir] = useState<'ltr' | 'rtl'>('ltr')
   const [polling, setPolling] = useState<{ started: boolean; reason?: string } | null>(null)
   const liveRegion = useRef<HTMLElement | null>(null)
   /** Event ids already seen, so a reconnect's snapshot does not re-announce. */
@@ -134,6 +136,8 @@ export default function Dashboard({ mock }: { mock: boolean }) {
     [selected],
   )
 
+  const onLocale = useCallback((_code: string, d: 'ltr' | 'rtl') => setDir(d), [])
+
   const simulate = useCallback(async (visitor: string) => {
     const res = await fetch('/api/simulate', {
       method: 'POST',
@@ -146,7 +150,7 @@ export default function Dashboard({ mock }: { mock: boolean }) {
   }, [])
 
   return (
-    <main className="mx-auto max-w-shell px-5 py-7 md:px-8">
+    <main className="mx-auto max-w-shell px-5 py-7 md:px-8" dir={dir}>
       <Header mock={mock} connected={connected} devices={devices} polling={polling} />
 
       <div className="mt-7 grid gap-5 lg:grid-cols-[1.55fr_1fr]">
@@ -202,6 +206,8 @@ export default function Dashboard({ mock }: { mock: boolean }) {
 
         {/* ---------------- side rail ---------------- */}
         <aside className="space-y-5">
+          <LocaleSwitcher onResidentChange={onLocale} />
+
           <section className="card p-4">
             <div className="mb-3 flex items-start justify-between gap-3">
               <div>
@@ -447,7 +453,7 @@ function History({
             <li key={e.id}>
               <button
                 onClick={() => onSelect(e.id)}
-                className="flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition hover:border-bright"
+                className="flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-start transition hover:border-bright"
                 style={{
                   background: on ? 'var(--ink-raised)' : 'transparent',
                   borderColor: on ? 'var(--line-bright)' : 'transparent',
@@ -466,7 +472,7 @@ function History({
                 />
                 <span className="min-w-0 flex-1 truncate text-[13px]">
                   {e.visitorLabel ?? visitorTitle(e.visitor)}
-                  <span className="ml-2 text-faint">{e.deviceName}</span>
+                  <span className="ms-2 text-faint">{e.deviceName}</span>
                 </span>
                 <span className="shrink-0 font-mono text-[10.5px] text-faint">
                   {timeAgo(e.startedAt)}

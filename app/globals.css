@@ -238,7 +238,8 @@ body::before {
   .ring-pulse::after,
   .breathe,
   .bar,
-  .rise {
+  .rise,
+  .locale-flip {
     animation: none !important;
   }
   .ring-pulse::before {
@@ -248,6 +249,27 @@ body::before {
   .ring-pulse::after {
     display: none;
   }
+}
+
+@keyframes locale-settle {
+  0% {
+    opacity: 0.35;
+    transform: translateY(3px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.locale-flip {
+  animation: locale-settle 420ms var(--ease-swell) both;
+}
+
+/* Direction is a document-level property, so the transition has to live on the
+   shell rather than on the control that triggered it. */
+main {
+  transition: opacity 260ms var(--ease-swell);
 }
 
 ::-webkit-scrollbar {

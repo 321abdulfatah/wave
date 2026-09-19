@@ -20,7 +20,7 @@ export default function Conversation({ event }: { event: DoorEvent }) {
       ))}
 
       {event.resolution === 'in_progress' && (
-        <li className="flex items-center gap-3 pl-1 pt-1">
+        <li className="flex items-center gap-3 ps-1 pt-1">
           <Waveform />
           <span className="text-xs text-faint">listening for a gesture…</span>
         </li>
@@ -46,11 +46,11 @@ function TurnRow({ turn }: { turn: Turn }) {
         {isDoor ? <SpeakerMark /> : <HandMark />}
       </div>
 
-      <div className={`max-w-[78%] ${isDoor ? '' : 'text-right'}`}>
+      <div className={`max-w-[78%] ${isDoor ? '' : 'text-end'}`}>
         <div className="eyebrow mb-1">
           {isDoor ? 'The door said' : 'Visitor gestured'}
           {typeof turn.confidence === 'number' && (
-            <span className="ml-2 font-mono text-[10px] text-faint">
+            <span className="ms-2 font-mono text-[10px] text-faint">
               {Math.round(turn.confidence * 100)}%
             </span>
           )}

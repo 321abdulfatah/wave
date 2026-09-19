@@ -162,7 +162,7 @@ export default function CaptionTrack({
 
         {chunks.map((c, i) => (
           <p key={i} className="rise mb-1.5">
-            <span className="mr-2 font-mono text-[10px] text-faint">{fmt(c.at)}</span>
+            <span className="me-2 font-mono text-[10px] text-faint">{fmt(c.at)}</span>
             {c.text}
           </p>
         ))}

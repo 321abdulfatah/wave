@@ -1,4 +1,5 @@
 import type { VisitorKind } from '@/lib/ring/types'
+import { visionStatus, visionOpenAICompatible } from '@/lib/ai/provider'
 
 /**
  * Who is at the door.
@@ -27,7 +28,7 @@ export interface VisionResult {
   /** One line the resident sees. The agent explains itself or it does not ship. */
   reasoning: string
   /** Which model answered, or why none did. */
-  source: 'bedrock' | 'unavailable'
+  source: 'bedrock' | 'openai-compatible' | 'unavailable'
 }
 
 const SYSTEM = `You look at a single still frame from a doorbell camera and report what is
@@ -48,7 +49,7 @@ Answer as JSON only:
 Confidence below 0.6 must be reported as "unknown".`
 
 export function visionAvailable(): boolean {
-  return Boolean(process.env.AWS_REGION && process.env.AWS_ACCESS_KEY_ID)
+  return visionStatus().available
 }
 
 /**
@@ -59,15 +60,25 @@ export function visionAvailable(): boolean {
  * way — by saying so rather than by throwing.
  */
 export async function classifyVisitor(jpeg: Uint8Array): Promise<VisionResult> {
-  if (!visionAvailable()) {
+  const status = visionStatus()
+  if (!status.available) {
     return {
       visitor: 'unknown',
       confidence: 0,
-      reasoning: 'No AWS credentials configured, so the frame was not sent anywhere.',
+      reasoning: 'No vision model configured, so the frame was not sent anywhere.',
       source: 'unavailable',
     }
   }
 
+  const text =
+    status.provider === 'bedrock'
+      ? await viaBedrock(jpeg)
+      : await visionOpenAICompatible(jpeg, SYSTEM, 'What is happening at this door?')
+
+  return parse(text, status.provider === 'bedrock' ? 'bedrock' : 'openai-compatible')
+}
+
+async function viaBedrock(jpeg: Uint8Array): Promise<string> {
   const { BedrockRuntimeClient, InvokeModelCommand } = await import('@aws-sdk/client-bedrock-runtime')
   const client = new BedrockRuntimeClient({ region: process.env.AWS_REGION })
 
@@ -98,7 +109,10 @@ export async function classifyVisitor(jpeg: Uint8Array): Promise<VisionResult> {
   )
 
   const decoded = JSON.parse(new TextDecoder().decode(res.body))
-  const text: string = decoded.content?.[0]?.text ?? ''
+  return decoded.content?.[0]?.text ?? ''
+}
+
+function parse(text: string, source: 'bedrock' | 'openai-compatible'): VisionResult {
 
   // The model is asked for bare JSON but may still wrap it in prose or a fence.
   // Extracting rather than parsing the whole string keeps one stray sentence
@@ -109,7 +123,7 @@ export async function classifyVisitor(jpeg: Uint8Array): Promise<VisionResult> {
       visitor: 'unknown',
       confidence: 0,
       reasoning: 'The model did not return a usable answer.',
-      source: 'bedrock',
+      source,
     }
   }
 
@@ -127,6 +141,6 @@ export async function classifyVisitor(jpeg: Uint8Array): Promise<VisionResult> {
     visitor: confidence < 0.6 ? 'unknown' : visitor,
     confidence,
     reasoning: String(parsed.reasoning ?? '').slice(0, 200),
-    source: 'bedrock',
+    source,
   }
 }

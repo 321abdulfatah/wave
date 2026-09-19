@@ -242,3 +242,76 @@ Submissions with friction logs can earn up to a 10% judging bonus.
      same primitive pointed at a doorbell would be the most significant accessibility feature in
      the category, and right now the documentation tells developers the raw material does not
      exist.
+
+---
+
+## FL-010 — The hackathon admits Syrian developers. AWS will not verify them.
+- **Date:** 2026-09-19
+- **Tool:** AWS account identity verification
+- **Severity:** **Critical**
+- **Task:** Enable Amazon Transcribe and Amazon Bedrock for the AWS Builder mini challenge.
+- **Steps:** Created an AWS account, requested the hackathon's $150 promotional credits, and
+  began identity verification.
+- **Expected:** To verify and continue, since this hackathon is open to "all countries and
+  territories, excluding standard exceptions" and the official rules exclude only countries
+  **comprehensively sanctioned by OFAC**.
+- **Actual:** **The account was suspended and verification cannot be completed, because Syria is
+  not offered in the nationality/country list.** A support case is open
+  (*AWS Account Verification — Manual Review Required*, 19 Sep 2026) asking three questions: why
+  Syrian nationality is unsupported, whether a Syrian national may use AWS at all, and whether a
+  manual path exists.
+
+### Why this is Critical rather than a personal inconvenience
+
+**Amazon's own rules and Amazon's own systems disagree with each other**, and a developer sits
+in the gap.
+
+Syria's position changed materially and is a matter of public record:
+
+| Date | Change |
+|---|---|
+| 30 Jun 2025 | All Syrian financial institutions removed from OFAC's SDN list |
+| **1 Jul 2025** | **The six Executive Orders constituting the Syria sanctions program revoked** |
+| 18 Dec 2025 | Caesar Act repealed |
+| 24 Aug 2026 | State Sponsor of Terrorism designation rescinded |
+
+Syria has therefore **not been comprehensively sanctioned by OFAC for fourteen months**. By the
+hackathon's own eligibility rule, a Syrian resident is eligible to enter and to win.
+
+Amazon's *Accepted IDs for Identity Verification* page — last updated **31 July 2025**, one month
+after the sanctions were revoked — still lists Syria among countries where "identity verification
+and Amazon developer account setup isn't currently supported." The same block returns a bare
+**404** on the Ring and Alexa developer consoles with no explanation (FL-005).
+
+So the position is: **the contest says come in, and the platform says you do not exist.**
+
+### The compounding problem with the credits
+
+The rules offer $150 in AWS promotional credits to entrants. AWS's own billing documentation
+states that **"Free account plans are not eligible for other promotional credits and discounts."**
+A new entrant on the default Free plan may therefore be unable to redeem the credits the
+hackathon is offering them — before the country block is even reached.
+
+### Workaround
+
+Every model call now routes through `lib/ai/provider.ts`, which prefers Bedrock and Transcribe
+where they are available and otherwise falls back to any OpenAI-compatible endpoint. **We would
+rather use the AWS services** — that is what the mini challenge asks for, and it is the
+architecture we designed. The abstraction exists because a project built from a country AWS will
+not verify cannot let a single vendor be load-bearing.
+
+The product runs fully without either: the decision engine is deterministic, and the caption and
+vision panels state which provider is active and what that means for where the data went.
+
+### Suggestion
+
+1. **Reconcile the eligibility rule with the verification list.** If the hackathon is open to a
+   country, the platform it requires should be too. Right now Amazon is inviting developers it
+   cannot onboard.
+2. **Re-examine the unsupported-country list.** It predates a documented change in Syria's legal
+   status by fourteen months. The list is not a law; it is a list, and it can be updated.
+3. **Return a real message, not a 404.** Anyone in the 43 listed territories currently discovers
+   this by hitting a dead page and guessing.
+4. **State the Free-plan credit restriction in the hackathon rules**, or grant the credits in a
+   form a Free-plan account can redeem. Offering credits that a default new account cannot accept
+   is a trap laid for exactly the entrants with the least margin.

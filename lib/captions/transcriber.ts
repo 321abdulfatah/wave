@@ -18,7 +18,9 @@
  * being transcribed by a third party.
  */
 
-export type TranscriberBackend = 'aws-transcribe' | 'none'
+import { speechStatus } from '@/lib/ai/provider'
+
+export type TranscriberBackend = 'aws-transcribe' | 'openai-compatible' | 'none'
 
 export interface CaptionChunk {
   /** Text so far. Partials are replaced; finals are appended. */
@@ -43,27 +45,29 @@ const EXPLAIN = {
   },
   ar: {
     aws: 'خدمة Amazon Transcribe. يُرسَل صوت الجرس إلى AWS في المنطقة المُعدّة ثم يُحذف بعد الكتابة؛ يبقى النص وحده.',
-    none: 'لا توجد خدمة كتابة مُعدّة، فلا يُكتب شيء ولا يغادر أي صوت هذا الجهاز. اضبطوا AWS_REGION و AWS_ACCESS_KEY_ID لتفعيل Amazon Transcribe.',
+    none: 'لا توجد خدمة كتابة مُعدّة، فلا يُكتب شيء ولا يغادر أي صوت هذا الجهاز.',
   },
 }
 
+/** The provider's own name, so the resident knows where the audio went. */
+function viaLabel(label: string, ar: boolean) {
+  return ar
+    ? `عبر ${label}. يُرسَل الصوت ثم يُحذف بعد الكتابة؛ يبقى النص وحده.`
+    : `Via ${label}. Audio is sent, transcribed and discarded; only the text is kept.`
+}
+
 export function transcriberStatus(locale = 'en-US'): TranscriberStatus {
-  const e = locale.startsWith('ar') ? EXPLAIN.ar : EXPLAIN.en
-  const hasAws = Boolean(process.env.AWS_REGION && process.env.AWS_ACCESS_KEY_ID)
+  const ar = locale.startsWith('ar')
+  const e = ar ? EXPLAIN.ar : EXPLAIN.en
+  const status = speechStatus()
 
-  if (hasAws) {
-    return {
-      backend: 'aws-transcribe',
-      available: true,
-      explanation: e.aws,
-    }
+  if (status.provider === 'aws-transcribe') {
+    return { backend: 'aws-transcribe', available: true, explanation: e.aws }
   }
-
-  return {
-    backend: 'none',
-    available: false,
-    explanation: e.none,
+  if (status.provider === 'openai-compatible') {
+    return { backend: 'openai-compatible', available: true, explanation: viaLabel(status.label, ar) }
   }
+  return { backend: 'none', available: false, explanation: e.none }
 }
 
 /**

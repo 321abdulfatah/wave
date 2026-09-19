@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { transcriberStatus, TRANSCRIBE_SAMPLE_RATE } from '@/lib/captions/transcriber'
 import type { CaptionChunk } from '@/lib/captions/transcriber'
+import { speechStatus, transcribeOpenAICompatible, pcmToWav } from '@/lib/ai/provider'
 
 export const dynamic = 'force-dynamic'
 
@@ -45,6 +46,14 @@ export async function POST(req: Request) {
  * out of the cold-start path.
  */
 async function transcribe(pcm: Int16Array, seconds: number): Promise<CaptionChunk[]> {
+  if (speechStatus().provider === 'openai-compatible') {
+    // Request/response rather than streaming, so every chunk comes back final.
+    // The UI already distinguishes partials from finals, so this degrades to
+    // slightly chunkier captions rather than breaking.
+    const text = await transcribeOpenAICompatible(pcmToWav(pcm, TRANSCRIBE_SAMPLE_RATE))
+    return text.trim() ? [{ text: text.trim(), isFinal: true, at: seconds }] : []
+  }
+
   const { TranscribeStreamingClient, StartStreamTranscriptionCommand } = await import(
     '@aws-sdk/client-transcribe-streaming'
   )

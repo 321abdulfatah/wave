@@ -1,0 +1,361 @@
+/*
+ * WAVE — per-locale theming.
+ *
+ * Generated companion to lib/theme/themes.ts. Every value here also lives
+ * there with the research finding that justifies it; if the two ever disagree,
+ * themes.ts is the source of truth.
+ *
+ * WIRING: app/globals.css imports this file on its first line. The base theme
+ * in globals.css :root remains the fallback — a document with no [data-locale]
+ * renders exactly as it does today, and a [data-locale] this file does not know
+ * inherits the base too.
+ *
+ * Each block below sets ONLY the tokens that depart from the base. A locale
+ * with no block, or an empty one, is a deliberate "no sourced reason to differ"
+ * rather than an oversight.
+ *
+ * Contrast: every body-text pair in every theme clears WCAG AA 4.5:1, measured
+ * from these hex values, not estimated. The per-theme worst case is in the
+ * comment above each block and the full matrix is in design/themes.html.
+ *
+ * Non-text finding, stated rather than silently patched: the base --ochre
+ * (#c58a2b), used for the .ring-pulse border, measures 2.72:1 against --paper,
+ * below the 3:1 that WCAG 1.4.11 asks of a graphical object carrying state.
+ * That is a pre-existing base value and changing it would restyle the shipped
+ * alert in all 14 locales, so it is reported here instead. #b8801f would clear
+ * it at 3.12:1. Themes that pick their own --ochre already clear 3:1.
+ */
+
+/* --------------------------------------------------------------------------
+ * Base typography tokens.
+ *
+ * These are new. app/globals.css hardcodes the Fraunces stack inside .display
+ * and the 0.12em tracking inside .eyebrow, neither of which can be themed. The
+ * values below are identical to what globals.css already renders, so this
+ * changes nothing for a document with no [data-locale].
+ * ----------------------------------------------------------------------- */
+:root {
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-sans: 'Inter', 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
+  --font-scale: 1;
+  --leading: 1.55;
+  --leading-display: 1.18;
+  --tracking-display: -0.015em;
+  --tracking-eyebrow: 0.12em;
+  --eyebrow-transform: uppercase;
+  --word-break: normal;
+  --overflow-wrap: break-word;
+  --line-break: auto;
+
+  /* --name-ink is deliberately NOT declared here.
+     A custom property whose value contains var() is substituted at computed-
+     value time on the element that DECLARES it, and the resolved string is what
+     inherits. Declaring --name-ink: var(--ink) on :root would therefore freeze
+     every locale's visitor name to the BASE ink, including ja-JP, whose --ink
+     is #24211f. The name colour is read as var(--name-ink, var(--ink)) instead,
+     so the fallback resolves against the themed element's own ink and
+     --name-ink stays available as a per-locale override. */
+}
+
+/* --------------------------------------------------------------------------
+ * Application layer.
+ *
+ * Scoped to [data-locale] so the untagged base document is untouched. These
+ * rules are unlayered and therefore outrank globals.css's @layer components.
+ * ----------------------------------------------------------------------- */
+[data-locale] {
+  font-family: var(--font-sans);
+  font-size: calc(1rem * var(--font-scale));
+  line-height: var(--leading);
+}
+
+[data-locale] .display {
+  font-family: var(--font-display);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-display);
+}
+
+[data-locale] .eyebrow {
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: var(--eyebrow-transform);
+}
+
+[data-locale] p,
+[data-locale] li,
+[data-locale] h1,
+[data-locale] h2,
+[data-locale] h3,
+[data-locale] .pill,
+[data-locale] .card {
+  word-break: var(--word-break);
+  overflow-wrap: var(--overflow-wrap);
+  line-break: var(--line-break);
+}
+
+/* Never red, in any theme. The fallback, not a :root alias — see above. */
+[data-locale] .visitor-name {
+  color: var(--name-ink, var(--ink));
+}
+
+/* --------------------------------------------------------------------------
+ * Per-locale blocks. Base = "Warm Domestic" = en-US.
+ * ----------------------------------------------------------------------- */
+
+/* en-US — English (US). No departure; inherits the base entirely.
+   No departure. lib/gestures/locales.ts records only ANSI Z535 for en-US — DANGER white-on-red, WARNING black-on-orange, CAUTION black-on-yellow — which is the same semantics the base already encodes from ISO 3864-4. */
+/* [data-locale='en-US'] intentionally sets nothing. */
+
+/* en-NG — English (Nigeria). No departure; inherits the base entirely.
+   No departure. The only colour note in lib/gestures/locales.ts is flag symbolism (green = agriculture, white = unity) plus a northern Islamic association for green — flag symbolism is not a UI constraint, and green as "safe" is ISO 3864-4, not a national reference. */
+/* [data-locale='en-NG'] intentionally sets nothing. */
+
+/* fr-FR — French (Français). Palette departs from base.
+   Worst measured body-text ratio in this theme: 4.91:1 (AA needs 4.5).
+   The caution tier moves from yellow-gold to orange. docs/locale-research-fr-us-ke.md: a saturated yellow panel in France reads as gilets jaunes (Nov 2018 – Jun 2020, ~3m participants, peak 287,710 per the Ministry of the Interior) before it reads as caution — and the doc names orange as the substitute, which is ANSI-correct anyway. */
+[data-locale='fr-FR'] {
+  --ochre: #c4600f;
+  --ochre-ink: #9a4508;
+  --ochre-wash: #f8e7d8;
+  --ochre-line: #e9c7ac;
+}
+
+/* el-GR — Greek (Ελληνικά). Palette identical to base; typography only.
+   Worst measured body-text ratio in this theme: 4.91:1 (AA needs 4.5).
+   Palette unchanged. lib/gestures/locales.ts is explicit: "Ground in ISO 3864-4; no reliable Greek-specific UI colour semantics found." A Greek palette invented to look Greek would be a costume. */
+[data-locale='el-GR'] {
+  --font-display: 'Noto Serif', 'Fraunces', Georgia, serif;
+  --eyebrow-transform: none;
+}
+
+/* tr-TR — Turkish. No departure; inherits the base entirely.
+   No departure. docs/gesture-research-mena.md states it directly: "Turkish colour semantics are snippet-level only. The Arabic colour paper does NOT apply." Borrowing the Arabic palette for Turkey because the locales are adjacent is exactly the error the research warns against. */
+/* [data-locale='tr-TR'] intentionally sets nothing. */
+
+/* ar-SA — Arabic (Gulf) (العربية). Palette departs from base.
+   Worst measured body-text ratio in this theme: 5.28:1 (AA needs 4.5).
+   The caution tier loses its yellow. Hasan, Al-Sammerai & Abdul Kadir (2011), English Language Teaching 4(3):206–213, read in full: yellow reads as envy, sickness, cruelty and dishonesty — "yellow smile = mean". It is not caution here. The warning tier becomes copper, which keeps an amber position in the ISO 3864-4 ordering without the yellow reading. */
+[data-locale='ar-SA'] {
+  --paper: #f6f0e3;
+  --paper-2: #efe7d6;
+  --paper-3: #e6dcc6;
+  --card: #fcf7ec;
+  --clay: #9c3a22;
+  --clay-2: #b8552f;
+  --clay-wash: #f4ddcf;
+  --clay-line: #e2bda8;
+  --ochre: #a8622a;
+  --ochre-ink: #7a4310;
+  --ochre-wash: #f4e4d6;
+  --ochre-line: #e0c4ab;
+  --sage: #2f5d3a;
+  --sage-wash: #e2eddd;
+  --sage-line: #bfd6b8;
+  --line: #e2d6bf;
+  --line-2: #d2c2a4;
+  --font-display: 'Noto Kufi Arabic', 'Fraunces', Georgia, serif;
+  --font-sans: 'Noto Kufi Arabic', 'Inter', system-ui, sans-serif;
+  --leading: 1.7;
+  --tracking-display: 0;
+  --tracking-eyebrow: 0.04em;
+}
+
+/* ar-EG — Arabic (Egypt) (العربية). Palette departs from base.
+   Worst measured body-text ratio in this theme: 5.28:1 (AA needs 4.5).
+   Identical palette to ar-SA. The Hasan et al. (2011) colour findings are pan-Arabic rather than country-specific, and inventing an Egyptian variant on top of a pan-Arabic source would be decoration. */
+[data-locale='ar-EG'] {
+  --paper: #f6f0e3;
+  --paper-2: #efe7d6;
+  --paper-3: #e6dcc6;
+  --card: #fcf7ec;
+  --clay: #9c3a22;
+  --clay-2: #b8552f;
+  --clay-wash: #f4ddcf;
+  --clay-line: #e2bda8;
+  --ochre: #a8622a;
+  --ochre-ink: #7a4310;
+  --ochre-wash: #f4e4d6;
+  --ochre-line: #e0c4ab;
+  --sage: #2f5d3a;
+  --sage-wash: #e2eddd;
+  --sage-line: #bfd6b8;
+  --line: #e2d6bf;
+  --line-2: #d2c2a4;
+  --font-display: 'Noto Kufi Arabic', 'Fraunces', Georgia, serif;
+  --font-sans: 'Noto Kufi Arabic', 'Inter', system-ui, sans-serif;
+  --leading: 1.7;
+  --tracking-display: 0;
+  --tracking-eyebrow: 0.04em;
+}
+
+/* ja-JP — Japanese (日本語). Palette departs from base.
+   Worst measured body-text ratio in this theme: 5.33:1 (AA needs 4.5).
+   The paper turns from cream to a low-chroma washi grey, and the alert wash turns fully neutral. This is the 紅白 finding in docs/locale-colour-typography.md: red-and-white together is the visual grammar of CELEBRATION in Japan — 紅白幕, 紅白餅, 紅白饅頭, all 縁起物 — traceable to the Genpei War banners. A red alert on a cream-white card is the most natural thing a Western designer reaches for, and in Japan it reads as bunting. */
+[data-locale='ja-JP'] {
+  --paper: #f2f1ee;
+  --paper-2: #eae9e5;
+  --paper-3: #dedcd7;
+  --card: #f7f6f3;
+  --ink: #24211f;
+  --ink-2: #4e4a46;
+  --ink-3: #67625e;
+  --clay: #9b3a2c;
+  --clay-2: #b04a38;
+  --clay-wash: #e5e2e0;
+  --clay-line: #c8c3c0;
+  --ochre: #a97d28;
+  --ochre-ink: #7c5410;
+  --ochre-wash: #efe9dc;
+  --ochre-line: #d7ccb5;
+  --sage: #3f5d48;
+  --sage-wash: #e3eae3;
+  --sage-line: #c5d3c6;
+  --line: #dedcd6;
+  --line-2: #c9c6be;
+  --font-display: 'Noto Serif JP', 'Fraunces', Georgia, serif;
+  --font-sans: 'Noto Sans JP', 'Inter', system-ui, sans-serif;
+  --leading: 1.65;
+  --line-break: strict;
+}
+
+/* zh-CN — Chinese (Simplified, Mainland) (简体中文). Palette departs from base.
+   Worst measured body-text ratio in this theme: 5.48:1 (AA needs 4.5).
+   The red is pushed from the base's muted terracotta toward a true safety red. Red-as-alert is the legally standardised meaning in the Chinese national safety-colour standard — 红 = 禁止、停止、紧急告警 — which maps cleanly onto ISO 3864-4, so it is reinforced by the built environment the user walks through every day. */
+[data-locale='zh-CN'] {
+  --clay: #b0140f;
+  --clay-2: #cc2a1c;
+  --clay-wash: #fadfdb;
+  --clay-line: #f0bcb3;
+  --sage: #35643f;
+  --sage-wash: #e5eee2;
+  --sage-line: #c6dac2;
+  --font-display: 'Noto Serif SC', 'Fraunces', Georgia, serif;
+  --font-sans: 'Noto Sans SC', 'Inter', system-ui, sans-serif;
+  --leading: 1.65;
+}
+
+/* ko-KR — Korean (한국어). Palette identical to base; typography only.
+   Worst measured body-text ratio in this theme: 4.91:1 (AA needs 4.5).
+   Palette unchanged, and that is the finding rather than the absence of one. The obvious move — recolour the Korean theme away from white because "white means death in Korea" — is NOT verified and the evidence cuts the other way: 백의민족, the white-clad people, is a well-cited description of white as ordinary everyday Korean dress for centuries, attested in the Records of Wei, Choe Nam-seon, Oppert and Yanagi. The English Korean funeral article contains no colour claims at all. */
+[data-locale='ko-KR'] {
+  --font-display: 'Noto Serif KR', 'Fraunces', Georgia, serif;
+  --font-sans: 'Noto Sans KR', 'Inter', system-ui, sans-serif;
+  --leading: 1.6;
+  --word-break: keep-all;
+}
+
+/* hi-IN — Hindi (हिन्दी). Palette departs from base.
+   Worst measured body-text ratio in this theme: 5.48:1 (AA needs 4.5).
+   Every orange is gone. lib/gestures/locales.ts: avoid saffron/orange ENTIRELY — simultaneously sacred (Hindu, Buddhist, Sikh), the Hindutva/BJP movement colour, and the top band of the flag. "No reading of a saffron warning badge is inert." That removes both the base --ochre (a golden orange) and --clay-2 (a clear orange), which is why this is the largest palette departure in the set. */
+[data-locale='hi-IN'] {
+  --card: #fdf8ec;
+  --clay: #9e2138;
+  --clay-2: #b93349;
+  --clay-wash: #f7e0e4;
+  --clay-line: #e9b8c1;
+  --ochre: #a08800;
+  --ochre-ink: #6f5c00;
+  --ochre-wash: #faf1cd;
+  --ochre-line: #e7d99c;
+  --sage: #3d5f43;
+  --sage-wash: #e6eee3;
+  --sage-line: #c8d9c4;
+  --font-display: 'Noto Serif Devanagari', 'Fraunces', Georgia, serif;
+  --font-sans: 'Noto Sans Devanagari', 'Inter', system-ui, sans-serif;
+  --leading: 1.8;
+  --leading-display: 1.4;
+  --tracking-display: 0;
+  --tracking-eyebrow: 0;
+}
+
+/* sw-KE — Swahili (Kenya) (Kiswahili). Palette departs from base.
+   Worst measured body-text ratio in this theme: 5.48:1 (AA needs 4.5).
+   Orange is removed, and this one costs something. Orange is ODM's election symbol and party colour, and orange is also the natural warning tier between yellow and red in every design system — docs/locale-research-fr-us-ke.md flags it as "an easy trap" for exactly that reason. */
+[data-locale='sw-KE'] {
+  --clay: #93231f;
+  --clay-2: #ad3128;
+  --clay-wash: #f6dedb;
+  --clay-line: #e8bbb5;
+  --ochre: #8a5c1c;
+  --ochre-ink: #6b4514;
+  --ochre-wash: #efe6d7;
+  --ochre-line: #d9c8ab;
+  --sage: #3a5c40;
+  --sage-wash: #e5ede2;
+  --sage-line: #c6d8c2;
+}
+
+/* es-MX — Spanish (Mexico) (Español). Palette departs from base.
+   Worst measured body-text ratio in this theme: 5.29:1 (AA needs 4.5).
+   The flag triad is broken on two axes at once. The base theme puts sage green, a near-white card and clay red in the same component — green, white and red, which lib/gestures/locales.ts says to avoid together. The green is rotated to a deep pine-teal and every surface is warmed to sand, so neither the hue nor the white survives to assemble the flag. */
+[data-locale='es-MX'] {
+  --paper: #f7f0e2;
+  --paper-2: #f0e7d4;
+  --paper-3: #e8dcc3;
+  --card: #fdf8ec;
+  --clay: #9b3527;
+  --clay-2: #b54833;
+  --clay-wash: #f6e0d8;
+  --clay-line: #e7c1b3;
+  --ochre: #a3841c;
+  --ochre-ink: #6f5a0c;
+  --ochre-wash: #f7eecf;
+  --ochre-line: #e6d69e;
+  --sage: #1f5b52;
+  --sage-wash: #dfece9;
+  --sage-line: #b8d5d0;
+  --line: #e3d6bd;
+  --line-2: #d3c0a1;
+}
+
+/* pt-BR — Portuguese (Brazil) (Português). Palette departs from base.
+   Worst measured body-text ratio in this theme: 5.48:1 (AA needs 4.5).
+   This is the theme where the default UI is the problem. Red is the historic colour of the Workers' Party and green+yellow is Bolsonaro's adopted pair, so a stock green-OK / red-alert interface puts the two most partisan colours in Brazilian politics side by side on a device mounted on someone's front door. */
+[data-locale='pt-BR'] {
+  --clay: #8e2a24;
+  --clay-2: #a4392f;
+  --clay-wash: #f5e0dc;
+  --clay-line: #e6bdb6;
+  --ochre: #c07d14;
+  --ochre-ink: #7d5209;
+  --sage: #0f5c5e;
+  --sage-wash: #deeceb;
+  --sage-line: #b6d5d4;
+}
+
+/* --------------------------------------------------------------------------
+ * Rules that are not expressible as a token.
+ * ----------------------------------------------------------------------- */
+
+/* hi-IN — never underline Devanagari. The visual line is already at the top
+   (the shirorekha) and an underline collides with below-base matras. The
+   affordance is kept as a bottom border with clearance, so this is a move, not
+   a removal. */
+[data-locale='hi-IN'] a {
+  text-decoration: none;
+  border-block-end: 1px solid currentColor;
+  padding-block-end: 0.18em;
+}
+
+/* ar-SA, ar-EG — RTL is a document property; the theme only guarantees it is
+   never fought by a physical margin. Components must use logical properties. */
+[data-locale='ar-SA'],
+[data-locale='ar-EG'] {
+  direction: rtl;
+}
+
+/* ja-JP — the 紅白 rule as an assertion rather than a comment. If a component
+   ever puts the alert red on a white-ish surface here, this makes it grey
+   rather than letting it read as celebration bunting. */
+[data-locale='ja-JP'] .alert-surface {
+  background: var(--clay-wash);
+  border-color: var(--clay-line);
+}
+
+/* el-GR — uppercase Greek must be supplied pre-composed, because CSS drops the
+   dialytika and mishandles the disjunctive ή. --eyebrow-transform is already
+   none for this locale; this stops a utility class re-enabling it. */
+[data-locale='el-GR'] .uppercase,
+[data-locale='el-GR'] .eyebrow {
+  text-transform: none;
+}
+

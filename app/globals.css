@@ -1,3 +1,10 @@
+/* Per-locale themes. Must stay first: @import has to precede every other rule.
+   theme.css only ever sets custom properties inside [data-locale] blocks, so
+   the base below remains the fallback and an untagged document is unchanged.
+   Typed source of truth, with the research finding behind every departure:
+   lib/theme/themes.ts. */
+@import './theme.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -41,8 +48,12 @@
   --clay-wash: #f6e1d5;
   --clay-line: #e6c4b2;
 
-  /* ochre — attention, and the light under a door */
-  --ochre: #c58a2b;
+  /* ochre — attention, and the light under a door.
+     Darkened from #c58a2b, which measured 2.72:1 on --paper and therefore
+     failed WCAG 1.4.11's 3:1 floor for a graphical object that carries state.
+     The ring IS the doorbell for a Deaf resident, so this is the one element in
+     the product that must not be borderline. #b8801f measures 3.12:1. */
+  --ochre: #b8801f;
   --ochre-ink: #815510; /* 5.9:1 */
   --ochre-wash: #f9ebd1;
   --ochre-line: #ebd3a6;

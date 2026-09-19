@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>WAVE — per-locale theming</title>
+<meta name="description" content="The same doorstep card in 14 locale themes, each with the research finding that justifies it and its measured WCAG contrast." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400;500;600;700&family=Noto+Serif:wght@400;600;700&family=Noto+Kufi+Arabic:wght@400;500;700&family=Noto+Serif+JP:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+Devanagari:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ===========================================================================
+   Base — "Warm Domestic", copied verbatim from app/globals.css :root so this
+   page is self-contained and the fallback here is the real fallback.
+   =========================================================================== */
+:root{
+  color-scheme: light;
+  --paper: #faf4ea;
+  --paper-2: #f4eadb;
+  --paper-3: #eee0cb;
+  --card: #fffcf6;
+  --ink: #2a2420;
+  --ink-2: #574c42;
+  --ink-3: #6e6154;
+  --clay: #a3432a;
+  --clay-2: #c2603d;
+  --clay-wash: #f6e1d5;
+  --clay-line: #e6c4b2;
+  --ochre: #c58a2b;
+  --ochre-ink: #815510;
+  --ochre-wash: #f9ebd1;
+  --ochre-line: #ebd3a6;
+  --sage: #44614a;
+  --sage-wash: #e7eee4;
+  --sage-line: #cbdac6;
+  --line: #e6d9c5;
+  --line-2: #d8c6ab;
+
+  --r-sm: 12px; --r-md: 18px; --r-lg: 26px;
+  --shadow-1: 0 1px 1px rgba(78,52,24,.05), 0 6px 18px -12px rgba(94,64,30,.30);
+  --shadow-2: 0 1px 2px rgba(78,52,24,.06), 0 18px 44px -26px rgba(94,64,30,.45);
+
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-sans: 'Inter', 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
+  --font-scale: 1;
+  --leading: 1.55;
+  --leading-display: 1.18;
+  --tracking-display: -0.015em;
+  --tracking-eyebrow: 0.12em;
+  --eyebrow-transform: uppercase;
+  --word-break: normal;
+  --overflow-wrap: break-word;
+  --line-break: auto;
+}
+
+/* ===========================================================================
+   app/theme.css — the per-locale blocks, inlined unchanged.
+   =========================================================================== */
+[data-locale]{ font-family: var(--font-sans); font-size: calc(1rem * var(--font-scale)); line-height: var(--leading); }
+[data-locale] .display{ font-family: var(--font-display); letter-spacing: var(--tracking-display); line-height: var(--leading-display); }
+[data-locale] .eyebrow{ letter-spacing: var(--tracking-eyebrow); text-transform: var(--eyebrow-transform); }
+[data-locale] p,[data-locale] .card,[data-locale] h3{ word-break: var(--word-break); overflow-wrap: var(--overflow-wrap); line-break: var(--line-break); }
+[data-locale] .visitor-name{ color: var(--name-ink, var(--ink)); }
+
+/* en-US — English (US). No departure; inherits the base entirely.
+   No departure. lib/gestures/locales.ts records only ANSI Z535 for en-US — DANGER white-on-red, WARNING black-on-orange, CAUTION black-on-yellow — which is the same semantics the base already encodes from ISO 3864-4. */
+/* [data-locale='en-US'] intentionally sets nothing. */
+
+/* en-NG — English (Nigeria). No departure; inherits the base entirely.
+   No departure. The only colour note in lib/gestures/locales.ts is flag symbolism (green = agriculture, white = unity) plus a northern Islamic association for green — flag symbolism is not a UI constraint, and green as "safe" is ISO 3864-4, not a national reference. */
+/* [data-locale='en-NG'] intentionally sets nothing. */
+
+/* fr-FR — French (Français). Palette departs from base.
+   Worst measured body-text ratio in this theme: 4.91:1 (AA needs 4.5).
+   The caution tier moves from yellow-gold to orange. docs/locale-research-fr-us-ke.md: a saturated yellow panel in France reads as gilets jaunes (Nov 2018 – Jun 2020, ~3m participants, peak 287,710 per the Ministry of the Interior) before it reads as caution — and the doc names orange as the substitute, which is ANSI-correct anyway. */
+[data-locale='fr-FR'] {
+  --ochre: #c4600f;
+  --ochre-ink: #9a4508;
+  --ochre-wash: #f8e7d8;
+  --ochre-line: #e9c7ac;
+}
+
+/* el-GR — Greek (Ελληνικά). Palette identical to base; typography only.
+   Worst measured body-text ratio in this theme: 4.91:1 (AA needs 4.5).
+   Palette unchanged. lib/gestures/locales.ts is explicit: "Ground in ISO 3864-4; no reliable Greek-specific UI colour semantics found." A Greek palette invented to look Greek would be a costume. */
+[data-locale='el-GR'] {
+  --font-display: 'Noto Serif', 'Fraunces', Georgia, serif;
+  --eyebrow-transform: none;
+}
+
+/* tr-TR — Turkish. No departure; inherits the base entirely.
+   No departure. docs/gesture-research-mena.md states it directly: "Turkish colour semantics are snippet-level only. The Arabic colour paper does NOT apply." Borrowing the Arabic palette for Turkey because the locales are adjacent is exactly the error the research warns against. */
+/* [data-locale='tr-TR'] intentionally sets nothing. */
+
+/* ar-SA — Arabic (Gulf) (العربية). Palette departs from base.
+   Worst measured body-text ratio in this theme: 5.28:1 (AA needs 4.5).
+   The caution tier loses its yellow. Hasan, Al-Sammerai & Abdul Kadir (2011), English Language Teaching 4(3):206–213, read in full: yellow reads as envy, sickness, cruelty and dishonesty — "yellow smile = mean". It is not caution here. The warning tier becomes copper, which keeps an amber position in the ISO 3864-4 ordering without the yellow reading. */
+[data-locale='ar-SA'] {
+  --paper: #f6f0e3;
+  --paper-2: #efe7d6;
+  --paper-3: #e6dcc6;
+  --card: #fcf7ec;
+  --clay: #9c3a22;
+  --clay-2: #b8552f;
+  --clay-wash: #f4ddcf;
+  --clay-line: #e2bda8;
+  --ochre: #a8622a;
+  --ochre-ink: #7a4310;
+  --ochre-wash: #f4e4d6;
+  --ochre-line: #e0c4ab;
+  --sage: #2f5d3a;
+  --sage-wash: #e2eddd;
+  --sage-line: #bfd6b8;
+  --line: #e2d6bf;
+  --line-2: #d2c2a4;
+  --font-display: 'Noto Kufi Arabic', 'Fraunces', Georgia, serif;
+  --font-sans: 'Noto Kufi Arabic', 'Inter', system-ui, sans-serif;
+  --leading: 1.7;
+  --tracking-display: 0;
+  --tracking-eyebrow: 0.04em;
+}
+
+/* ar-EG — Arabic (Egypt) (العربية). Palette departs from base.
+   Worst measured body-text ratio in this theme: 5.28:1 (AA needs 4.5).
+   Identical palette to ar-SA. The Hasan et al. (2011) colour findings are pan-Arabic rather than country-specific, and inventing an Egyptian variant on top of a pan-Arabic source would be decoration. */
+[data-locale='ar-EG'] {
+  --paper: #f6f0e3;
+  --paper-2: #efe7d6;
+  --paper-3: #e6dcc6;
+  --card: #fcf7ec;
+  --clay: #9c3a22;
+  --clay-2: #b8552f;
+  --clay-wash: #f4ddcf;
+  --clay-line: #e2bda8;
+  --ochre: #a8622a;
+  --ochre-ink: #7a4310;
+  --ochre-wash: #f4e4d6;
+  --ochre-line: #e0c4ab;
+  --sage: #2f5d3a;
+  --sage-wash: #e2eddd;
+  --sage-line: #bfd6b8;
+  --line: #e2d6bf;
+  --line-2: #d2c2a4;
+  --font-display: 'Noto Kufi Arabic', 'Fraunces', Georgia, serif;
+  --font-sans: 'Noto Kufi Arabic', 'Inter', system-ui, sans-serif;
+  --leading: 1.7;
+  --tracking-display: 0;
+  --tracking-eyebrow: 0.04em;
+}
+
+/* ja-JP — Japanese (日本語). Palette departs from base.
+   Worst measured body-text ratio in this theme: 5.33:1 (AA needs 4.5).
+   The paper turns from cream to a low-chroma washi grey, and the alert wash turns fully neutral. This is the 紅白 finding in docs/locale-colour-typography.md: red-and-white together is the visual grammar of CELEBRATION in Japan — 紅白幕, 紅白餅, 紅白饅頭, all 縁起物 — traceable to the Genpei War banners. A red alert on a cream-white card is the most natural thing a Western designer reaches for, and in Japan it reads as bunting. */
+[data-locale='ja-JP'] {
+  --paper: #f2f1ee;
+  --paper-2: #eae9e5;
+  --paper-3: #dedcd7;
+  --card: #f7f6f3;
+  --ink: #24211f;
+  --ink-2: #4e4a46;
+  --ink-3: #67625e;
+  --clay: #9b3a2c;
+  --clay-2: #b04a38;
+  --clay-wash: #e5e2e0;
+  --clay-line: #c8c3c0;
+  --ochre: #a97d28;
+  --ochre-ink: #7c5410;
+  --ochre-wash: #efe9dc;
+  --ochre-line: #d7ccb5;
+  --sage: #3f5d48;
+  --sage-wash: #e3eae3;
+  --sage-line: #c5d3c6;
+  --line: #dedcd6;
+  --line-2: #c9c6be;
+  --font-display: 'Noto Serif JP', 'Fraunces', Georgia, serif;
+  --font-sans: 'Noto Sans JP', 'Inter', system-ui, sans-serif;
+  --leading: 1.65;
+  --line-break: strict;
+}
+
+/* zh-CN — Chinese (Simplified, Mainland) (简体中文). Palette departs from base.
+   Worst measured body-text ratio in this theme: 5.48:1 (AA needs 4.5).
+   The red is pushed from the base's muted terracotta toward a true safety red. Red-as-alert is the legally standardised meaning in the Chinese national safety-colour standard — 红 = 禁止、停止、紧急告警 — which maps cleanly onto ISO 3864-4, so it is reinforced by the built environment the user walks through every day. */
+[data-locale='zh-CN'] {
+  --clay: #b0140f;
+  --clay-2: #cc2a1c;
+  --clay-wash: #fadfdb;
+  --clay-line: #f0bcb3;
+  --sage: #35643f;
+  --sage-wash: #e5eee2;
+  --sage-line: #c6dac2;
+  --font-display: 'Noto Serif SC', 'Fraunces', Georgia, serif;
+  --font-sans: 'Noto Sans SC', 'Inter', system-ui, sans-serif;
+  --leading: 1.65;
+}
+
+/* ko-KR — Korean (한국어). Palette identical to base; typography only.
+   Worst measured body-text ratio in this theme: 4.91:1 (AA needs 4.5).
+   Palette unchanged, and that is the finding rather than the absence of one. The obvious move — recolour the Korean theme away from white because "white means death in Korea" — is NOT verified and the evidence cuts the other way: 백의민족, the white-clad people, is a well-cited description of white as ordinary everyday Korean dress for centuries, attested in the Records of Wei, Choe Nam-seon, Oppert and Yanagi. The English Korean funeral article contains no colour claims at all. */
+[data-locale='ko-KR'] {
+  --font-display: 'Noto Serif KR', 'Fraunces', Georgia, serif;
+  --font-sans: 'Noto Sans KR', 'Inter', system-ui, sans-serif;
+  --leading: 1.6;
+  --word-break: keep-all;
+}
+
+/* hi-IN — Hindi (हिन्दी). Palette departs from base.
+   Worst measured body-text ratio in this theme: 5.48:1 (AA needs 4.5).
+   Every orange is gone. lib/gestures/locales.ts: avoid saffron/orange ENTIRELY — simultaneously sacred (Hindu, Buddhist, Sikh), the Hindutva/BJP movement colour, and the top band of the flag. "No reading of a saffron warning badge is inert." That removes both the base --ochre (a golden orange) and --clay-2 (a clear orange), which is why this is the largest palette departure in the set. */
+[data-locale='hi-IN'] {
+  --card: #fdf8ec;
+  --clay: #9e2138;
+  --clay-2: #b93349;
+  --clay-wash: #f7e0e4;
+  --clay-line: #e9b8c1;
+  --ochre: #a08800;
+  --ochre-ink: #6f5c00;
+  --ochre-wash: #faf1cd;
+  --ochre-line: #e7d99c;
+  --sage: #3d5f43;
+  --sage-wash: #e6eee3;
+  --sage-line: #c8d9c4;
+  --font-display: 'Noto Serif Devanagari', 'Fraunces', Georgia, serif;
+  --font-sans: 'Noto Sans Devanagari', 'Inter', system-ui, sans-serif;
+  --leading: 1.8;
+  --leading-display: 1.4;
+  --tracking-display: 0;
+  --tracking-eyebrow: 0;
+}
+
+/* sw-KE — Swahili (Kenya) (Kiswahili). Palette departs from base.
+   Worst measured body-text ratio in this theme: 5.48:1 (AA needs 4.5).
+   Orange is removed, and this one costs something. Orange is ODM's election symbol and party colour, and orange is also the natural warning tier between yellow and red in every design system — docs/locale-research-fr-us-ke.md flags it as "an easy trap" for exactly that reason. */
+[data-locale='sw-KE'] {
+  --clay: #93231f;
+  --clay-2: #ad3128;
+  --clay-wash: #f6dedb;
+  --clay-line: #e8bbb5;
+  --ochre: #8a5c1c;
+  --ochre-ink: #6b4514;
+  --ochre-wash: #efe6d7;
+  --ochre-line: #d9c8ab;
+  --sage: #3a5c40;
+  --sage-wash: #e5ede2;
+  --sage-line: #c6d8c2;
+}
+
+/* es-MX — Spanish (Mexico) (Español). Palette departs from base.
+   Worst measured body-text ratio in this theme: 5.29:1 (AA needs 4.5).
+   The flag triad is broken on two axes at once. The base theme puts sage green, a near-white card and clay red in the same component — green, white and red, which lib/gestures/locales.ts says to avoid together. The green is rotated to a deep pine-teal and every surface is warmed to sand, so neither the hue nor the white survives to assemble the flag. */
+[data-locale='es-MX'] {
+  --paper: #f7f0e2;
+  --paper-2: #f0e7d4;
+  --paper-3: #e8dcc3;
+  --card: #fdf8ec;
+  --clay: #9b3527;
+  --clay-2: #b54833;
+  --clay-wash: #f6e0d8;
+  --clay-line: #e7c1b3;
+  --ochre: #a3841c;
+  --ochre-ink: #6f5a0c;
+  --ochre-wash: #f7eecf;
+  --ochre-line: #e6d69e;
+  --sage: #1f5b52;
+  --sage-wash: #dfece9;
+  --sage-line: #b8d5d0;
+  --line: #e3d6bd;
+  --line-2: #d3c0a1;
+}
+
+/* pt-BR — Portuguese (Brazil) (Português). Palette departs from base.
+   Worst measured body-text ratio in this theme: 5.48:1 (AA needs 4.5).
+   This is the theme where the default UI is the problem. Red is the historic colour of the Workers' Party and green+yellow is Bolsonaro's adopted pair, so a stock green-OK / red-alert interface puts the two most partisan colours in Brazilian politics side by side on a device mounted on someone's front door. */
+[data-locale='pt-BR'] {
+  --clay: #8e2a24;
+  --clay-2: #a4392f;
+  --clay-wash: #f5e0dc;
+  --clay-line: #e6bdb6;
+  --ochre: #c07d14;
+  --ochre-ink: #7d5209;
+  --sage: #0f5c5e;
+  --sage-wash: #deeceb;
+  --sage-line: #b6d5d4;
+}
+
+[data-locale='hi-IN'] a{ text-decoration:none; border-block-end:1px solid currentColor; padding-block-end:.18em; }
+[data-locale='ar-SA'] .ds,[data-locale='ar-EG'] .ds{ direction: rtl; }
+[data-locale='el-GR'] .eyebrow{ text-transform:none; }
+
+/* ===========================================================================
+   Page chrome. Deliberately neutral so it never competes with the themes.
+   =========================================================================== */
+*,*::before,*::after{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
+body{
+  margin:0; background:#f4f1ec; color:#221f1c;
+  font-family:'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size:16px; line-height:1.55;
+}
+.shell{ max-width:1180px; margin:0 auto; padding:0 20px 96px; }
+
+header.masthead{ padding:64px 0 34px; border-bottom:1px solid #ddd6cc; margin-bottom:34px; }
+.kicker{ font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#8a7f72; margin:0 0 14px; }
+h1{ font-family:'Fraunces',Georgia,serif; font-size:clamp(32px,5vw,52px); line-height:1.08; letter-spacing:-.02em; margin:0 0 18px; font-weight:600; }
+.lede{ font-size:18px; line-height:1.6; max-width:64ch; color:#3d372f; margin:0 0 10px; }
+.lede.small{ font-size:15.5px; color:#5b544a; }
+
+.rules{ display:grid; grid-template-columns:repeat(auto-fit,minmax(248px,1fr)); gap:14px; margin:30px 0 0; padding:0; list-style:none; }
+.rules li{ background:#fffdf9; border:1px solid #e2dace; border-radius:14px; padding:14px 16px; font-size:14px; line-height:1.5; color:#3d372f; }
+.rules b{ display:block; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#8a7f72; margin-bottom:6px; }
+
+h2.sec{ font-family:'Fraunces',Georgia,serif; font-size:26px; font-weight:600; letter-spacing:-.01em; margin:56px 0 6px; }
+.sec-sub{ color:#5b544a; font-size:15px; margin:0 0 20px; max-width:70ch; }
+
+table.summary{ width:100%; border-collapse:collapse; background:#fffdf9; border:1px solid #e2dace; border-radius:14px; overflow:hidden; font-size:14px; }
+table.summary th{ text-align:left; font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:#8a7f72; padding:11px 14px; border-bottom:1px solid #e2dace; font-weight:600; }
+table.summary td{ padding:9px 14px; border-bottom:1px solid #eee8de; }
+table.summary tr:last-child td{ border-bottom:0; }
+table.summary a{ color:inherit; }
+.num{ text-align:right; font-variant-numeric:tabular-nums; }
+.small{ font-size:12.5px; color:#6b6459; }
+.dot{ display:inline-block; width:8px; height:8px; border-radius:99px; margin-right:6px; vertical-align:1px; }
+.dot-base{ background:#b8ac9b; }
+.dot-new{ background:#a3432a; }
+code{ font-family:ui-monospace,'Cascadia Code',Consolas,monospace; font-size:.9em; }
+
+/* ---- a theme panel ---- */
+.panel{ margin:26px 0 0; border:1px solid #ddd6cc; border-radius:20px; overflow:hidden; background:#fffdf9; }
+.panel-head{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
+  padding:12px 18px; background:#f7f3ec; border-bottom:1px solid #e4ddd2; }
+.ph-left{ display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+.ph-left .code{ font-family:ui-monospace,Consolas,monospace; font-size:13px; font-weight:600; color:#221f1c;
+  background:#ece5da; border-radius:6px; padding:3px 8px; }
+.ph-left .nat{ font-size:17px; font-weight:600; }
+.ph-left .eng{ font-size:13px; color:#7b7367; }
+.ph-right{ display:flex; gap:7px; flex-wrap:wrap; }
+.tag{ font-size:11px; font-weight:600; letter-spacing:.03em; padding:3px 9px; border-radius:999px; border:1px solid; }
+.tag-base{ color:#6b6459; border-color:#cfc6b8; background:#f2ece2; }
+.tag-new{ color:#7d3320; border-color:#e0bcae; background:#faeae2; }
+.tag-type{ color:#3c5b6e; border-color:#bcd0da; background:#e9f1f5; }
+.tag-aa{ color:#38543e; border-color:#c2d4be; background:#e9f0e6; }
+
+.panel-body{ display:grid; grid-template-columns:minmax(0,420px) minmax(0,1fr); gap:0; }
+.panel-card{ padding:26px 24px; background:var(--paper); border-right:1px solid #e4ddd2; }
+.panel-why{ padding:22px 24px; min-width:0; }
+
+/* ---- the doorstep card: identical markup in all 14 themes ---- */
+.ds{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r-md);
+  box-shadow:var(--shadow-1); padding:18px 18px 16px; color:var(--ink);
+}
+.ds-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+.eyebrow{ font-size:11px; font-weight:600; color:var(--ink-3); }
+.ds-meta{ font-size:11.5px; color:var(--ink-3); font-variant-numeric:tabular-nums; }
+.ds-title{ margin:0 0 14px; font-size:22px; font-weight:600; color:var(--ink); }
+
+.ds-alert{ display:flex; align-items:center; gap:9px; padding:8px 11px; margin-bottom:13px;
+  border:1px solid var(--clay-line); border-inline-start:3px solid var(--clay);
+  border-radius:var(--r-sm); background:var(--clay-wash); }
+.ds-alert-ico{ color:var(--clay); display:inline-flex; }
+.ds-alert-label{ font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-2); }
+.visitor-name{ font-size:14.5px; font-weight:600; margin-inline-start:auto; }
+[dir='rtl'] .ds-alert-label{ letter-spacing:0; text-transform:none; }
+
+.ds-said{ border-inline-start:2px solid var(--line-2); padding-inline-start:12px; margin-bottom:13px; }
+.ds-lab{ display:block; font-size:10.5px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-bottom:4px; }
+[dir='rtl'] .ds-lab{ letter-spacing:0; text-transform:none; font-size:11.5px; }
+.ds-said p{ margin:0; font-size:14.5px; color:var(--ink-2); }
+.ds-gest{ margin-bottom:15px; }
+.ds-gest-v{ font-size:14.5px; font-weight:600; color:var(--sage); }
+
+.ds-states{ display:flex; flex-wrap:wrap; gap:7px; padding-top:13px; border-top:1px solid var(--line); }
+.chip{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px;
+  font-size:12px; font-weight:600; border:1px solid; }
+.ico{ width:15px; height:15px; flex:none; }
+.chip-safe{ color:var(--sage); background:var(--sage-wash); border-color:var(--sage-line); }
+.chip-warn{ color:var(--ochre-ink); background:var(--ochre-wash); border-color:var(--ochre-line); }
+.chip-stop{ color:var(--clay); background:var(--clay-wash); border-color:var(--clay-line); }
+
+/* ---- swatches + rationale ---- */
+.swatches{ display:flex; flex-wrap:wrap; gap:7px; margin-bottom:16px; }
+.sw{ display:flex; flex-direction:column; gap:2px; min-width:82px; padding:7px 9px; border:1px solid #e4ddd2; border-radius:10px; background:#fff; }
+.sw-moved{ border-color:#d8b7a8; background:#fdf4ef; }
+.sw i{ display:block; height:16px; border-radius:4px; border:1px solid rgba(0,0,0,.12); }
+.sw b{ font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:#8a7f72; font-weight:600; }
+.sw code{ font-size:10.5px; color:#453f37; }
+.sw em{ font-size:10px; font-style:normal; color:#6b6459; font-variant-numeric:tabular-nums; }
+
+ol.why{ margin:0; padding-inline-start:20px; }
+ol.why li{ font-size:13.5px; line-height:1.58; color:#3d372f; margin-bottom:9px; }
+ol.why li::marker{ color:#a89c8b; font-size:12px; }
+
+details.numbers{ margin-top:12px; border-top:1px solid #eee8de; padding-top:10px; }
+details.numbers summary{ cursor:pointer; font-size:12px; font-weight:600; color:#6b6459; letter-spacing:.03em; }
+details.numbers table{ width:100%; border-collapse:collapse; margin-top:9px; font-size:11.5px; }
+details.numbers th{ text-align:left; color:#8a7f72; font-weight:600; padding:3px 6px; border-bottom:1px solid #eee8de; }
+details.numbers td{ padding:3px 6px; border-bottom:1px solid #f4efe7; }
+details.numbers tr.bad td{ background:#fdf1ec; color:#8a3a1e; }
+p.note{ font-size:11.5px; color:#6b6459; margin:9px 0 0; }
+
+footer{ margin-top:64px; padding-top:26px; border-top:1px solid #ddd6cc; font-size:14px; color:#5b544a; }
+footer h3{ font-family:'Fraunces',Georgia,serif; font-size:19px; margin:24px 0 8px; color:#221f1c; font-weight:600; }
+footer p{ max-width:76ch; }
+
+@media (max-width: 900px){
+  .panel-body{ grid-template-columns:1fr; }
+  .panel-card{ border-right:0; border-bottom:1px solid #e4ddd2; }
+}
+@media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<header class="masthead">
+  <p class="kicker">WAVE · design system · per-locale theming</p>
+  <h1>The same door, in fourteen places.</h1>
+  <p class="lede">One doorstep card, rendered in every locale theme. The markup is identical in all fourteen — only the custom properties change. What varies is what the research said should vary, and nothing else.</p>
+  <p class="lede small">9 of 14 locales get a distinct palette. 5 keep the base, because no sourced reason to depart was found and an unjustified palette is a liability rather than a feature. Two of those 5 still change typeface or text-layout tokens — script coverage is not a matter of taste.</p>
+
+  <ul class="rules">
+    <li><b>Alert semantics</b>ISO 3864-4, not folk symbolism: red = prohibition, yellow = warning, green = safe, blue = mandatory. Legally standardised in every market here, and matched by China's own national safety-colour standard. pt-BR is the one documented exception.</li>
+    <li><b>WCAG 1.4.1</b>Colour never carries a state alone. Every state below also has an ISO 7010 shape — square, triangle, circle-with-bar — and a text label. Theming may change hue; it may not make hue load-bearing.</li>
+    <li><b>Contrast</b>Measured from the hex values, not eyeballed. Every body-text pair in every theme clears AA 4.5:1; the worst case per theme is in the table and every pair is listed under each card.</li>
+    <li><b>No flags, no costumes</b>A change with no finding behind it did not get made. Where the repo says "no reliable locale-specific colour semantics found", the theme says so too.</li>
+  </ul>
+</header>
+
+<h2 class="sec">At a glance</h2>
+<p class="sec-sub">"Distinct" means the colour tokens depart from the base. "Type" counts typography tokens that depart — a locale can have a base palette and still need a different typeface, and two of them do.</p>
+<table class="summary">
+  <thead><tr><th>locale</th><th>language</th><th>palette</th><th>type deltas</th><th class="num">worst body ratio</th><th>display face</th></tr></thead>
+  <tbody><tr><td><a href="#t-en-US"><code>en-US</code></a></td><td>English (US)</td><td><span class="dot dot-base"></span> base</td><td>—</td><td class="num">4.91:1</td><td class="small">Fraunces</td></tr><tr><td><a href="#t-en-NG"><code>en-NG</code></a></td><td>English (Nigeria)</td><td><span class="dot dot-base"></span> base</td><td>—</td><td class="num">4.91:1</td><td class="small">Fraunces</td></tr><tr><td><a href="#t-fr-FR"><code>fr-FR</code></a></td><td>French</td><td><span class="dot dot-new"></span> distinct</td><td>—</td><td class="num">4.91:1</td><td class="small">Fraunces</td></tr><tr><td><a href="#t-el-GR"><code>el-GR</code></a></td><td>Greek</td><td><span class="dot dot-base"></span> base</td><td>2 tokens</td><td class="num">4.91:1</td><td class="small">Noto Serif</td></tr><tr><td><a href="#t-tr-TR"><code>tr-TR</code></a></td><td>Turkish</td><td><span class="dot dot-base"></span> base</td><td>—</td><td class="num">4.91:1</td><td class="small">Fraunces</td></tr><tr><td><a href="#t-ar-SA"><code>ar-SA</code></a></td><td>Arabic (Gulf)</td><td><span class="dot dot-new"></span> distinct</td><td>5 tokens</td><td class="num">5.28:1</td><td class="small">Noto Kufi Arabic</td></tr><tr><td><a href="#t-ar-EG"><code>ar-EG</code></a></td><td>Arabic (Egypt)</td><td><span class="dot dot-new"></span> distinct</td><td>5 tokens</td><td class="num">5.28:1</td><td class="small">Noto Kufi Arabic</td></tr><tr><td><a href="#t-ja-JP"><code>ja-JP</code></a></td><td>Japanese</td><td><span class="dot dot-new"></span> distinct</td><td>4 tokens</td><td class="num">5.33:1</td><td class="small">Noto Serif JP</td></tr><tr><td><a href="#t-zh-CN"><code>zh-CN</code></a></td><td>Chinese (Simplified, Mainland)</td><td><span class="dot dot-new"></span> distinct</td><td>3 tokens</td><td class="num">5.48:1</td><td class="small">Noto Serif SC</td></tr><tr><td><a href="#t-ko-KR"><code>ko-KR</code></a></td><td>Korean</td><td><span class="dot dot-base"></span> base</td><td>4 tokens</td><td class="num">4.91:1</td><td class="small">Noto Serif KR</td></tr><tr><td><a href="#t-hi-IN"><code>hi-IN</code></a></td><td>Hindi</td><td><span class="dot dot-new"></span> distinct</td><td>6 tokens</td><td class="num">5.48:1</td><td class="small">Noto Serif Devanagari</td></tr><tr><td><a href="#t-sw-KE"><code>sw-KE</code></a></td><td>Swahili (Kenya)</td><td><span class="dot dot-new"></span> distinct</td><td>—</td><td class="num">5.48:1</td><td class="small">Fraunces</td></tr><tr><td><a href="#t-es-MX"><code>es-MX</code></a></td><td>Spanish (Mexico)</td><td><span class="dot dot-new"></span> distinct</td><td>—</td><td class="num">5.29:1</td><td class="small">Fraunces</td></tr><tr><td><a href="#t-pt-BR"><code>pt-BR</code></a></td><td>Portuguese (Brazil)</td><td><span class="dot dot-new"></span> distinct</td><td>—</td><td class="num">5.48:1</td><td class="small">Fraunces</td></tr></tbody>
+</table>
+
+<h2 class="sec">The fourteen</h2>
+<p class="sec-sub">Read the numbered list beside each card as the audit trail: one entry per decision, each naming the finding that forced it. Swatches outlined in clay are the tokens that moved.</p>
+
+<section class="panel" data-locale="en-US" id="t-en-US">
+  <header class="panel-head">
+    <div class="ph-left">
+      <span class="code">en-US</span>
+      <span class="nat" lang="en-US" dir="ltr">English</span>
+      <span class="eng">English (US)</span>
+    </div>
+    <div class="ph-right">
+      <span class="tag tag-base">palette = base</span>
+      
+      <span class="tag tag-aa">AA 4.91:1</span>
+    </div>
+  </header>
+
+  <div class="panel-body">
+    <div class="panel-card"><div class="ds card alert-surface-host" lang="en-US" dir="ltr">
+  <div class="ds-top">
+    <span class="eyebrow">At the door now</span>
+    <span class="ds-meta">Front door · 14:26</span>
+  </div>
+  <h3 class="display ds-title">A courier is at the front door.</h3>
+
+  <div class="ds-alert alert-surface">
+    <span class="ds-alert-ico" aria-hidden="true"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+    <span class="ds-alert-label">Recognised</span>
+    <span class="visitor-name">Rosa M.</span>
+  </div>
+
+  <div class="ds-said">
+    <span class="ds-lab">The door said</span>
+    <p>Hello. The resident here is Deaf and cannot come to the door. I can help — are you delivering something?</p>
+  </div>
+
+  <div class="ds-gest">
+    <span class="ds-lab">Visitor gestured</span>
+    <span class="ds-gest-v">Nod — yes</span>
+  </div>
+
+  <div class="ds-states">
+    <span class="chip chip-safe"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><rect x="2.5" y="2.5" width="15" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10.4l2.8 2.8L14.4 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Safe</span></span>
+    <span class="chip chip-warn"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><path d="M10 2.6l7.6 14H2.4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 7.6v3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14.1" r="1.05" fill="currentColor"/></svg><span>Warning</span></span>
+    <span class="chip chip-stop"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Turned away</span></span>
+  </div>
+</div></div>
+    <div class="panel-why">
+      <div class="swatches"><div class="sw"><i style="background:#faf4ea"></i><b>paper</b><code>#faf4ea</code><em>&nbsp;</em></div><div class="sw"><i style="background:#fffcf6"></i><b>card</b><code>#fffcf6</code><em>&nbsp;</em></div><div class="sw"><i style="background:#2a2420"></i><b>ink</b><code>#2a2420</code><em>14.95:1</em></div><div class="sw"><i style="background:#a3432a"></i><b>clay</b><code>#a3432a</code><em>6.04:1</em></div><div class="sw"><i style="background:#815510"></i><b>ochre-ink</b><code>#815510</code><em>6.33:1</em></div><div class="sw"><i style="background:#44614a"></i><b>sage</b><code>#44614a</code><em>6.71:1</em></div></div>
+      <ol class="why"><li>No departure. lib/gestures/locales.ts records only ANSI Z535 for en-US — DANGER white-on-red, WARNING black-on-orange, CAUTION black-on-yellow — which is the same semantics the base already encodes from ISO 3864-4.</li><li>The base clay / ochre / sage triad already maps red = prohibition, amber = warning, green = safe. Restating it in different hex would be change without a finding behind it.</li></ol>
+      <details class="numbers">
+        <summary>Measured contrast — 25 pairs</summary>
+        <table><thead><tr><th>pair</th><th>fg</th><th>bg</th><th class="num">ratio</th><th class="num">min</th></tr></thead><tbody><tr class=""><td>ink / paper</td><td><code>#2a2420</code></td><td><code>#faf4ea</code></td><td class="num">13.99</td><td class="num">4.5</td></tr><tr class=""><td>ink / card</td><td><code>#2a2420</code></td><td><code>#fffcf6</code></td><td class="num">14.95</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-2</td><td><code>#2a2420</code></td><td><code>#f4eadb</code></td><td class="num">12.86</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-3</td><td><code>#2a2420</code></td><td><code>#eee0cb</code></td><td class="num">11.78</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / paper</td><td><code>#574c42</code></td><td><code>#faf4ea</code></td><td class="num">7.62</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / card</td><td><code>#574c42</code></td><td><code>#fffcf6</code></td><td class="num">8.15</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / paper</td><td><code>#6e6154</code></td><td><code>#faf4ea</code></td><td class="num">5.48</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / card</td><td><code>#6e6154</code></td><td><code>#fffcf6</code></td><td class="num">5.86</td><td class="num">4.5</td></tr><tr class=""><td>clay / paper</td><td><code>#a3432a</code></td><td><code>#faf4ea</code></td><td class="num">5.66</td><td class="num">4.5</td></tr><tr class=""><td>clay / card</td><td><code>#a3432a</code></td><td><code>#fffcf6</code></td><td class="num">6.04</td><td class="num">4.5</td></tr><tr class=""><td>clay / clay-wash</td><td><code>#a3432a</code></td><td><code>#f6e1d5</code></td><td class="num">4.91</td><td class="num">4.5</td></tr><tr class=""><td>ink / clay-wash</td><td><code>#2a2420</code></td><td><code>#f6e1d5</code></td><td class="num">12.14</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / paper</td><td><code>#815510</code></td><td><code>#faf4ea</code></td><td class="num">5.92</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / card</td><td><code>#815510</code></td><td><code>#fffcf6</code></td><td class="num">6.33</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / ochre-wash</td><td><code>#815510</code></td><td><code>#f9ebd1</code></td><td class="num">5.50</td><td class="num">4.5</td></tr><tr class=""><td>ink / ochre-wash</td><td><code>#2a2420</code></td><td><code>#f9ebd1</code></td><td class="num">13.00</td><td class="num">4.5</td></tr><tr class=""><td>sage / paper</td><td><code>#44614a</code></td><td><code>#faf4ea</code></td><td class="num">6.28</td><td class="num">4.5</td></tr><tr class=""><td>sage / card</td><td><code>#44614a</code></td><td><code>#fffcf6</code></td><td class="num">6.71</td><td class="num">4.5</td></tr><tr class=""><td>sage / sage-wash</td><td><code>#44614a</code></td><td><code>#e7eee4</code></td><td class="num">5.81</td><td class="num">4.5</td></tr><tr class=""><td>ink / sage-wash</td><td><code>#2a2420</code></td><td><code>#e7eee4</code></td><td class="num">12.94</td><td class="num">4.5</td></tr><tr class=""><td>clay-2 / paper (large)</td><td><code>#c2603d</code></td><td><code>#faf4ea</code></td><td class="num">3.81</td><td class="num">3</td></tr><tr class="bad"><td>ochre / paper (large)</td><td><code>#c58a2b</code></td><td><code>#faf4ea</code></td><td class="num">2.72</td><td class="num">3</td></tr><tr class=""><td>clay-line / clay-wash (bdr)</td><td><code>#e6c4b2</code></td><td><code>#f6e1d5</code></td><td class="num">1.29</td><td class="num">1.2</td></tr><tr class=""><td>ochre-line / ochre-wash (bdr)</td><td><code>#ebd3a6</code></td><td><code>#f9ebd1</code></td><td class="num">1.24</td><td class="num">1.2</td></tr><tr class=""><td>sage-line / sage-wash (bdr)</td><td><code>#cbdac6</code></td><td><code>#e7eee4</code></td><td class="num">1.23</td><td class="num">1.2</td></tr></tbody></table>
+        <p class="note">Font: <code>'Fraunces'</code> display · <code>'Inter'</code> text · line-height <code>1.55</code> · tracking <code>0.12em</code> · word-break <code>normal</code></p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-locale="en-NG" id="t-en-NG">
+  <header class="panel-head">
+    <div class="ph-left">
+      <span class="code">en-NG</span>
+      <span class="nat" lang="en-NG" dir="ltr">English</span>
+      <span class="eng">English (Nigeria)</span>
+    </div>
+    <div class="ph-right">
+      <span class="tag tag-base">palette = base</span>
+      
+      <span class="tag tag-aa">AA 4.91:1</span>
+    </div>
+  </header>
+
+  <div class="panel-body">
+    <div class="panel-card"><div class="ds card alert-surface-host" lang="en-NG" dir="ltr">
+  <div class="ds-top">
+    <span class="eyebrow">At the door now</span>
+    <span class="ds-meta">Front door · 14:26</span>
+  </div>
+  <h3 class="display ds-title">A courier is at the front door.</h3>
+
+  <div class="ds-alert alert-surface">
+    <span class="ds-alert-ico" aria-hidden="true"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+    <span class="ds-alert-label">Recognised</span>
+    <span class="visitor-name">Chidinma A.</span>
+  </div>
+
+  <div class="ds-said">
+    <span class="ds-lab">The door said</span>
+    <p>Good afternoon, sir. The resident here is Deaf and cannot come to the door. Are you dropping something off?</p>
+  </div>
+
+  <div class="ds-gest">
+    <span class="ds-lab">Visitor gestured</span>
+    <span class="ds-gest-v">Nod — yes</span>
+  </div>
+
+  <div class="ds-states">
+    <span class="chip chip-safe"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><rect x="2.5" y="2.5" width="15" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10.4l2.8 2.8L14.4 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Safe</span></span>
+    <span class="chip chip-warn"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><path d="M10 2.6l7.6 14H2.4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 7.6v3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14.1" r="1.05" fill="currentColor"/></svg><span>Warning</span></span>
+    <span class="chip chip-stop"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Turned away</span></span>
+  </div>
+</div></div>
+    <div class="panel-why">
+      <div class="swatches"><div class="sw"><i style="background:#faf4ea"></i><b>paper</b><code>#faf4ea</code><em>&nbsp;</em></div><div class="sw"><i style="background:#fffcf6"></i><b>card</b><code>#fffcf6</code><em>&nbsp;</em></div><div class="sw"><i style="background:#2a2420"></i><b>ink</b><code>#2a2420</code><em>14.95:1</em></div><div class="sw"><i style="background:#a3432a"></i><b>clay</b><code>#a3432a</code><em>6.04:1</em></div><div class="sw"><i style="background:#815510"></i><b>ochre-ink</b><code>#815510</code><em>6.33:1</em></div><div class="sw"><i style="background:#44614a"></i><b>sage</b><code>#44614a</code><em>6.71:1</em></div></div>
+      <ol class="why"><li>No departure. The only colour note in lib/gestures/locales.ts is flag symbolism (green = agriculture, white = unity) plus a northern Islamic association for green — flag symbolism is not a UI constraint, and green as &quot;safe&quot; is ISO 3864-4, not a national reference.</li><li>docs/gesture-research-greece-africa.md withdrew both Nigerian claims this project previously made — the &quot;waka&quot; reading of the spread palm carries no citation anywhere it could be traced, and the West-African thumbs-up taboo traces to a 1991 travel book. Having withdrawn two claims for being unsourced, inventing a Nigerian palette from nothing would be the same error in a new place.</li></ol>
+      <details class="numbers">
+        <summary>Measured contrast — 25 pairs</summary>
+        <table><thead><tr><th>pair</th><th>fg</th><th>bg</th><th class="num">ratio</th><th class="num">min</th></tr></thead><tbody><tr class=""><td>ink / paper</td><td><code>#2a2420</code></td><td><code>#faf4ea</code></td><td class="num">13.99</td><td class="num">4.5</td></tr><tr class=""><td>ink / card</td><td><code>#2a2420</code></td><td><code>#fffcf6</code></td><td class="num">14.95</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-2</td><td><code>#2a2420</code></td><td><code>#f4eadb</code></td><td class="num">12.86</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-3</td><td><code>#2a2420</code></td><td><code>#eee0cb</code></td><td class="num">11.78</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / paper</td><td><code>#574c42</code></td><td><code>#faf4ea</code></td><td class="num">7.62</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / card</td><td><code>#574c42</code></td><td><code>#fffcf6</code></td><td class="num">8.15</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / paper</td><td><code>#6e6154</code></td><td><code>#faf4ea</code></td><td class="num">5.48</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / card</td><td><code>#6e6154</code></td><td><code>#fffcf6</code></td><td class="num">5.86</td><td class="num">4.5</td></tr><tr class=""><td>clay / paper</td><td><code>#a3432a</code></td><td><code>#faf4ea</code></td><td class="num">5.66</td><td class="num">4.5</td></tr><tr class=""><td>clay / card</td><td><code>#a3432a</code></td><td><code>#fffcf6</code></td><td class="num">6.04</td><td class="num">4.5</td></tr><tr class=""><td>clay / clay-wash</td><td><code>#a3432a</code></td><td><code>#f6e1d5</code></td><td class="num">4.91</td><td class="num">4.5</td></tr><tr class=""><td>ink / clay-wash</td><td><code>#2a2420</code></td><td><code>#f6e1d5</code></td><td class="num">12.14</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / paper</td><td><code>#815510</code></td><td><code>#faf4ea</code></td><td class="num">5.92</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / card</td><td><code>#815510</code></td><td><code>#fffcf6</code></td><td class="num">6.33</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / ochre-wash</td><td><code>#815510</code></td><td><code>#f9ebd1</code></td><td class="num">5.50</td><td class="num">4.5</td></tr><tr class=""><td>ink / ochre-wash</td><td><code>#2a2420</code></td><td><code>#f9ebd1</code></td><td class="num">13.00</td><td class="num">4.5</td></tr><tr class=""><td>sage / paper</td><td><code>#44614a</code></td><td><code>#faf4ea</code></td><td class="num">6.28</td><td class="num">4.5</td></tr><tr class=""><td>sage / card</td><td><code>#44614a</code></td><td><code>#fffcf6</code></td><td class="num">6.71</td><td class="num">4.5</td></tr><tr class=""><td>sage / sage-wash</td><td><code>#44614a</code></td><td><code>#e7eee4</code></td><td class="num">5.81</td><td class="num">4.5</td></tr><tr class=""><td>ink / sage-wash</td><td><code>#2a2420</code></td><td><code>#e7eee4</code></td><td class="num">12.94</td><td class="num">4.5</td></tr><tr class=""><td>clay-2 / paper (large)</td><td><code>#c2603d</code></td><td><code>#faf4ea</code></td><td class="num">3.81</td><td class="num">3</td></tr><tr class="bad"><td>ochre / paper (large)</td><td><code>#c58a2b</code></td><td><code>#faf4ea</code></td><td class="num">2.72</td><td class="num">3</td></tr><tr class=""><td>clay-line / clay-wash (bdr)</td><td><code>#e6c4b2</code></td><td><code>#f6e1d5</code></td><td class="num">1.29</td><td class="num">1.2</td></tr><tr class=""><td>ochre-line / ochre-wash (bdr)</td><td><code>#ebd3a6</code></td><td><code>#f9ebd1</code></td><td class="num">1.24</td><td class="num">1.2</td></tr><tr class=""><td>sage-line / sage-wash (bdr)</td><td><code>#cbdac6</code></td><td><code>#e7eee4</code></td><td class="num">1.23</td><td class="num">1.2</td></tr></tbody></table>
+        <p class="note">Font: <code>'Fraunces'</code> display · <code>'Inter'</code> text · line-height <code>1.55</code> · tracking <code>0.12em</code> · word-break <code>normal</code></p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-locale="fr-FR" id="t-fr-FR">
+  <header class="panel-head">
+    <div class="ph-left">
+      <span class="code">fr-FR</span>
+      <span class="nat" lang="fr-FR" dir="ltr">Français</span>
+      <span class="eng">French</span>
+    </div>
+    <div class="ph-right">
+      <span class="tag tag-new">palette departs</span>
+      
+      <span class="tag tag-aa">AA 4.91:1</span>
+    </div>
+  </header>
+
+  <div class="panel-body">
+    <div class="panel-card"><div class="ds card alert-surface-host" lang="fr-FR" dir="ltr">
+  <div class="ds-top">
+    <span class="eyebrow">À la porte maintenant</span>
+    <span class="ds-meta">Porte d’entrée : 14 h 26</span>
+  </div>
+  <h3 class="display ds-title">Un livreur est à la porte.</h3>
+
+  <div class="ds-alert alert-surface">
+    <span class="ds-alert-ico" aria-hidden="true"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+    <span class="ds-alert-label">Reconnue</span>
+    <span class="visitor-name">Élodie R.</span>
+  </div>
+
+  <div class="ds-said">
+    <span class="ds-lab">La porte a dit</span>
+    <p>Bonjour. La personne qui habite ici est sourde et ne peut pas venir à la porte. Souhaitez-vous déposer un colis ?</p>
+  </div>
+
+  <div class="ds-gest">
+    <span class="ds-lab">Le visiteur a fait un signe</span>
+    <span class="ds-gest-v">Hochement de tête — oui</span>
+  </div>
+
+  <div class="ds-states">
+    <span class="chip chip-safe"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><rect x="2.5" y="2.5" width="15" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10.4l2.8 2.8L14.4 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Sûr</span></span>
+    <span class="chip chip-warn"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><path d="M10 2.6l7.6 14H2.4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 7.6v3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14.1" r="1.05" fill="currentColor"/></svg><span>Attention</span></span>
+    <span class="chip chip-stop"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Refusé</span></span>
+  </div>
+</div></div>
+    <div class="panel-why">
+      <div class="swatches"><div class="sw"><i style="background:#faf4ea"></i><b>paper</b><code>#faf4ea</code><em>&nbsp;</em></div><div class="sw"><i style="background:#fffcf6"></i><b>card</b><code>#fffcf6</code><em>&nbsp;</em></div><div class="sw"><i style="background:#2a2420"></i><b>ink</b><code>#2a2420</code><em>14.95:1</em></div><div class="sw"><i style="background:#a3432a"></i><b>clay</b><code>#a3432a</code><em>6.04:1</em></div><div class="sw sw-moved"><i style="background:#9a4508"></i><b>ochre-ink</b><code>#9a4508</code><em>6.35:1</em></div><div class="sw"><i style="background:#44614a"></i><b>sage</b><code>#44614a</code><em>6.71:1</em></div></div>
+      <ol class="why"><li>The caution tier moves from yellow-gold to orange. docs/locale-research-fr-us-ke.md: a saturated yellow panel in France reads as gilets jaunes (Nov 2018 – Jun 2020, ~3m participants, peak 287,710 per the Ministry of the Interior) before it reads as caution — and the doc names orange as the substitute, which is ANSI-correct anyway.</li><li>The yellow wash is replaced by a pale orange one, so no surface in the theme is a large yellow fill. Pastoureau (Jaune, Seuil 2019) supplies the older layer — greenish yellow as the colour of Judas and forgers, lexicalised in « rire jaune ».</li><li>Everything else stays at base: no sourced French constraint touches the red, green or paper tiers.</li><li>Type unchanged. Fraunces and Inter both carry accented capitals (À É Î Ô Ù), which the Académie française requires — « en français, l'accent a pleine valeur orthographique ». The hazard there is a locale-naive toUpperCase() in code, not the typeface.</li></ol>
+      <details class="numbers">
+        <summary>Measured contrast — 25 pairs</summary>
+        <table><thead><tr><th>pair</th><th>fg</th><th>bg</th><th class="num">ratio</th><th class="num">min</th></tr></thead><tbody><tr class=""><td>ink / paper</td><td><code>#2a2420</code></td><td><code>#faf4ea</code></td><td class="num">13.99</td><td class="num">4.5</td></tr><tr class=""><td>ink / card</td><td><code>#2a2420</code></td><td><code>#fffcf6</code></td><td class="num">14.95</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-2</td><td><code>#2a2420</code></td><td><code>#f4eadb</code></td><td class="num">12.86</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-3</td><td><code>#2a2420</code></td><td><code>#eee0cb</code></td><td class="num">11.78</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / paper</td><td><code>#574c42</code></td><td><code>#faf4ea</code></td><td class="num">7.62</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / card</td><td><code>#574c42</code></td><td><code>#fffcf6</code></td><td class="num">8.15</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / paper</td><td><code>#6e6154</code></td><td><code>#faf4ea</code></td><td class="num">5.48</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / card</td><td><code>#6e6154</code></td><td><code>#fffcf6</code></td><td class="num">5.86</td><td class="num">4.5</td></tr><tr class=""><td>clay / paper</td><td><code>#a3432a</code></td><td><code>#faf4ea</code></td><td class="num">5.66</td><td class="num">4.5</td></tr><tr class=""><td>clay / card</td><td><code>#a3432a</code></td><td><code>#fffcf6</code></td><td class="num">6.04</td><td class="num">4.5</td></tr><tr class=""><td>clay / clay-wash</td><td><code>#a3432a</code></td><td><code>#f6e1d5</code></td><td class="num">4.91</td><td class="num">4.5</td></tr><tr class=""><td>ink / clay-wash</td><td><code>#2a2420</code></td><td><code>#f6e1d5</code></td><td class="num">12.14</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / paper</td><td><code>#9a4508</code></td><td><code>#faf4ea</code></td><td class="num">5.94</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / card</td><td><code>#9a4508</code></td><td><code>#fffcf6</code></td><td class="num">6.35</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / ochre-wash</td><td><code>#9a4508</code></td><td><code>#f8e7d8</code></td><td class="num">5.39</td><td class="num">4.5</td></tr><tr class=""><td>ink / ochre-wash</td><td><code>#2a2420</code></td><td><code>#f8e7d8</code></td><td class="num">12.70</td><td class="num">4.5</td></tr><tr class=""><td>sage / paper</td><td><code>#44614a</code></td><td><code>#faf4ea</code></td><td class="num">6.28</td><td class="num">4.5</td></tr><tr class=""><td>sage / card</td><td><code>#44614a</code></td><td><code>#fffcf6</code></td><td class="num">6.71</td><td class="num">4.5</td></tr><tr class=""><td>sage / sage-wash</td><td><code>#44614a</code></td><td><code>#e7eee4</code></td><td class="num">5.81</td><td class="num">4.5</td></tr><tr class=""><td>ink / sage-wash</td><td><code>#2a2420</code></td><td><code>#e7eee4</code></td><td class="num">12.94</td><td class="num">4.5</td></tr><tr class=""><td>clay-2 / paper (large)</td><td><code>#c2603d</code></td><td><code>#faf4ea</code></td><td class="num">3.81</td><td class="num">3</td></tr><tr class=""><td>ochre / paper (large)</td><td><code>#c4600f</code></td><td><code>#faf4ea</code></td><td class="num">3.82</td><td class="num">3</td></tr><tr class=""><td>clay-line / clay-wash (bdr)</td><td><code>#e6c4b2</code></td><td><code>#f6e1d5</code></td><td class="num">1.29</td><td class="num">1.2</td></tr><tr class=""><td>ochre-line / ochre-wash (bdr)</td><td><code>#e9c7ac</code></td><td><code>#f8e7d8</code></td><td class="num">1.32</td><td class="num">1.2</td></tr><tr class=""><td>sage-line / sage-wash (bdr)</td><td><code>#cbdac6</code></td><td><code>#e7eee4</code></td><td class="num">1.23</td><td class="num">1.2</td></tr></tbody></table>
+        <p class="note">Font: <code>'Fraunces'</code> display · <code>'Inter'</code> text · line-height <code>1.55</code> · tracking <code>0.12em</code> · word-break <code>normal</code></p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-locale="el-GR" id="t-el-GR">
+  <header class="panel-head">
+    <div class="ph-left">
+      <span class="code">el-GR</span>
+      <span class="nat" lang="el-GR" dir="ltr">Ελληνικά</span>
+      <span class="eng">Greek</span>
+    </div>
+    <div class="ph-right">
+      <span class="tag tag-base">palette = base</span>
+      <span class="tag tag-type">type ×2</span>
+      <span class="tag tag-aa">AA 4.91:1</span>
+    </div>
+  </header>
+
+  <div class="panel-body">
+    <div class="panel-card"><div class="ds card alert-surface-host" lang="el-GR" dir="ltr">
+  <div class="ds-top">
+    <span class="eyebrow">ΤΩΡΑ ΣΤΗΝ ΠΟΡΤΑ</span>
+    <span class="ds-meta">Κύρια είσοδος · 14:26</span>
+  </div>
+  <h3 class="display ds-title">Ένας διανομέας είναι στην πόρτα.</h3>
+
+  <div class="ds-alert alert-surface">
+    <span class="ds-alert-ico" aria-hidden="true"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+    <span class="ds-alert-label">Αναγνωρίστηκε</span>
+    <span class="visitor-name">Ελένη Π.</span>
+  </div>
+
+  <div class="ds-said">
+    <span class="ds-lab">Η πόρτα είπε</span>
+    <p>Γεια σας. Ο ένοικος είναι κωφός και δεν μπορεί να έρθει στην πόρτα. Έχετε κάποια παράδοση;</p>
+  </div>
+
+  <div class="ds-gest">
+    <span class="ds-lab">Ο επισκέπτης έκανε νεύμα</span>
+    <span class="ds-gest-v">Νεύμα — ναι</span>
+  </div>
+
+  <div class="ds-states">
+    <span class="chip chip-safe"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><rect x="2.5" y="2.5" width="15" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10.4l2.8 2.8L14.4 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Ασφαλές</span></span>
+    <span class="chip chip-warn"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><path d="M10 2.6l7.6 14H2.4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 7.6v3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14.1" r="1.05" fill="currentColor"/></svg><span>Προσοχή</span></span>
+    <span class="chip chip-stop"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Δεν έγινε δεκτό</span></span>
+  </div>
+</div></div>
+    <div class="panel-why">
+      <div class="swatches"><div class="sw"><i style="background:#faf4ea"></i><b>paper</b><code>#faf4ea</code><em>&nbsp;</em></div><div class="sw"><i style="background:#fffcf6"></i><b>card</b><code>#fffcf6</code><em>&nbsp;</em></div><div class="sw"><i style="background:#2a2420"></i><b>ink</b><code>#2a2420</code><em>14.95:1</em></div><div class="sw"><i style="background:#a3432a"></i><b>clay</b><code>#a3432a</code><em>6.04:1</em></div><div class="sw"><i style="background:#815510"></i><b>ochre-ink</b><code>#815510</code><em>6.33:1</em></div><div class="sw"><i style="background:#44614a"></i><b>sage</b><code>#44614a</code><em>6.71:1</em></div></div>
+      <ol class="why"><li>Palette unchanged. lib/gestures/locales.ts is explicit: &quot;Ground in ISO 3864-4; no reliable Greek-specific UI colour semantics found.&quot; A Greek palette invented to look Greek would be a costume.</li><li>Display face changes for coverage, not taste: the Google Fonts API serves Fraunces in latin, latin-ext and vietnamese only — no Greek subset — so a Greek headline in Fraunces silently falls back to Georgia and loses the whole voice of the brand. Noto Serif carries greek and greek-ext.</li><li>text-transform: uppercase is switched off for the eyebrow. docs/gesture-research-greece-africa.md: Greek uppercase drops the tonos but keeps the dialytika, and the disjunctive ή keeps its tonos — CSS gets this wrong. Uppercase Greek is supplied pre-composed instead.</li></ol>
+      <details class="numbers">
+        <summary>Measured contrast — 25 pairs</summary>
+        <table><thead><tr><th>pair</th><th>fg</th><th>bg</th><th class="num">ratio</th><th class="num">min</th></tr></thead><tbody><tr class=""><td>ink / paper</td><td><code>#2a2420</code></td><td><code>#faf4ea</code></td><td class="num">13.99</td><td class="num">4.5</td></tr><tr class=""><td>ink / card</td><td><code>#2a2420</code></td><td><code>#fffcf6</code></td><td class="num">14.95</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-2</td><td><code>#2a2420</code></td><td><code>#f4eadb</code></td><td class="num">12.86</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-3</td><td><code>#2a2420</code></td><td><code>#eee0cb</code></td><td class="num">11.78</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / paper</td><td><code>#574c42</code></td><td><code>#faf4ea</code></td><td class="num">7.62</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / card</td><td><code>#574c42</code></td><td><code>#fffcf6</code></td><td class="num">8.15</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / paper</td><td><code>#6e6154</code></td><td><code>#faf4ea</code></td><td class="num">5.48</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / card</td><td><code>#6e6154</code></td><td><code>#fffcf6</code></td><td class="num">5.86</td><td class="num">4.5</td></tr><tr class=""><td>clay / paper</td><td><code>#a3432a</code></td><td><code>#faf4ea</code></td><td class="num">5.66</td><td class="num">4.5</td></tr><tr class=""><td>clay / card</td><td><code>#a3432a</code></td><td><code>#fffcf6</code></td><td class="num">6.04</td><td class="num">4.5</td></tr><tr class=""><td>clay / clay-wash</td><td><code>#a3432a</code></td><td><code>#f6e1d5</code></td><td class="num">4.91</td><td class="num">4.5</td></tr><tr class=""><td>ink / clay-wash</td><td><code>#2a2420</code></td><td><code>#f6e1d5</code></td><td class="num">12.14</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / paper</td><td><code>#815510</code></td><td><code>#faf4ea</code></td><td class="num">5.92</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / card</td><td><code>#815510</code></td><td><code>#fffcf6</code></td><td class="num">6.33</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / ochre-wash</td><td><code>#815510</code></td><td><code>#f9ebd1</code></td><td class="num">5.50</td><td class="num">4.5</td></tr><tr class=""><td>ink / ochre-wash</td><td><code>#2a2420</code></td><td><code>#f9ebd1</code></td><td class="num">13.00</td><td class="num">4.5</td></tr><tr class=""><td>sage / paper</td><td><code>#44614a</code></td><td><code>#faf4ea</code></td><td class="num">6.28</td><td class="num">4.5</td></tr><tr class=""><td>sage / card</td><td><code>#44614a</code></td><td><code>#fffcf6</code></td><td class="num">6.71</td><td class="num">4.5</td></tr><tr class=""><td>sage / sage-wash</td><td><code>#44614a</code></td><td><code>#e7eee4</code></td><td class="num">5.81</td><td class="num">4.5</td></tr><tr class=""><td>ink / sage-wash</td><td><code>#2a2420</code></td><td><code>#e7eee4</code></td><td class="num">12.94</td><td class="num">4.5</td></tr><tr class=""><td>clay-2 / paper (large)</td><td><code>#c2603d</code></td><td><code>#faf4ea</code></td><td class="num">3.81</td><td class="num">3</td></tr><tr class="bad"><td>ochre / paper (large)</td><td><code>#c58a2b</code></td><td><code>#faf4ea</code></td><td class="num">2.72</td><td class="num">3</td></tr><tr class=""><td>clay-line / clay-wash (bdr)</td><td><code>#e6c4b2</code></td><td><code>#f6e1d5</code></td><td class="num">1.29</td><td class="num">1.2</td></tr><tr class=""><td>ochre-line / ochre-wash (bdr)</td><td><code>#ebd3a6</code></td><td><code>#f9ebd1</code></td><td class="num">1.24</td><td class="num">1.2</td></tr><tr class=""><td>sage-line / sage-wash (bdr)</td><td><code>#cbdac6</code></td><td><code>#e7eee4</code></td><td class="num">1.23</td><td class="num">1.2</td></tr></tbody></table>
+        <p class="note">Font: <code>'Noto Serif'</code> display · <code>'Inter'</code> text · line-height <code>1.55</code> · tracking <code>0.12em</code> · word-break <code>normal</code></p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-locale="tr-TR" id="t-tr-TR">
+  <header class="panel-head">
+    <div class="ph-left">
+      <span class="code">tr-TR</span>
+      <span class="nat" lang="tr-TR" dir="ltr">Türkçe</span>
+      <span class="eng">Turkish</span>
+    </div>
+    <div class="ph-right">
+      <span class="tag tag-base">palette = base</span>
+      
+      <span class="tag tag-aa">AA 4.91:1</span>
+    </div>
+  </header>
+
+  <div class="panel-body">
+    <div class="panel-card"><div class="ds card alert-surface-host" lang="tr-TR" dir="ltr">
+  <div class="ds-top">
+    <span class="eyebrow">ŞU AN KAPIDA</span>
+    <span class="ds-meta">Ön kapı · 14.26</span>
+  </div>
+  <h3 class="display ds-title">Kapıda bir kurye var.</h3>
+
+  <div class="ds-alert alert-surface">
+    <span class="ds-alert-ico" aria-hidden="true"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+    <span class="ds-alert-label">Tanındı</span>
+    <span class="visitor-name">İlknur Ş.</span>
+  </div>
+
+  <div class="ds-said">
+    <span class="ds-lab">Kapı şunu söyledi</span>
+    <p>Buyurun. Burada oturan kişi işitme engelli ve kapıya gelemiyor. Bir teslimatınız mı var?</p>
+  </div>
+
+  <div class="ds-gest">
+    <span class="ds-lab">Ziyaretçi işaret etti</span>
+    <span class="ds-gest-v">Baş sallama — evet</span>
+  </div>
+
+  <div class="ds-states">
+    <span class="chip chip-safe"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><rect x="2.5" y="2.5" width="15" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10.4l2.8 2.8L14.4 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Güvenli</span></span>
+    <span class="chip chip-warn"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><path d="M10 2.6l7.6 14H2.4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 7.6v3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14.1" r="1.05" fill="currentColor"/></svg><span>Dikkat</span></span>
+    <span class="chip chip-stop"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Kabul edilmedi</span></span>
+  </div>
+</div></div>
+    <div class="panel-why">
+      <div class="swatches"><div class="sw"><i style="background:#faf4ea"></i><b>paper</b><code>#faf4ea</code><em>&nbsp;</em></div><div class="sw"><i style="background:#fffcf6"></i><b>card</b><code>#fffcf6</code><em>&nbsp;</em></div><div class="sw"><i style="background:#2a2420"></i><b>ink</b><code>#2a2420</code><em>14.95:1</em></div><div class="sw"><i style="background:#a3432a"></i><b>clay</b><code>#a3432a</code><em>6.04:1</em></div><div class="sw"><i style="background:#815510"></i><b>ochre-ink</b><code>#815510</code><em>6.33:1</em></div><div class="sw"><i style="background:#44614a"></i><b>sage</b><code>#44614a</code><em>6.71:1</em></div></div>
+      <ol class="why"><li>No departure. docs/gesture-research-mena.md states it directly: &quot;Turkish colour semantics are snippet-level only. The Arabic colour paper does NOT apply.&quot; Borrowing the Arabic palette for Turkey because the locales are adjacent is exactly the error the research warns against.</li><li>The real Turkish constraint is casing, not colour: toUpperCase(&quot;i&quot;) is &quot;İ&quot; (U+0130) and toLowerCase(&quot;I&quot;) is &quot;ı&quot; (U+0131). That is a string-handling rule, and it belongs in the i18n layer rather than in a theme. Fraunces covers U+0131 in its latin subset and U+0130 in latin-ext, so the display face renders both correctly.</li></ol>
+      <details class="numbers">
+        <summary>Measured contrast — 25 pairs</summary>
+        <table><thead><tr><th>pair</th><th>fg</th><th>bg</th><th class="num">ratio</th><th class="num">min</th></tr></thead><tbody><tr class=""><td>ink / paper</td><td><code>#2a2420</code></td><td><code>#faf4ea</code></td><td class="num">13.99</td><td class="num">4.5</td></tr><tr class=""><td>ink / card</td><td><code>#2a2420</code></td><td><code>#fffcf6</code></td><td class="num">14.95</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-2</td><td><code>#2a2420</code></td><td><code>#f4eadb</code></td><td class="num">12.86</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-3</td><td><code>#2a2420</code></td><td><code>#eee0cb</code></td><td class="num">11.78</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / paper</td><td><code>#574c42</code></td><td><code>#faf4ea</code></td><td class="num">7.62</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / card</td><td><code>#574c42</code></td><td><code>#fffcf6</code></td><td class="num">8.15</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / paper</td><td><code>#6e6154</code></td><td><code>#faf4ea</code></td><td class="num">5.48</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / card</td><td><code>#6e6154</code></td><td><code>#fffcf6</code></td><td class="num">5.86</td><td class="num">4.5</td></tr><tr class=""><td>clay / paper</td><td><code>#a3432a</code></td><td><code>#faf4ea</code></td><td class="num">5.66</td><td class="num">4.5</td></tr><tr class=""><td>clay / card</td><td><code>#a3432a</code></td><td><code>#fffcf6</code></td><td class="num">6.04</td><td class="num">4.5</td></tr><tr class=""><td>clay / clay-wash</td><td><code>#a3432a</code></td><td><code>#f6e1d5</code></td><td class="num">4.91</td><td class="num">4.5</td></tr><tr class=""><td>ink / clay-wash</td><td><code>#2a2420</code></td><td><code>#f6e1d5</code></td><td class="num">12.14</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / paper</td><td><code>#815510</code></td><td><code>#faf4ea</code></td><td class="num">5.92</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / card</td><td><code>#815510</code></td><td><code>#fffcf6</code></td><td class="num">6.33</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / ochre-wash</td><td><code>#815510</code></td><td><code>#f9ebd1</code></td><td class="num">5.50</td><td class="num">4.5</td></tr><tr class=""><td>ink / ochre-wash</td><td><code>#2a2420</code></td><td><code>#f9ebd1</code></td><td class="num">13.00</td><td class="num">4.5</td></tr><tr class=""><td>sage / paper</td><td><code>#44614a</code></td><td><code>#faf4ea</code></td><td class="num">6.28</td><td class="num">4.5</td></tr><tr class=""><td>sage / card</td><td><code>#44614a</code></td><td><code>#fffcf6</code></td><td class="num">6.71</td><td class="num">4.5</td></tr><tr class=""><td>sage / sage-wash</td><td><code>#44614a</code></td><td><code>#e7eee4</code></td><td class="num">5.81</td><td class="num">4.5</td></tr><tr class=""><td>ink / sage-wash</td><td><code>#2a2420</code></td><td><code>#e7eee4</code></td><td class="num">12.94</td><td class="num">4.5</td></tr><tr class=""><td>clay-2 / paper (large)</td><td><code>#c2603d</code></td><td><code>#faf4ea</code></td><td class="num">3.81</td><td class="num">3</td></tr><tr class="bad"><td>ochre / paper (large)</td><td><code>#c58a2b</code></td><td><code>#faf4ea</code></td><td class="num">2.72</td><td class="num">3</td></tr><tr class=""><td>clay-line / clay-wash (bdr)</td><td><code>#e6c4b2</code></td><td><code>#f6e1d5</code></td><td class="num">1.29</td><td class="num">1.2</td></tr><tr class=""><td>ochre-line / ochre-wash (bdr)</td><td><code>#ebd3a6</code></td><td><code>#f9ebd1</code></td><td class="num">1.24</td><td class="num">1.2</td></tr><tr class=""><td>sage-line / sage-wash (bdr)</td><td><code>#cbdac6</code></td><td><code>#e7eee4</code></td><td class="num">1.23</td><td class="num">1.2</td></tr></tbody></table>
+        <p class="note">Font: <code>'Fraunces'</code> display · <code>'Inter'</code> text · line-height <code>1.55</code> · tracking <code>0.12em</code> · word-break <code>normal</code></p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-locale="ar-SA" id="t-ar-SA">
+  <header class="panel-head">
+    <div class="ph-left">
+      <span class="code">ar-SA</span>
+      <span class="nat" lang="ar-SA" dir="rtl">العربية</span>
+      <span class="eng">Arabic (Gulf)</span>
+    </div>
+    <div class="ph-right">
+      <span class="tag tag-new">palette departs</span>
+      <span class="tag tag-type">type ×5</span>
+      <span class="tag tag-aa">AA 5.28:1</span>
+    </div>
+  </header>
+
+  <div class="panel-body">
+    <div class="panel-card"><div class="ds card alert-surface-host" lang="ar-SA" dir="rtl">
+  <div class="ds-top">
+    <span class="eyebrow">عند الباب الآن</span>
+    <span class="ds-meta">الباب الرئيسي · ٢:٢٦ م</span>
+  </div>
+  <h3 class="display ds-title">مندوب توصيل عند الباب.</h3>
+
+  <div class="ds-alert alert-surface">
+    <span class="ds-alert-ico" aria-hidden="true"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+    <span class="ds-alert-label">تمّ التعرّف</span>
+    <span class="visitor-name">ريم ع.</span>
+  </div>
+
+  <div class="ds-said">
+    <span class="ds-lab">قال الباب</span>
+    <p>أهلاً. المقيم هنا من الصمّ ولا يستطيع الوصول إلى الباب. أستطيع مساعدتكم — هل لديكم توصيلة؟</p>
+  </div>
+
+  <div class="ds-gest">
+    <span class="ds-lab">أشار الزائر</span>
+    <span class="ds-gest-v">إيماءة بالرأس — نعم</span>
+  </div>
+
+  <div class="ds-states">
+    <span class="chip chip-safe"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><rect x="2.5" y="2.5" width="15" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10.4l2.8 2.8L14.4 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>آمن</span></span>
+    <span class="chip chip-warn"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><path d="M10 2.6l7.6 14H2.4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 7.6v3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14.1" r="1.05" fill="currentColor"/></svg><span>تنبيه</span></span>
+    <span class="chip chip-stop"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>انصرف</span></span>
+  </div>
+</div></div>
+    <div class="panel-why">
+      <div class="swatches"><div class="sw sw-moved"><i style="background:#f6f0e3"></i><b>paper</b><code>#f6f0e3</code><em>&nbsp;</em></div><div class="sw sw-moved"><i style="background:#fcf7ec"></i><b>card</b><code>#fcf7ec</code><em>&nbsp;</em></div><div class="sw"><i style="background:#2a2420"></i><b>ink</b><code>#2a2420</code><em>14.33:1</em></div><div class="sw sw-moved"><i style="background:#9c3a22"></i><b>clay</b><code>#9c3a22</code><em>6.46:1</em></div><div class="sw sw-moved"><i style="background:#7a4310"></i><b>ochre-ink</b><code>#7a4310</code><em>7.45:1</em></div><div class="sw sw-moved"><i style="background:#2f5d3a"></i><b>sage</b><code>#2f5d3a</code><em>7.15:1</em></div></div>
+      <ol class="why"><li>The caution tier loses its yellow. Hasan, Al-Sammerai &amp; Abdul Kadir (2011), English Language Teaching 4(3):206–213, read in full: yellow reads as envy, sickness, cruelty and dishonesty — &quot;yellow smile = mean&quot;. It is not caution here. The warning tier becomes copper, which keeps an amber position in the ISO 3864-4 ordering without the yellow reading.</li><li>No surface is white. The same paper gives white as purity and weddings but also the shroud and the coffin — &quot;nearly impossible to change&quot; — so the near-white card (#fffcf6) is warmed to ivory and the paper deepened to sand. White is not the neutral background Western UI assumes it to be.</li><li>Green is strengthened rather than merely kept. The source explicitly gives &quot;green light = good sign&quot;, so the safe tier is the one place the Arabic reading and ISO 3864-4 agree, and it is worth leaning on.</li><li>Blue is deliberately absent. The same paper puts blue with envy, jealousy, death and gloom — the default &quot;informational&quot; colour of every design system. It rests on one paper, so the response is to avoid introducing blue, not to make a claim about it.</li><li>Type: Noto Kufi Arabic at the SAME size as the Latin stack (--font-scale: 1). The UAE Government Design System sets Arabic at identical sizes to Latin, which contradicts the common &quot;set Arabic 20–30% larger&quot; advice. Leading goes to 1.7 for the deeper Arabic descenders, and letter-spacing goes to zero because tracking breaks cursive joins.</li><li>Layout is RTL via dir=&quot;rtl&quot;; the theme sets no physical margins, so components must use logical properties.</li></ol>
+      <details class="numbers">
+        <summary>Measured contrast — 25 pairs</summary>
+        <table><thead><tr><th>pair</th><th>fg</th><th>bg</th><th class="num">ratio</th><th class="num">min</th></tr></thead><tbody><tr class=""><td>ink / paper</td><td><code>#2a2420</code></td><td><code>#f6f0e3</code></td><td class="num">13.48</td><td class="num">4.5</td></tr><tr class=""><td>ink / card</td><td><code>#2a2420</code></td><td><code>#fcf7ec</code></td><td class="num">14.33</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-2</td><td><code>#2a2420</code></td><td><code>#efe7d6</code></td><td class="num">12.45</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-3</td><td><code>#2a2420</code></td><td><code>#e6dcc6</code></td><td class="num">11.24</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / paper</td><td><code>#574c42</code></td><td><code>#f6f0e3</code></td><td class="num">7.34</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / card</td><td><code>#574c42</code></td><td><code>#fcf7ec</code></td><td class="num">7.81</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / paper</td><td><code>#6e6154</code></td><td><code>#f6f0e3</code></td><td class="num">5.28</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / card</td><td><code>#6e6154</code></td><td><code>#fcf7ec</code></td><td class="num">5.61</td><td class="num">4.5</td></tr><tr class=""><td>clay / paper</td><td><code>#9c3a22</code></td><td><code>#f6f0e3</code></td><td class="num">6.08</td><td class="num">4.5</td></tr><tr class=""><td>clay / card</td><td><code>#9c3a22</code></td><td><code>#fcf7ec</code></td><td class="num">6.46</td><td class="num">4.5</td></tr><tr class=""><td>clay / clay-wash</td><td><code>#9c3a22</code></td><td><code>#f4ddcf</code></td><td class="num">5.29</td><td class="num">4.5</td></tr><tr class=""><td>ink / clay-wash</td><td><code>#2a2420</code></td><td><code>#f4ddcf</code></td><td class="num">11.73</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / paper</td><td><code>#7a4310</code></td><td><code>#f6f0e3</code></td><td class="num">7.01</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / card</td><td><code>#7a4310</code></td><td><code>#fcf7ec</code></td><td class="num">7.45</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / ochre-wash</td><td><code>#7a4310</code></td><td><code>#f4e4d6</code></td><td class="num">6.41</td><td class="num">4.5</td></tr><tr class=""><td>ink / ochre-wash</td><td><code>#2a2420</code></td><td><code>#f4e4d6</code></td><td class="num">12.33</td><td class="num">4.5</td></tr><tr class=""><td>sage / paper</td><td><code>#2f5d3a</code></td><td><code>#f6f0e3</code></td><td class="num">6.73</td><td class="num">4.5</td></tr><tr class=""><td>sage / card</td><td><code>#2f5d3a</code></td><td><code>#fcf7ec</code></td><td class="num">7.15</td><td class="num">4.5</td></tr><tr class=""><td>sage / sage-wash</td><td><code>#2f5d3a</code></td><td><code>#e2eddd</code></td><td class="num">6.33</td><td class="num">4.5</td></tr><tr class=""><td>ink / sage-wash</td><td><code>#2a2420</code></td><td><code>#e2eddd</code></td><td class="num">12.68</td><td class="num">4.5</td></tr><tr class=""><td>clay-2 / paper (large)</td><td><code>#b8552f</code></td><td><code>#f6f0e3</code></td><td class="num">4.22</td><td class="num">3</td></tr><tr class=""><td>ochre / paper (large)</td><td><code>#a8622a</code></td><td><code>#f6f0e3</code></td><td class="num">4.16</td><td class="num">3</td></tr><tr class=""><td>clay-line / clay-wash (bdr)</td><td><code>#e2bda8</code></td><td><code>#f4ddcf</code></td><td class="num">1.33</td><td class="num">1.2</td></tr><tr class=""><td>ochre-line / ochre-wash (bdr)</td><td><code>#e0c4ab</code></td><td><code>#f4e4d6</code></td><td class="num">1.34</td><td class="num">1.2</td></tr><tr class=""><td>sage-line / sage-wash (bdr)</td><td><code>#bfd6b8</code></td><td><code>#e2eddd</code></td><td class="num">1.29</td><td class="num">1.2</td></tr></tbody></table>
+        <p class="note">Font: <code>'Noto Kufi Arabic'</code> display · <code>'Noto Kufi Arabic'</code> text · line-height <code>1.7</code> · tracking <code>0.04em</code> · word-break <code>normal</code></p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-locale="ar-EG" id="t-ar-EG">
+  <header class="panel-head">
+    <div class="ph-left">
+      <span class="code">ar-EG</span>
+      <span class="nat" lang="ar-EG" dir="rtl">العربية</span>
+      <span class="eng">Arabic (Egypt)</span>
+    </div>
+    <div class="ph-right">
+      <span class="tag tag-new">palette departs</span>
+      <span class="tag tag-type">type ×5</span>
+      <span class="tag tag-aa">AA 5.28:1</span>
+    </div>
+  </header>
+
+  <div class="panel-body">
+    <div class="panel-card"><div class="ds card alert-surface-host" lang="ar-EG" dir="rtl">
+  <div class="ds-top">
+    <span class="eyebrow">عند الباب الآن</span>
+    <span class="ds-meta">الباب الرئيسي · 2:26 م</span>
+  </div>
+  <h3 class="display ds-title">مندوب توصيل عند الباب.</h3>
+
+  <div class="ds-alert alert-surface">
+    <span class="ds-alert-ico" aria-hidden="true"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+    <span class="ds-alert-label">تمّ التعرّف</span>
+    <span class="visitor-name">منى ع.</span>
+  </div>
+
+  <div class="ds-said">
+    <span class="ds-lab">قال الباب</span>
+    <p>أهلاً. المقيم هنا من الصمّ ولا يستطيع الوصول إلى الباب. أستطيع مساعدتكم — هل لديكم توصيلة؟</p>
+  </div>
+
+  <div class="ds-gest">
+    <span class="ds-lab">أشار الزائر</span>
+    <span class="ds-gest-v">إيماءة بالرأس — نعم</span>
+  </div>
+
+  <div class="ds-states">
+    <span class="chip chip-safe"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><rect x="2.5" y="2.5" width="15" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10.4l2.8 2.8L14.4 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>آمن</span></span>
+    <span class="chip chip-warn"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><path d="M10 2.6l7.6 14H2.4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 7.6v3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14.1" r="1.05" fill="currentColor"/></svg><span>تنبيه</span></span>
+    <span class="chip chip-stop"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>انصرف</span></span>
+  </div>
+</div></div>
+    <div class="panel-why">
+      <div class="swatches"><div class="sw sw-moved"><i style="background:#f6f0e3"></i><b>paper</b><code>#f6f0e3</code><em>&nbsp;</em></div><div class="sw sw-moved"><i style="background:#fcf7ec"></i><b>card</b><code>#fcf7ec</code><em>&nbsp;</em></div><div class="sw"><i style="background:#2a2420"></i><b>ink</b><code>#2a2420</code><em>14.33:1</em></div><div class="sw sw-moved"><i style="background:#9c3a22"></i><b>clay</b><code>#9c3a22</code><em>6.46:1</em></div><div class="sw sw-moved"><i style="background:#7a4310"></i><b>ochre-ink</b><code>#7a4310</code><em>7.45:1</em></div><div class="sw sw-moved"><i style="background:#2f5d3a"></i><b>sage</b><code>#2f5d3a</code><em>7.15:1</em></div></div>
+      <ol class="why"><li>Identical palette to ar-SA. The Hasan et al. (2011) colour findings are pan-Arabic rather than country-specific, and inventing an Egyptian variant on top of a pan-Arabic source would be decoration.</li><li>The yellow removal here is for the sourced envy/sickness reading, NOT for mourning. docs/gesture-research-mena.md: &quot;the yellow = mourning in Egypt claim does not survive&quot; — the peer-reviewed source assigns mourning to black and a death association to white. The right constraint, from the wrong reason, is still a liability.</li><li>The two locales diverge in numerals rather than in colour — Egypt conventionally uses European digits where the Gulf leans Arabic-Indic ٠-٩ — and that is a formatting concern, not a theme token.</li></ol>
+      <details class="numbers">
+        <summary>Measured contrast — 25 pairs</summary>
+        <table><thead><tr><th>pair</th><th>fg</th><th>bg</th><th class="num">ratio</th><th class="num">min</th></tr></thead><tbody><tr class=""><td>ink / paper</td><td><code>#2a2420</code></td><td><code>#f6f0e3</code></td><td class="num">13.48</td><td class="num">4.5</td></tr><tr class=""><td>ink / card</td><td><code>#2a2420</code></td><td><code>#fcf7ec</code></td><td class="num">14.33</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-2</td><td><code>#2a2420</code></td><td><code>#efe7d6</code></td><td class="num">12.45</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-3</td><td><code>#2a2420</code></td><td><code>#e6dcc6</code></td><td class="num">11.24</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / paper</td><td><code>#574c42</code></td><td><code>#f6f0e3</code></td><td class="num">7.34</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / card</td><td><code>#574c42</code></td><td><code>#fcf7ec</code></td><td class="num">7.81</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / paper</td><td><code>#6e6154</code></td><td><code>#f6f0e3</code></td><td class="num">5.28</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / card</td><td><code>#6e6154</code></td><td><code>#fcf7ec</code></td><td class="num">5.61</td><td class="num">4.5</td></tr><tr class=""><td>clay / paper</td><td><code>#9c3a22</code></td><td><code>#f6f0e3</code></td><td class="num">6.08</td><td class="num">4.5</td></tr><tr class=""><td>clay / card</td><td><code>#9c3a22</code></td><td><code>#fcf7ec</code></td><td class="num">6.46</td><td class="num">4.5</td></tr><tr class=""><td>clay / clay-wash</td><td><code>#9c3a22</code></td><td><code>#f4ddcf</code></td><td class="num">5.29</td><td class="num">4.5</td></tr><tr class=""><td>ink / clay-wash</td><td><code>#2a2420</code></td><td><code>#f4ddcf</code></td><td class="num">11.73</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / paper</td><td><code>#7a4310</code></td><td><code>#f6f0e3</code></td><td class="num">7.01</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / card</td><td><code>#7a4310</code></td><td><code>#fcf7ec</code></td><td class="num">7.45</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / ochre-wash</td><td><code>#7a4310</code></td><td><code>#f4e4d6</code></td><td class="num">6.41</td><td class="num">4.5</td></tr><tr class=""><td>ink / ochre-wash</td><td><code>#2a2420</code></td><td><code>#f4e4d6</code></td><td class="num">12.33</td><td class="num">4.5</td></tr><tr class=""><td>sage / paper</td><td><code>#2f5d3a</code></td><td><code>#f6f0e3</code></td><td class="num">6.73</td><td class="num">4.5</td></tr><tr class=""><td>sage / card</td><td><code>#2f5d3a</code></td><td><code>#fcf7ec</code></td><td class="num">7.15</td><td class="num">4.5</td></tr><tr class=""><td>sage / sage-wash</td><td><code>#2f5d3a</code></td><td><code>#e2eddd</code></td><td class="num">6.33</td><td class="num">4.5</td></tr><tr class=""><td>ink / sage-wash</td><td><code>#2a2420</code></td><td><code>#e2eddd</code></td><td class="num">12.68</td><td class="num">4.5</td></tr><tr class=""><td>clay-2 / paper (large)</td><td><code>#b8552f</code></td><td><code>#f6f0e3</code></td><td class="num">4.22</td><td class="num">3</td></tr><tr class=""><td>ochre / paper (large)</td><td><code>#a8622a</code></td><td><code>#f6f0e3</code></td><td class="num">4.16</td><td class="num">3</td></tr><tr class=""><td>clay-line / clay-wash (bdr)</td><td><code>#e2bda8</code></td><td><code>#f4ddcf</code></td><td class="num">1.33</td><td class="num">1.2</td></tr><tr class=""><td>ochre-line / ochre-wash (bdr)</td><td><code>#e0c4ab</code></td><td><code>#f4e4d6</code></td><td class="num">1.34</td><td class="num">1.2</td></tr><tr class=""><td>sage-line / sage-wash (bdr)</td><td><code>#bfd6b8</code></td><td><code>#e2eddd</code></td><td class="num">1.29</td><td class="num">1.2</td></tr></tbody></table>
+        <p class="note">Font: <code>'Noto Kufi Arabic'</code> display · <code>'Noto Kufi Arabic'</code> text · line-height <code>1.7</code> · tracking <code>0.04em</code> · word-break <code>normal</code></p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-locale="ja-JP" id="t-ja-JP">
+  <header class="panel-head">
+    <div class="ph-left">
+      <span class="code">ja-JP</span>
+      <span class="nat" lang="ja-JP" dir="ltr">日本語</span>
+      <span class="eng">Japanese</span>
+    </div>
+    <div class="ph-right">
+      <span class="tag tag-new">palette departs</span>
+      <span class="tag tag-type">type ×4</span>
+      <span class="tag tag-aa">AA 5.33:1</span>
+    </div>
+  </header>
+
+  <div class="panel-body">
+    <div class="panel-card"><div class="ds card alert-surface-host" lang="ja-JP" dir="ltr">
+  <div class="ds-top">
+    <span class="eyebrow">ただいま玄関に</span>
+    <span class="ds-meta">玄関 · 14:26</span>
+  </div>
+  <h3 class="display ds-title">配達の方が玄関にいらっしゃいます。</h3>
+
+  <div class="ds-alert alert-surface">
+    <span class="ds-alert-ico" aria-hidden="true"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+    <span class="ds-alert-label">照合済み</span>
+    <span class="visitor-name">佐藤 みゆき</span>
+  </div>
+
+  <div class="ds-said">
+    <span class="ds-lab">ドアの応答</span>
+    <p>こんにちは。こちらの住人は耳が聞こえないため、玄関に出ることができません。お荷物のお届けでしょうか。</p>
+  </div>
+
+  <div class="ds-gest">
+    <span class="ds-lab">来訪者の合図</span>
+    <span class="ds-gest-v">うなずき — はい</span>
+  </div>
+
+  <div class="ds-states">
+    <span class="chip chip-safe"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><rect x="2.5" y="2.5" width="15" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10.4l2.8 2.8L14.4 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>安全</span></span>
+    <span class="chip chip-warn"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><path d="M10 2.6l7.6 14H2.4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 7.6v3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14.1" r="1.05" fill="currentColor"/></svg><span>警告</span></span>
+    <span class="chip chip-stop"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>対応終了</span></span>
+  </div>
+</div></div>
+    <div class="panel-why">
+      <div class="swatches"><div class="sw sw-moved"><i style="background:#f2f1ee"></i><b>paper</b><code>#f2f1ee</code><em>&nbsp;</em></div><div class="sw sw-moved"><i style="background:#f7f6f3"></i><b>card</b><code>#f7f6f3</code><em>&nbsp;</em></div><div class="sw sw-moved"><i style="background:#24211f"></i><b>ink</b><code>#24211f</code><em>14.81:1</em></div><div class="sw sw-moved"><i style="background:#9b3a2c"></i><b>clay</b><code>#9b3a2c</code><em>6.40:1</em></div><div class="sw sw-moved"><i style="background:#7c5410"></i><b>ochre-ink</b><code>#7c5410</code><em>6.20:1</em></div><div class="sw sw-moved"><i style="background:#3f5d48"></i><b>sage</b><code>#3f5d48</code><em>6.77:1</em></div></div>
+      <ol class="why"><li>The paper turns from cream to a low-chroma washi grey, and the alert wash turns fully neutral. This is the 紅白 finding in docs/locale-colour-typography.md: red-and-white together is the visual grammar of CELEBRATION in Japan — 紅白幕, 紅白餅, 紅白饅頭, all 縁起物 — traceable to the Genpei War banners. A red alert on a cream-white card is the most natural thing a Western designer reaches for, and in Japan it reads as bunting.</li><li>The fix the doc names is &quot;red on a neutral, grey or dark surface&quot;, so the clay wash (#f6e1d5, a pink) becomes #e5e2e0, a warm grey. The red itself is kept — it is the alert hue that was never the problem; the white was.</li><li>The theme stays LIGHT on purpose. Black, not white, is the modern Japanese funeral colour, and the pivot is datable: at Ōkubo Toshimichi's funeral in 1878 the upper classes wore black 「西洋のブラックフォーマルにならったものである」. A black-dominant &quot;serious&quot; theme carries a funerary tint here that it does not carry elsewhere, so ja-JP is the one locale where a dark variant would be a regression.</li><li>Type: Noto Serif JP / Noto Sans JP, leading 1.65 (CJK wants 1.6–1.7 against ~1.4 for Latin), and line-break: strict, because loose breaking strands a 。 or 」 at line start. word-break stays normal — ベタ組 means lines may break almost anywhere, and that is correct.</li><li>lang=&quot;ja-JP&quot; is load-bearing, not decoration. Han unification means the codepoint does not carry the locale; without it, kanji can render through a Simplified-Chinese fallback and look subtly wrong to a Japanese reader.</li></ol>
+      <details class="numbers">
+        <summary>Measured contrast — 25 pairs</summary>
+        <table><thead><tr><th>pair</th><th>fg</th><th>bg</th><th class="num">ratio</th><th class="num">min</th></tr></thead><tbody><tr class=""><td>ink / paper</td><td><code>#24211f</code></td><td><code>#f2f1ee</code></td><td class="num">14.17</td><td class="num">4.5</td></tr><tr class=""><td>ink / card</td><td><code>#24211f</code></td><td><code>#f7f6f3</code></td><td class="num">14.81</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-2</td><td><code>#24211f</code></td><td><code>#eae9e5</code></td><td class="num">13.17</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-3</td><td><code>#24211f</code></td><td><code>#dedcd7</code></td><td class="num">11.68</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / paper</td><td><code>#4e4a46</code></td><td><code>#f2f1ee</code></td><td class="num">7.77</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / card</td><td><code>#4e4a46</code></td><td><code>#f7f6f3</code></td><td class="num">8.12</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / paper</td><td><code>#67625e</code></td><td><code>#f2f1ee</code></td><td class="num">5.33</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / card</td><td><code>#67625e</code></td><td><code>#f7f6f3</code></td><td class="num">5.58</td><td class="num">4.5</td></tr><tr class=""><td>clay / paper</td><td><code>#9b3a2c</code></td><td><code>#f2f1ee</code></td><td class="num">6.13</td><td class="num">4.5</td></tr><tr class=""><td>clay / card</td><td><code>#9b3a2c</code></td><td><code>#f7f6f3</code></td><td class="num">6.40</td><td class="num">4.5</td></tr><tr class=""><td>clay / clay-wash</td><td><code>#9b3a2c</code></td><td><code>#e5e2e0</code></td><td class="num">5.37</td><td class="num">4.5</td></tr><tr class=""><td>ink / clay-wash</td><td><code>#24211f</code></td><td><code>#e5e2e0</code></td><td class="num">12.41</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / paper</td><td><code>#7c5410</code></td><td><code>#f2f1ee</code></td><td class="num">5.94</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / card</td><td><code>#7c5410</code></td><td><code>#f7f6f3</code></td><td class="num">6.20</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / ochre-wash</td><td><code>#7c5410</code></td><td><code>#efe9dc</code></td><td class="num">5.54</td><td class="num">4.5</td></tr><tr class=""><td>ink / ochre-wash</td><td><code>#24211f</code></td><td><code>#efe9dc</code></td><td class="num">13.23</td><td class="num">4.5</td></tr><tr class=""><td>sage / paper</td><td><code>#3f5d48</code></td><td><code>#f2f1ee</code></td><td class="num">6.48</td><td class="num">4.5</td></tr><tr class=""><td>sage / card</td><td><code>#3f5d48</code></td><td><code>#f7f6f3</code></td><td class="num">6.77</td><td class="num">4.5</td></tr><tr class=""><td>sage / sage-wash</td><td><code>#3f5d48</code></td><td><code>#e3eae3</code></td><td class="num">5.97</td><td class="num">4.5</td></tr><tr class=""><td>ink / sage-wash</td><td><code>#24211f</code></td><td><code>#e3eae3</code></td><td class="num">13.06</td><td class="num">4.5</td></tr><tr class=""><td>clay-2 / paper (large)</td><td><code>#b04a38</code></td><td><code>#f2f1ee</code></td><td class="num">4.79</td><td class="num">3</td></tr><tr class=""><td>ochre / paper (large)</td><td><code>#a97d28</code></td><td><code>#f2f1ee</code></td><td class="num">3.29</td><td class="num">3</td></tr><tr class=""><td>clay-line / clay-wash (bdr)</td><td><code>#c8c3c0</code></td><td><code>#e5e2e0</code></td><td class="num">1.35</td><td class="num">1.2</td></tr><tr class=""><td>ochre-line / ochre-wash (bdr)</td><td><code>#d7ccb5</code></td><td><code>#efe9dc</code></td><td class="num">1.32</td><td class="num">1.2</td></tr><tr class=""><td>sage-line / sage-wash (bdr)</td><td><code>#c5d3c6</code></td><td><code>#e3eae3</code></td><td class="num">1.27</td><td class="num">1.2</td></tr></tbody></table>
+        <p class="note">Font: <code>'Noto Serif JP'</code> display · <code>'Noto Sans JP'</code> text · line-height <code>1.65</code> · tracking <code>0.12em</code> · word-break <code>normal</code> · line-break <code>strict</code></p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-locale="zh-CN" id="t-zh-CN">
+  <header class="panel-head">
+    <div class="ph-left">
+      <span class="code">zh-CN</span>
+      <span class="nat" lang="zh-Hans-CN" dir="ltr">简体中文</span>
+      <span class="eng">Chinese (Simplified, Mainland)</span>
+    </div>
+    <div class="ph-right">
+      <span class="tag tag-new">palette departs</span>
+      <span class="tag tag-type">type ×3</span>
+      <span class="tag tag-aa">AA 5.48:1</span>
+    </div>
+  </header>
+
+  <div class="panel-body">
+    <div class="panel-card"><div class="ds card alert-surface-host" lang="zh-Hans-CN" dir="ltr">
+  <div class="ds-top">
+    <span class="eyebrow">门口有人</span>
+    <span class="ds-meta">正门 · 14:26</span>
+  </div>
+  <h3 class="display ds-title">一位快递员在门口。</h3>
+
+  <div class="ds-alert alert-surface">
+    <span class="ds-alert-ico" aria-hidden="true"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+    <span class="ds-alert-label">已识别</span>
+    <span class="visitor-name">李文静</span>
+  </div>
+
+  <div class="ds-said">
+    <span class="ds-lab">门口播报</span>
+    <p>您好。这里的住户是聋人，无法到门口。请问是送快递吗？</p>
+  </div>
+
+  <div class="ds-gest">
+    <span class="ds-lab">访客手势</span>
+    <span class="ds-gest-v">点头 — 是</span>
+  </div>
+
+  <div class="ds-states">
+    <span class="chip chip-safe"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><rect x="2.5" y="2.5" width="15" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10.4l2.8 2.8L14.4 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>安全</span></span>
+    <span class="chip chip-warn"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><path d="M10 2.6l7.6 14H2.4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 7.6v3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14.1" r="1.05" fill="currentColor"/></svg><span>警告</span></span>
+    <span class="chip chip-stop"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>已结束</span></span>
+  </div>
+</div></div>
+    <div class="panel-why">
+      <div class="swatches"><div class="sw"><i style="background:#faf4ea"></i><b>paper</b><code>#faf4ea</code><em>&nbsp;</em></div><div class="sw"><i style="background:#fffcf6"></i><b>card</b><code>#fffcf6</code><em>&nbsp;</em></div><div class="sw"><i style="background:#2a2420"></i><b>ink</b><code>#2a2420</code><em>14.95:1</em></div><div class="sw sw-moved"><i style="background:#b0140f"></i><b>clay</b><code>#b0140f</code><em>6.94:1</em></div><div class="sw"><i style="background:#815510"></i><b>ochre-ink</b><code>#815510</code><em>6.33:1</em></div><div class="sw sw-moved"><i style="background:#35643f"></i><b>sage</b><code>#35643f</code><em>6.73:1</em></div></div>
+      <ol class="why"><li>The red is pushed from the base's muted terracotta toward a true safety red. Red-as-alert is the legally standardised meaning in the Chinese national safety-colour standard — 红 = 禁止、停止、紧急告警 — which maps cleanly onto ISO 3864-4, so it is reinforced by the built environment the user walks through every day.</li><li>The reason to strengthen it rather than merely keep it is measured: Kawai et al. (2022), Psychological Research 87(3):704–724, find red-negativity is attenuated in Mainland Chinese participants — a congruence effect of 32.42 ms versus 76.84 ms in the Western group, roughly 2.4× weaker. Red still works; it simply carries less on its own.</li><li>Which is exactly why the theme does not lean on hue. Every state in the preview keeps an ISO 7010 shape (triangle = warning, circle-with-bar = prohibition, square = safe) and a text label. WCAG 1.4.1 requires that anyway; here it is also the fix for a measured effect size.</li><li>Green surfaces are kept and slightly cleaned up. 戴绿帽子 derives from 綠頭巾 and is bound to the worn object — it does not generalise to green surfaces, text or status dots, and against it stands 绿 = 安全 in the national standard. The one real caveat is illustration: no green hat on any avatar.</li><li>The 黄色 hazard is lexical, not chromatic, so the yellow swatch is untouched. 黄 carries the colloquial &quot;pornographic&quot; sense as a standalone morpheme (黄片, 扫黄), so the rule bites on copy: 「黄色警报」 is idiomatic and fine, a chip reading just 「黄色」 is not. The preview labels the warning chip 「警告」.</li><li>Tagged zh-Hans-CN, not bare zh. CLReq: &quot;It is recommended that user agents distinguish typographical rules by region rather than Traditional or Simplified.&quot;</li></ol>
+      <details class="numbers">
+        <summary>Measured contrast — 25 pairs</summary>
+        <table><thead><tr><th>pair</th><th>fg</th><th>bg</th><th class="num">ratio</th><th class="num">min</th></tr></thead><tbody><tr class=""><td>ink / paper</td><td><code>#2a2420</code></td><td><code>#faf4ea</code></td><td class="num">13.99</td><td class="num">4.5</td></tr><tr class=""><td>ink / card</td><td><code>#2a2420</code></td><td><code>#fffcf6</code></td><td class="num">14.95</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-2</td><td><code>#2a2420</code></td><td><code>#f4eadb</code></td><td class="num">12.86</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-3</td><td><code>#2a2420</code></td><td><code>#eee0cb</code></td><td class="num">11.78</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / paper</td><td><code>#574c42</code></td><td><code>#faf4ea</code></td><td class="num">7.62</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / card</td><td><code>#574c42</code></td><td><code>#fffcf6</code></td><td class="num">8.15</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / paper</td><td><code>#6e6154</code></td><td><code>#faf4ea</code></td><td class="num">5.48</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / card</td><td><code>#6e6154</code></td><td><code>#fffcf6</code></td><td class="num">5.86</td><td class="num">4.5</td></tr><tr class=""><td>clay / paper</td><td><code>#b0140f</code></td><td><code>#faf4ea</code></td><td class="num">6.50</td><td class="num">4.5</td></tr><tr class=""><td>clay / card</td><td><code>#b0140f</code></td><td><code>#fffcf6</code></td><td class="num">6.94</td><td class="num">4.5</td></tr><tr class=""><td>clay / clay-wash</td><td><code>#b0140f</code></td><td><code>#fadfdb</code></td><td class="num">5.64</td><td class="num">4.5</td></tr><tr class=""><td>ink / clay-wash</td><td><code>#2a2420</code></td><td><code>#fadfdb</code></td><td class="num">12.13</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / paper</td><td><code>#815510</code></td><td><code>#faf4ea</code></td><td class="num">5.92</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / card</td><td><code>#815510</code></td><td><code>#fffcf6</code></td><td class="num">6.33</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / ochre-wash</td><td><code>#815510</code></td><td><code>#f9ebd1</code></td><td class="num">5.50</td><td class="num">4.5</td></tr><tr class=""><td>ink / ochre-wash</td><td><code>#2a2420</code></td><td><code>#f9ebd1</code></td><td class="num">13.00</td><td class="num">4.5</td></tr><tr class=""><td>sage / paper</td><td><code>#35643f</code></td><td><code>#faf4ea</code></td><td class="num">6.30</td><td class="num">4.5</td></tr><tr class=""><td>sage / card</td><td><code>#35643f</code></td><td><code>#fffcf6</code></td><td class="num">6.73</td><td class="num">4.5</td></tr><tr class=""><td>sage / sage-wash</td><td><code>#35643f</code></td><td><code>#e5eee2</code></td><td class="num">5.80</td><td class="num">4.5</td></tr><tr class=""><td>ink / sage-wash</td><td><code>#2a2420</code></td><td><code>#e5eee2</code></td><td class="num">12.87</td><td class="num">4.5</td></tr><tr class=""><td>clay-2 / paper (large)</td><td><code>#cc2a1c</code></td><td><code>#faf4ea</code></td><td class="num">4.90</td><td class="num">3</td></tr><tr class="bad"><td>ochre / paper (large)</td><td><code>#c58a2b</code></td><td><code>#faf4ea</code></td><td class="num">2.72</td><td class="num">3</td></tr><tr class=""><td>clay-line / clay-wash (bdr)</td><td><code>#f0bcb3</code></td><td><code>#fadfdb</code></td><td class="num">1.33</td><td class="num">1.2</td></tr><tr class=""><td>ochre-line / ochre-wash (bdr)</td><td><code>#ebd3a6</code></td><td><code>#f9ebd1</code></td><td class="num">1.24</td><td class="num">1.2</td></tr><tr class=""><td>sage-line / sage-wash (bdr)</td><td><code>#c6dac2</code></td><td><code>#e5eee2</code></td><td class="num">1.24</td><td class="num">1.2</td></tr></tbody></table>
+        <p class="note">Font: <code>'Noto Serif SC'</code> display · <code>'Noto Sans SC'</code> text · line-height <code>1.65</code> · tracking <code>0.12em</code> · word-break <code>normal</code></p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-locale="ko-KR" id="t-ko-KR">
+  <header class="panel-head">
+    <div class="ph-left">
+      <span class="code">ko-KR</span>
+      <span class="nat" lang="ko-KR" dir="ltr">한국어</span>
+      <span class="eng">Korean</span>
+    </div>
+    <div class="ph-right">
+      <span class="tag tag-base">palette = base</span>
+      <span class="tag tag-type">type ×4</span>
+      <span class="tag tag-aa">AA 4.91:1</span>
+    </div>
+  </header>
+
+  <div class="panel-body">
+    <div class="panel-card"><div class="ds card alert-surface-host" lang="ko-KR" dir="ltr">
+  <div class="ds-top">
+    <span class="eyebrow">지금 현관에</span>
+    <span class="ds-meta">현관 · 14:26</span>
+  </div>
+  <h3 class="display ds-title">택배 기사님이 현관에 계십니다.</h3>
+
+  <div class="ds-alert alert-surface">
+    <span class="ds-alert-ico" aria-hidden="true"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+    <span class="ds-alert-label">확인됨</span>
+    <span class="visitor-name">김서연</span>
+  </div>
+
+  <div class="ds-said">
+    <span class="ds-lab">도어가 전한 말</span>
+    <p>안녕하세요. 이 집의 거주자는 청각장애가 있어 문 앞으로 나올 수 없습니다. 배송 오셨나요?</p>
+  </div>
+
+  <div class="ds-gest">
+    <span class="ds-lab">방문자 동작</span>
+    <span class="ds-gest-v">끄덕임 — 예</span>
+  </div>
+
+  <div class="ds-states">
+    <span class="chip chip-safe"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><rect x="2.5" y="2.5" width="15" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10.4l2.8 2.8L14.4 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>안전</span></span>
+    <span class="chip chip-warn"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><path d="M10 2.6l7.6 14H2.4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 7.6v3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14.1" r="1.05" fill="currentColor"/></svg><span>경고</span></span>
+    <span class="chip chip-stop"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>응대 종료</span></span>
+  </div>
+</div></div>
+    <div class="panel-why">
+      <div class="swatches"><div class="sw"><i style="background:#faf4ea"></i><b>paper</b><code>#faf4ea</code><em>&nbsp;</em></div><div class="sw"><i style="background:#fffcf6"></i><b>card</b><code>#fffcf6</code><em>&nbsp;</em></div><div class="sw"><i style="background:#2a2420"></i><b>ink</b><code>#2a2420</code><em>14.95:1</em></div><div class="sw"><i style="background:#a3432a"></i><b>clay</b><code>#a3432a</code><em>6.04:1</em></div><div class="sw"><i style="background:#815510"></i><b>ochre-ink</b><code>#815510</code><em>6.33:1</em></div><div class="sw"><i style="background:#44614a"></i><b>sage</b><code>#44614a</code><em>6.71:1</em></div></div>
+      <ol class="why"><li>Palette unchanged, and that is the finding rather than the absence of one. The obvious move — recolour the Korean theme away from white because &quot;white means death in Korea&quot; — is NOT verified and the evidence cuts the other way: 백의민족, the white-clad people, is a well-cited description of white as ordinary everyday Korean dress for centuries, attested in the Records of Wei, Choe Nam-seon, Oppert and Yanagi. The English Korean funeral article contains no colour claims at all.</li><li>One rule is added instead, and it is the sharpest per-locale rule in the whole corpus: a person's name is never rendered in red. Attested by Korea.net and the Dartmouth Folklore Archive with multiple independent informants. Red stays in the icon, border and badge; --name-ink pins the name to the default foreground even inside an otherwise-red alert.</li><li>The taboo is cited, never explained — the two origin accounts (funeral wreaths and death certificates; execution decrees) conflict, and there is no acceptable source on whether it extends to China or Japan, so it is not treated as pan-CJK.</li><li>Type: word-break: keep-all plus overflow-wrap: break-word. This is the OPPOSITE of ja-JP and zh-CN, and the reason is 한글 맞춤법 Article 2 (문화체육관광부 고시 제2017-12호): 문장의 각 단어는 띄어 씀을 원칙으로 한다. Korean is spaced between words, so it must not break inside them. One CSS rule must never be shared across the three.</li><li>Korean also contracts rather than expands — W3C measures &quot;views&quot; → 조회 at about 0.8× — so labels are centred rather than stretched, and no alert card gets a fixed height.</li></ol>
+      <details class="numbers">
+        <summary>Measured contrast — 25 pairs</summary>
+        <table><thead><tr><th>pair</th><th>fg</th><th>bg</th><th class="num">ratio</th><th class="num">min</th></tr></thead><tbody><tr class=""><td>ink / paper</td><td><code>#2a2420</code></td><td><code>#faf4ea</code></td><td class="num">13.99</td><td class="num">4.5</td></tr><tr class=""><td>ink / card</td><td><code>#2a2420</code></td><td><code>#fffcf6</code></td><td class="num">14.95</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-2</td><td><code>#2a2420</code></td><td><code>#f4eadb</code></td><td class="num">12.86</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-3</td><td><code>#2a2420</code></td><td><code>#eee0cb</code></td><td class="num">11.78</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / paper</td><td><code>#574c42</code></td><td><code>#faf4ea</code></td><td class="num">7.62</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / card</td><td><code>#574c42</code></td><td><code>#fffcf6</code></td><td class="num">8.15</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / paper</td><td><code>#6e6154</code></td><td><code>#faf4ea</code></td><td class="num">5.48</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / card</td><td><code>#6e6154</code></td><td><code>#fffcf6</code></td><td class="num">5.86</td><td class="num">4.5</td></tr><tr class=""><td>clay / paper</td><td><code>#a3432a</code></td><td><code>#faf4ea</code></td><td class="num">5.66</td><td class="num">4.5</td></tr><tr class=""><td>clay / card</td><td><code>#a3432a</code></td><td><code>#fffcf6</code></td><td class="num">6.04</td><td class="num">4.5</td></tr><tr class=""><td>clay / clay-wash</td><td><code>#a3432a</code></td><td><code>#f6e1d5</code></td><td class="num">4.91</td><td class="num">4.5</td></tr><tr class=""><td>ink / clay-wash</td><td><code>#2a2420</code></td><td><code>#f6e1d5</code></td><td class="num">12.14</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / paper</td><td><code>#815510</code></td><td><code>#faf4ea</code></td><td class="num">5.92</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / card</td><td><code>#815510</code></td><td><code>#fffcf6</code></td><td class="num">6.33</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / ochre-wash</td><td><code>#815510</code></td><td><code>#f9ebd1</code></td><td class="num">5.50</td><td class="num">4.5</td></tr><tr class=""><td>ink / ochre-wash</td><td><code>#2a2420</code></td><td><code>#f9ebd1</code></td><td class="num">13.00</td><td class="num">4.5</td></tr><tr class=""><td>sage / paper</td><td><code>#44614a</code></td><td><code>#faf4ea</code></td><td class="num">6.28</td><td class="num">4.5</td></tr><tr class=""><td>sage / card</td><td><code>#44614a</code></td><td><code>#fffcf6</code></td><td class="num">6.71</td><td class="num">4.5</td></tr><tr class=""><td>sage / sage-wash</td><td><code>#44614a</code></td><td><code>#e7eee4</code></td><td class="num">5.81</td><td class="num">4.5</td></tr><tr class=""><td>ink / sage-wash</td><td><code>#2a2420</code></td><td><code>#e7eee4</code></td><td class="num">12.94</td><td class="num">4.5</td></tr><tr class=""><td>clay-2 / paper (large)</td><td><code>#c2603d</code></td><td><code>#faf4ea</code></td><td class="num">3.81</td><td class="num">3</td></tr><tr class="bad"><td>ochre / paper (large)</td><td><code>#c58a2b</code></td><td><code>#faf4ea</code></td><td class="num">2.72</td><td class="num">3</td></tr><tr class=""><td>clay-line / clay-wash (bdr)</td><td><code>#e6c4b2</code></td><td><code>#f6e1d5</code></td><td class="num">1.29</td><td class="num">1.2</td></tr><tr class=""><td>ochre-line / ochre-wash (bdr)</td><td><code>#ebd3a6</code></td><td><code>#f9ebd1</code></td><td class="num">1.24</td><td class="num">1.2</td></tr><tr class=""><td>sage-line / sage-wash (bdr)</td><td><code>#cbdac6</code></td><td><code>#e7eee4</code></td><td class="num">1.23</td><td class="num">1.2</td></tr></tbody></table>
+        <p class="note">Font: <code>'Noto Serif KR'</code> display · <code>'Noto Sans KR'</code> text · line-height <code>1.6</code> · tracking <code>0.12em</code> · word-break <code>keep-all</code></p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-locale="hi-IN" id="t-hi-IN">
+  <header class="panel-head">
+    <div class="ph-left">
+      <span class="code">hi-IN</span>
+      <span class="nat" lang="hi-IN" dir="ltr">हिन्दी</span>
+      <span class="eng">Hindi</span>
+    </div>
+    <div class="ph-right">
+      <span class="tag tag-new">palette departs</span>
+      <span class="tag tag-type">type ×6</span>
+      <span class="tag tag-aa">AA 5.48:1</span>
+    </div>
+  </header>
+
+  <div class="panel-body">
+    <div class="panel-card"><div class="ds card alert-surface-host" lang="hi-IN" dir="ltr">
+  <div class="ds-top">
+    <span class="eyebrow">अभी दरवाज़े पर</span>
+    <span class="ds-meta">मुख्य दरवाज़ा · 14:26</span>
+  </div>
+  <h3 class="display ds-title">एक डिलीवरी एजेंट दरवाज़े पर हैं।</h3>
+
+  <div class="ds-alert alert-surface">
+    <span class="ds-alert-ico" aria-hidden="true"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+    <span class="ds-alert-label">पहचाना गया</span>
+    <span class="visitor-name">अंजलि श.</span>
+  </div>
+
+  <div class="ds-said">
+    <span class="ds-lab">दरवाज़े ने कहा</span>
+    <p>नमस्ते। यहाँ रहने वाले व्यक्ति बधिर हैं और दरवाज़े तक नहीं आ सकते। क्या आप कुछ पहुँचाने आए हैं?</p>
+  </div>
+
+  <div class="ds-gest">
+    <span class="ds-lab">आगंतुक का संकेत</span>
+    <span class="ds-gest-v">सिर हिलाना — हाँ</span>
+  </div>
+
+  <div class="ds-states">
+    <span class="chip chip-safe"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><rect x="2.5" y="2.5" width="15" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10.4l2.8 2.8L14.4 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>सुरक्षित</span></span>
+    <span class="chip chip-warn"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><path d="M10 2.6l7.6 14H2.4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 7.6v3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14.1" r="1.05" fill="currentColor"/></svg><span>चेतावनी</span></span>
+    <span class="chip chip-stop"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>वापस भेजा</span></span>
+  </div>
+</div></div>
+    <div class="panel-why">
+      <div class="swatches"><div class="sw"><i style="background:#faf4ea"></i><b>paper</b><code>#faf4ea</code><em>&nbsp;</em></div><div class="sw sw-moved"><i style="background:#fdf8ec"></i><b>card</b><code>#fdf8ec</code><em>&nbsp;</em></div><div class="sw"><i style="background:#2a2420"></i><b>ink</b><code>#2a2420</code><em>14.45:1</em></div><div class="sw sw-moved"><i style="background:#9e2138"></i><b>clay</b><code>#9e2138</code><em>7.26:1</em></div><div class="sw sw-moved"><i style="background:#6f5c00"></i><b>ochre-ink</b><code>#6f5c00</code><em>6.18:1</em></div><div class="sw sw-moved"><i style="background:#3d5f43"></i><b>sage</b><code>#3d5f43</code><em>6.79:1</em></div></div>
+      <ol class="why"><li>Every orange is gone. lib/gestures/locales.ts: avoid saffron/orange ENTIRELY — simultaneously sacred (Hindu, Buddhist, Sikh), the Hindutva/BJP movement colour, and the top band of the flag. &quot;No reading of a saffron warning badge is inert.&quot; That removes both the base --ochre (a golden orange) and --clay-2 (a clear orange), which is why this is the largest palette departure in the set.</li><li>The caution tier becomes haldi yellow, darkened to clear contrast. Yellow is auspicious and celebratory, so it underperforms as caution — the research says so plainly — but it is the best available warm accent precisely because it is not partisan. The underperformance is absorbed by the ISO 7010 triangle and the text label, not by the hue.</li><li>The alert red is rotated away from orange toward madder/crimson, so no intermediate step between the red and the yellow can be read as saffron. Red stays bivalent here — sindoor and marriage as well as danger — which is another reason the state is never hue-only.</li><li>White is not used as the all-clear. The all-clear tier is green, and the card is warmed off near-white. Hindu widowhood is marked by the SUBTRACTION of red and ornament (verified); the positive white-sari claim is only partially verified, so the theme acts on the verified half.</li><li>Saffron, white and green never co-occur. There is no saffron in the palette at all, so the flag triad — whose depiction is regulated — cannot assemble by accident.</li><li>Type: letter-spacing is forced to ZERO on both the display and the eyebrow. The shirorekha is drawn as part of each glyph and butts against its neighbour to form one continuous bar; tracking shatters the word. The base eyebrow ships 0.12em, so this is an override, not a default.</li><li>Links get a spaced bottom border instead of an underline: the visual line in Devanagari is already at the top, and an underline collides with below-base matras. The affordance is kept; the collision is not.</li><li>Leading goes to 1.8 — the tallest in the set — because Devanagari stacks matras above and below the base line.</li></ol>
+      <details class="numbers">
+        <summary>Measured contrast — 25 pairs</summary>
+        <table><thead><tr><th>pair</th><th>fg</th><th>bg</th><th class="num">ratio</th><th class="num">min</th></tr></thead><tbody><tr class=""><td>ink / paper</td><td><code>#2a2420</code></td><td><code>#faf4ea</code></td><td class="num">13.99</td><td class="num">4.5</td></tr><tr class=""><td>ink / card</td><td><code>#2a2420</code></td><td><code>#fdf8ec</code></td><td class="num">14.45</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-2</td><td><code>#2a2420</code></td><td><code>#f4eadb</code></td><td class="num">12.86</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-3</td><td><code>#2a2420</code></td><td><code>#eee0cb</code></td><td class="num">11.78</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / paper</td><td><code>#574c42</code></td><td><code>#faf4ea</code></td><td class="num">7.62</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / card</td><td><code>#574c42</code></td><td><code>#fdf8ec</code></td><td class="num">7.87</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / paper</td><td><code>#6e6154</code></td><td><code>#faf4ea</code></td><td class="num">5.48</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / card</td><td><code>#6e6154</code></td><td><code>#fdf8ec</code></td><td class="num">5.66</td><td class="num">4.5</td></tr><tr class=""><td>clay / paper</td><td><code>#9e2138</code></td><td><code>#faf4ea</code></td><td class="num">7.03</td><td class="num">4.5</td></tr><tr class=""><td>clay / card</td><td><code>#9e2138</code></td><td><code>#fdf8ec</code></td><td class="num">7.26</td><td class="num">4.5</td></tr><tr class=""><td>clay / clay-wash</td><td><code>#9e2138</code></td><td><code>#f7e0e4</code></td><td class="num">6.13</td><td class="num">4.5</td></tr><tr class=""><td>ink / clay-wash</td><td><code>#2a2420</code></td><td><code>#f7e0e4</code></td><td class="num">12.20</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / paper</td><td><code>#6f5c00</code></td><td><code>#faf4ea</code></td><td class="num">5.99</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / card</td><td><code>#6f5c00</code></td><td><code>#fdf8ec</code></td><td class="num">6.18</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / ochre-wash</td><td><code>#6f5c00</code></td><td><code>#faf1cd</code></td><td class="num">5.78</td><td class="num">4.5</td></tr><tr class=""><td>ink / ochre-wash</td><td><code>#2a2420</code></td><td><code>#faf1cd</code></td><td class="num">13.51</td><td class="num">4.5</td></tr><tr class=""><td>sage / paper</td><td><code>#3d5f43</code></td><td><code>#faf4ea</code></td><td class="num">6.58</td><td class="num">4.5</td></tr><tr class=""><td>sage / card</td><td><code>#3d5f43</code></td><td><code>#fdf8ec</code></td><td class="num">6.79</td><td class="num">4.5</td></tr><tr class=""><td>sage / sage-wash</td><td><code>#3d5f43</code></td><td><code>#e6eee3</code></td><td class="num">6.07</td><td class="num">4.5</td></tr><tr class=""><td>ink / sage-wash</td><td><code>#2a2420</code></td><td><code>#e6eee3</code></td><td class="num">12.91</td><td class="num">4.5</td></tr><tr class=""><td>clay-2 / paper (large)</td><td><code>#b93349</code></td><td><code>#faf4ea</code></td><td class="num">5.28</td><td class="num">3</td></tr><tr class=""><td>ochre / paper (large)</td><td><code>#a08800</code></td><td><code>#faf4ea</code></td><td class="num">3.19</td><td class="num">3</td></tr><tr class=""><td>clay-line / clay-wash (bdr)</td><td><code>#e9b8c1</code></td><td><code>#f7e0e4</code></td><td class="num">1.38</td><td class="num">1.2</td></tr><tr class=""><td>ochre-line / ochre-wash (bdr)</td><td><code>#e7d99c</code></td><td><code>#faf1cd</code></td><td class="num">1.25</td><td class="num">1.2</td></tr><tr class=""><td>sage-line / sage-wash (bdr)</td><td><code>#c8d9c4</code></td><td><code>#e6eee3</code></td><td class="num">1.25</td><td class="num">1.2</td></tr></tbody></table>
+        <p class="note">Font: <code>'Noto Serif Devanagari'</code> display · <code>'Noto Sans Devanagari'</code> text · line-height <code>1.8</code> · tracking <code>0</code> · word-break <code>normal</code></p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-locale="sw-KE" id="t-sw-KE">
+  <header class="panel-head">
+    <div class="ph-left">
+      <span class="code">sw-KE</span>
+      <span class="nat" lang="sw-KE" dir="ltr">Kiswahili</span>
+      <span class="eng">Swahili (Kenya)</span>
+    </div>
+    <div class="ph-right">
+      <span class="tag tag-new">palette departs</span>
+      
+      <span class="tag tag-aa">AA 5.48:1</span>
+    </div>
+  </header>
+
+  <div class="panel-body">
+    <div class="panel-card"><div class="ds card alert-surface-host" lang="sw-KE" dir="ltr">
+  <div class="ds-top">
+    <span class="eyebrow">Mlangoni sasa</span>
+    <span class="ds-meta">Mlango wa mbele · 14:26</span>
+  </div>
+  <h3 class="display ds-title">Mtoa huduma yupo mlangoni.</h3>
+
+  <div class="ds-alert alert-surface">
+    <span class="ds-alert-ico" aria-hidden="true"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+    <span class="ds-alert-label">Ametambuliwa</span>
+    <span class="visitor-name">Peter Ng’ang’a</span>
+  </div>
+
+  <div class="ds-said">
+    <span class="ds-lab">Mlango ulisema</span>
+    <p>Habari? Mkazi wa hapa ni kiziwi na hawezi kufika mlangoni. Je, umeleta kifurushi?</p>
+  </div>
+
+  <div class="ds-gest">
+    <span class="ds-lab">Mgeni ameashiria</span>
+    <span class="ds-gest-v">Kutikisa kichwa — ndiyo</span>
+  </div>
+
+  <div class="ds-states">
+    <span class="chip chip-safe"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><rect x="2.5" y="2.5" width="15" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10.4l2.8 2.8L14.4 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Salama</span></span>
+    <span class="chip chip-warn"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><path d="M10 2.6l7.6 14H2.4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 7.6v3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14.1" r="1.05" fill="currentColor"/></svg><span>Tahadhari</span></span>
+    <span class="chip chip-stop"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Hakupokelewa</span></span>
+  </div>
+</div></div>
+    <div class="panel-why">
+      <div class="swatches"><div class="sw"><i style="background:#faf4ea"></i><b>paper</b><code>#faf4ea</code><em>&nbsp;</em></div><div class="sw"><i style="background:#fffcf6"></i><b>card</b><code>#fffcf6</code><em>&nbsp;</em></div><div class="sw"><i style="background:#2a2420"></i><b>ink</b><code>#2a2420</code><em>14.95:1</em></div><div class="sw sw-moved"><i style="background:#93231f"></i><b>clay</b><code>#93231f</code><em>8.20:1</em></div><div class="sw sw-moved"><i style="background:#6b4514"></i><b>ochre-ink</b><code>#6b4514</code><em>8.25:1</em></div><div class="sw sw-moved"><i style="background:#3a5c40"></i><b>sage</b><code>#3a5c40</code><em>7.36:1</em></div></div>
+      <ol class="why"><li>Orange is removed, and this one costs something. Orange is ODM's election symbol and party colour, and orange is also the natural warning tier between yellow and red in every design system — docs/locale-research-fr-us-ke.md flags it as &quot;an easy trap&quot; for exactly that reason.</li><li>The doc gives two outs: &quot;Use amber-toward-red, or drop the middle tier.&quot; This theme takes the first. The caution tier becomes a dark umber (#6b4514 ink) — an amber pulled so far down in lightness and chroma that it reads as brown rather than as ODM orange — and the alert red is pushed to a bluer, truer red so the two tiers stay separable by lightness as well as by hue.</li><li>Yellow never appears beside green. Yellow + green together is the UDA pairing, and a two-state OK/caution indicator is precisely where those two would meet. Removing yellow from the caution tier removes the pairing as a side effect rather than by a separate rule.</li><li>Red is kept for alerts but never as the sole signal. In Kenyan official symbolism red is sacrificial — the Kenya High Commission gives &quot;blood shed for independence&quot; — not merely &quot;danger&quot;, so it carries a register the ISO reading does not cover.</li><li>Paper, ink and the green tier stay at base: no source addresses them, and Kenyan mourning colour conventions could not be sourced at all. The flag assigning black to the people cuts against the Western assumption, which is a reason to leave it alone.</li><li>Type unchanged — Latin, LTR, no diacritics in standard Swahili. The real constraint is that the apostrophe in ng' is a LETTER (ngoma &quot;drum&quot; vs ng'ombe &quot;cow&quot;), which is an ingest-normalisation and segmentation rule, not a theme token. The preview uses the surname Ng'ang'a deliberately.</li></ol>
+      <details class="numbers">
+        <summary>Measured contrast — 25 pairs</summary>
+        <table><thead><tr><th>pair</th><th>fg</th><th>bg</th><th class="num">ratio</th><th class="num">min</th></tr></thead><tbody><tr class=""><td>ink / paper</td><td><code>#2a2420</code></td><td><code>#faf4ea</code></td><td class="num">13.99</td><td class="num">4.5</td></tr><tr class=""><td>ink / card</td><td><code>#2a2420</code></td><td><code>#fffcf6</code></td><td class="num">14.95</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-2</td><td><code>#2a2420</code></td><td><code>#f4eadb</code></td><td class="num">12.86</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-3</td><td><code>#2a2420</code></td><td><code>#eee0cb</code></td><td class="num">11.78</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / paper</td><td><code>#574c42</code></td><td><code>#faf4ea</code></td><td class="num">7.62</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / card</td><td><code>#574c42</code></td><td><code>#fffcf6</code></td><td class="num">8.15</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / paper</td><td><code>#6e6154</code></td><td><code>#faf4ea</code></td><td class="num">5.48</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / card</td><td><code>#6e6154</code></td><td><code>#fffcf6</code></td><td class="num">5.86</td><td class="num">4.5</td></tr><tr class=""><td>clay / paper</td><td><code>#93231f</code></td><td><code>#faf4ea</code></td><td class="num">7.67</td><td class="num">4.5</td></tr><tr class=""><td>clay / card</td><td><code>#93231f</code></td><td><code>#fffcf6</code></td><td class="num">8.20</td><td class="num">4.5</td></tr><tr class=""><td>clay / clay-wash</td><td><code>#93231f</code></td><td><code>#f6dedb</code></td><td class="num">6.55</td><td class="num">4.5</td></tr><tr class=""><td>ink / clay-wash</td><td><code>#2a2420</code></td><td><code>#f6dedb</code></td><td class="num">11.95</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / paper</td><td><code>#6b4514</code></td><td><code>#faf4ea</code></td><td class="num">7.72</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / card</td><td><code>#6b4514</code></td><td><code>#fffcf6</code></td><td class="num">8.25</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / ochre-wash</td><td><code>#6b4514</code></td><td><code>#efe6d7</code></td><td class="num">6.82</td><td class="num">4.5</td></tr><tr class=""><td>ink / ochre-wash</td><td><code>#2a2420</code></td><td><code>#efe6d7</code></td><td class="num">12.37</td><td class="num">4.5</td></tr><tr class=""><td>sage / paper</td><td><code>#3a5c40</code></td><td><code>#faf4ea</code></td><td class="num">6.89</td><td class="num">4.5</td></tr><tr class=""><td>sage / card</td><td><code>#3a5c40</code></td><td><code>#fffcf6</code></td><td class="num">7.36</td><td class="num">4.5</td></tr><tr class=""><td>sage / sage-wash</td><td><code>#3a5c40</code></td><td><code>#e5ede2</code></td><td class="num">6.30</td><td class="num">4.5</td></tr><tr class=""><td>ink / sage-wash</td><td><code>#2a2420</code></td><td><code>#e5ede2</code></td><td class="num">12.79</td><td class="num">4.5</td></tr><tr class=""><td>clay-2 / paper (large)</td><td><code>#ad3128</code></td><td><code>#faf4ea</code></td><td class="num">5.91</td><td class="num">3</td></tr><tr class=""><td>ochre / paper (large)</td><td><code>#8a5c1c</code></td><td><code>#faf4ea</code></td><td class="num">5.29</td><td class="num">3</td></tr><tr class=""><td>clay-line / clay-wash (bdr)</td><td><code>#e8bbb5</code></td><td><code>#f6dedb</code></td><td class="num">1.34</td><td class="num">1.2</td></tr><tr class=""><td>ochre-line / ochre-wash (bdr)</td><td><code>#d9c8ab</code></td><td><code>#efe6d7</code></td><td class="num">1.33</td><td class="num">1.2</td></tr><tr class=""><td>sage-line / sage-wash (bdr)</td><td><code>#c6d8c2</code></td><td><code>#e5ede2</code></td><td class="num">1.25</td><td class="num">1.2</td></tr></tbody></table>
+        <p class="note">Font: <code>'Fraunces'</code> display · <code>'Inter'</code> text · line-height <code>1.55</code> · tracking <code>0.12em</code> · word-break <code>normal</code></p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-locale="es-MX" id="t-es-MX">
+  <header class="panel-head">
+    <div class="ph-left">
+      <span class="code">es-MX</span>
+      <span class="nat" lang="es-MX" dir="ltr">Español</span>
+      <span class="eng">Spanish (Mexico)</span>
+    </div>
+    <div class="ph-right">
+      <span class="tag tag-new">palette departs</span>
+      
+      <span class="tag tag-aa">AA 5.29:1</span>
+    </div>
+  </header>
+
+  <div class="panel-body">
+    <div class="panel-card"><div class="ds card alert-surface-host" lang="es-MX" dir="ltr">
+  <div class="ds-top">
+    <span class="eyebrow">En la puerta ahora</span>
+    <span class="ds-meta">Puerta principal · 14:26</span>
+  </div>
+  <h3 class="display ds-title">Un repartidor está en la puerta.</h3>
+
+  <div class="ds-alert alert-surface">
+    <span class="ds-alert-ico" aria-hidden="true"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+    <span class="ds-alert-label">Identificada</span>
+    <span class="visitor-name">Ximena O.</span>
+  </div>
+
+  <div class="ds-said">
+    <span class="ds-lab">La puerta dijo</span>
+    <p>Buenas tardes. La persona que vive aquí es sorda y no puede salir a la puerta. ¿Viene a dejar un paquete?</p>
+  </div>
+
+  <div class="ds-gest">
+    <span class="ds-lab">El visitante hizo una seña</span>
+    <span class="ds-gest-v">Asentimiento — sí</span>
+  </div>
+
+  <div class="ds-states">
+    <span class="chip chip-safe"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><rect x="2.5" y="2.5" width="15" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10.4l2.8 2.8L14.4 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Seguro</span></span>
+    <span class="chip chip-warn"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><path d="M10 2.6l7.6 14H2.4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 7.6v3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14.1" r="1.05" fill="currentColor"/></svg><span>Precaución</span></span>
+    <span class="chip chip-stop"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>No se recibió</span></span>
+  </div>
+</div></div>
+    <div class="panel-why">
+      <div class="swatches"><div class="sw sw-moved"><i style="background:#f7f0e2"></i><b>paper</b><code>#f7f0e2</code><em>&nbsp;</em></div><div class="sw sw-moved"><i style="background:#fdf8ec"></i><b>card</b><code>#fdf8ec</code><em>&nbsp;</em></div><div class="sw"><i style="background:#2a2420"></i><b>ink</b><code>#2a2420</code><em>14.45:1</em></div><div class="sw sw-moved"><i style="background:#9b3527"></i><b>clay</b><code>#9b3527</code><em>6.76:1</em></div><div class="sw sw-moved"><i style="background:#6f5a0c"></i><b>ochre-ink</b><code>#6f5a0c</code><em>6.30:1</em></div><div class="sw sw-moved"><i style="background:#1f5b52"></i><b>sage</b><code>#1f5b52</code><em>7.40:1</em></div></div>
+      <ol class="why"><li>The flag triad is broken on two axes at once. The base theme puts sage green, a near-white card and clay red in the same component — green, white and red, which lib/gestures/locales.ts says to avoid together. The green is rotated to a deep pine-teal and every surface is warmed to sand, so neither the hue nor the white survives to assemble the flag.</li><li>Rotating the green rather than only warming the white is the deliberate belt-and-braces choice: a cream card is still light enough to read as white in a photograph or a projector, and the flag reading is about what a glance produces.</li><li>The yellow is pulled off marigold. In late October a saturated marigold reads as Día de Muertos decoration — festive, and off-register for an alert — so the caution tier sits at a cooler straw/amber, hue rotated away from the cempasúchil orange.</li><li>Purple is absent by construction and stays that way. Purple is a mourning colour here and must not become the neutral &quot;info&quot; state — which is exactly what a designer reaching for a fourth tier would do.</li><li>Type unchanged. Accents on capitals are mandatory (RAE) and á é í ó ú ü ñ ¿ ¡ are all covered by Fraunces latin/latin-ext.</li></ol>
+      <details class="numbers">
+        <summary>Measured contrast — 25 pairs</summary>
+        <table><thead><tr><th>pair</th><th>fg</th><th>bg</th><th class="num">ratio</th><th class="num">min</th></tr></thead><tbody><tr class=""><td>ink / paper</td><td><code>#2a2420</code></td><td><code>#f7f0e2</code></td><td class="num">13.50</td><td class="num">4.5</td></tr><tr class=""><td>ink / card</td><td><code>#2a2420</code></td><td><code>#fdf8ec</code></td><td class="num">14.45</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-2</td><td><code>#2a2420</code></td><td><code>#f0e7d4</code></td><td class="num">12.46</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-3</td><td><code>#2a2420</code></td><td><code>#e8dcc3</code></td><td class="num">11.27</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / paper</td><td><code>#574c42</code></td><td><code>#f7f0e2</code></td><td class="num">7.35</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / card</td><td><code>#574c42</code></td><td><code>#fdf8ec</code></td><td class="num">7.87</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / paper</td><td><code>#6e6154</code></td><td><code>#f7f0e2</code></td><td class="num">5.29</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / card</td><td><code>#6e6154</code></td><td><code>#fdf8ec</code></td><td class="num">5.66</td><td class="num">4.5</td></tr><tr class=""><td>clay / paper</td><td><code>#9b3527</code></td><td><code>#f7f0e2</code></td><td class="num">6.31</td><td class="num">4.5</td></tr><tr class=""><td>clay / card</td><td><code>#9b3527</code></td><td><code>#fdf8ec</code></td><td class="num">6.76</td><td class="num">4.5</td></tr><tr class=""><td>clay / clay-wash</td><td><code>#9b3527</code></td><td><code>#f6e0d8</code></td><td class="num">5.65</td><td class="num">4.5</td></tr><tr class=""><td>ink / clay-wash</td><td><code>#2a2420</code></td><td><code>#f6e0d8</code></td><td class="num">12.08</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / paper</td><td><code>#6f5a0c</code></td><td><code>#f7f0e2</code></td><td class="num">5.89</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / card</td><td><code>#6f5a0c</code></td><td><code>#fdf8ec</code></td><td class="num">6.30</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / ochre-wash</td><td><code>#6f5a0c</code></td><td><code>#f7eecf</code></td><td class="num">5.75</td><td class="num">4.5</td></tr><tr class=""><td>ink / ochre-wash</td><td><code>#2a2420</code></td><td><code>#f7eecf</code></td><td class="num">13.19</td><td class="num">4.5</td></tr><tr class=""><td>sage / paper</td><td><code>#1f5b52</code></td><td><code>#f7f0e2</code></td><td class="num">6.92</td><td class="num">4.5</td></tr><tr class=""><td>sage / card</td><td><code>#1f5b52</code></td><td><code>#fdf8ec</code></td><td class="num">7.40</td><td class="num">4.5</td></tr><tr class=""><td>sage / sage-wash</td><td><code>#1f5b52</code></td><td><code>#dfece9</code></td><td class="num">6.47</td><td class="num">4.5</td></tr><tr class=""><td>ink / sage-wash</td><td><code>#2a2420</code></td><td><code>#dfece9</code></td><td class="num">12.62</td><td class="num">4.5</td></tr><tr class=""><td>clay-2 / paper (large)</td><td><code>#b54833</code></td><td><code>#f7f0e2</code></td><td class="num">4.70</td><td class="num">3</td></tr><tr class=""><td>ochre / paper (large)</td><td><code>#a3841c</code></td><td><code>#f7f0e2</code></td><td class="num">3.15</td><td class="num">3</td></tr><tr class=""><td>clay-line / clay-wash (bdr)</td><td><code>#e7c1b3</code></td><td><code>#f6e0d8</code></td><td class="num">1.31</td><td class="num">1.2</td></tr><tr class=""><td>ochre-line / ochre-wash (bdr)</td><td><code>#e6d69e</code></td><td><code>#f7eecf</code></td><td class="num">1.25</td><td class="num">1.2</td></tr><tr class=""><td>sage-line / sage-wash (bdr)</td><td><code>#b8d5d0</code></td><td><code>#dfece9</code></td><td class="num">1.29</td><td class="num">1.2</td></tr></tbody></table>
+        <p class="note">Font: <code>'Fraunces'</code> display · <code>'Inter'</code> text · line-height <code>1.55</code> · tracking <code>0.12em</code> · word-break <code>normal</code></p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="panel" data-locale="pt-BR" id="t-pt-BR">
+  <header class="panel-head">
+    <div class="ph-left">
+      <span class="code">pt-BR</span>
+      <span class="nat" lang="pt-BR" dir="ltr">Português</span>
+      <span class="eng">Portuguese (Brazil)</span>
+    </div>
+    <div class="ph-right">
+      <span class="tag tag-new">palette departs</span>
+      
+      <span class="tag tag-aa">AA 5.48:1</span>
+    </div>
+  </header>
+
+  <div class="panel-body">
+    <div class="panel-card"><div class="ds card alert-surface-host" lang="pt-BR" dir="ltr">
+  <div class="ds-top">
+    <span class="eyebrow">Na porta agora</span>
+    <span class="ds-meta">Porta da frente · 14h26</span>
+  </div>
+  <h3 class="display ds-title">Um entregador está na porta.</h3>
+
+  <div class="ds-alert alert-surface">
+    <span class="ds-alert-ico" aria-hidden="true"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+    <span class="ds-alert-label">Reconhecida</span>
+    <span class="visitor-name">Letícia A.</span>
+  </div>
+
+  <div class="ds-said">
+    <span class="ds-lab">A porta disse</span>
+    <p>Olá. Quem mora aqui é surdo e não pode vir até a porta. É uma entrega?</p>
+  </div>
+
+  <div class="ds-gest">
+    <span class="ds-lab">O visitante acenou</span>
+    <span class="ds-gest-v">Aceno de cabeça — sim</span>
+  </div>
+
+  <div class="ds-states">
+    <span class="chip chip-safe"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><rect x="2.5" y="2.5" width="15" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10.4l2.8 2.8L14.4 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Tudo certo</span></span>
+    <span class="chip chip-warn"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><path d="M10 2.6l7.6 14H2.4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 7.6v3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14.1" r="1.05" fill="currentColor"/></svg><span>Atenção</span></span>
+    <span class="chip chip-stop"><svg viewBox="0 0 20 20" aria-hidden="true" class="ico"><circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.2 14.8L14.8 5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Encerrado</span></span>
+  </div>
+</div></div>
+    <div class="panel-why">
+      <div class="swatches"><div class="sw"><i style="background:#faf4ea"></i><b>paper</b><code>#faf4ea</code><em>&nbsp;</em></div><div class="sw"><i style="background:#fffcf6"></i><b>card</b><code>#fffcf6</code><em>&nbsp;</em></div><div class="sw"><i style="background:#2a2420"></i><b>ink</b><code>#2a2420</code><em>14.95:1</em></div><div class="sw sw-moved"><i style="background:#8e2a24"></i><b>clay</b><code>#8e2a24</code><em>8.18:1</em></div><div class="sw sw-moved"><i style="background:#7d5209"></i><b>ochre-ink</b><code>#7d5209</code><em>6.65:1</em></div><div class="sw sw-moved"><i style="background:#0f5c5e"></i><b>sage</b><code>#0f5c5e</code><em>7.56:1</em></div></div>
+      <ol class="why"><li>This is the theme where the default UI is the problem. Red is the historic colour of the Workers' Party and green+yellow is Bolsonaro's adopted pair, so a stock green-OK / red-alert interface puts the two most partisan colours in Brazilian politics side by side on a device mounted on someone's front door.</li><li>The prescription is taken verbatim from lib/gestures/locales.ts: &quot;Use blue or teal for OK and amber for alert; reserve saturated red for genuine emergency.&quot; The safe tier becomes deep teal, the attention tier becomes amber, and the red is darkened and demoted to genuine emergency only.</li><li>This is the only theme that departs from ISO 3864-4 on the SAFE tier, and the departure is deliberate rather than accidental: ISO reads blue as mandatory-instruction, not as safe. It is defensible only because WCAG 1.4.1 already forbids colour as the sole carrier — the ISO 7010 square and the text label still say &quot;safe&quot;, and the teal is only the surface it sits on. Note this as the one place the theme system trades a standard for a political reading.</li><li>Removing green also removes the green+yellow pair as a side effect, so the Bolsonaro pairing cannot assemble even though amber remains.</li><li>Purple stays out of every neutral state. Purple is the dominant Brazilian funerary colour today (CNBB) — it has replaced black — and it is the obvious candidate for a fourth &quot;info&quot; tier.</li><li>Type unchanged. No ü (the trema was abolished for native words by the Acordo Ortográfico de 1990) and no ¿ ¡; á é í ó ú â ê ô ã õ ç à are all in Fraunces latin/latin-ext.</li></ol>
+      <details class="numbers">
+        <summary>Measured contrast — 25 pairs</summary>
+        <table><thead><tr><th>pair</th><th>fg</th><th>bg</th><th class="num">ratio</th><th class="num">min</th></tr></thead><tbody><tr class=""><td>ink / paper</td><td><code>#2a2420</code></td><td><code>#faf4ea</code></td><td class="num">13.99</td><td class="num">4.5</td></tr><tr class=""><td>ink / card</td><td><code>#2a2420</code></td><td><code>#fffcf6</code></td><td class="num">14.95</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-2</td><td><code>#2a2420</code></td><td><code>#f4eadb</code></td><td class="num">12.86</td><td class="num">4.5</td></tr><tr class=""><td>ink / paper-3</td><td><code>#2a2420</code></td><td><code>#eee0cb</code></td><td class="num">11.78</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / paper</td><td><code>#574c42</code></td><td><code>#faf4ea</code></td><td class="num">7.62</td><td class="num">4.5</td></tr><tr class=""><td>ink-2 / card</td><td><code>#574c42</code></td><td><code>#fffcf6</code></td><td class="num">8.15</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / paper</td><td><code>#6e6154</code></td><td><code>#faf4ea</code></td><td class="num">5.48</td><td class="num">4.5</td></tr><tr class=""><td>ink-3 / card</td><td><code>#6e6154</code></td><td><code>#fffcf6</code></td><td class="num">5.86</td><td class="num">4.5</td></tr><tr class=""><td>clay / paper</td><td><code>#8e2a24</code></td><td><code>#faf4ea</code></td><td class="num">7.66</td><td class="num">4.5</td></tr><tr class=""><td>clay / card</td><td><code>#8e2a24</code></td><td><code>#fffcf6</code></td><td class="num">8.18</td><td class="num">4.5</td></tr><tr class=""><td>clay / clay-wash</td><td><code>#8e2a24</code></td><td><code>#f5e0dc</code></td><td class="num">6.61</td><td class="num">4.5</td></tr><tr class=""><td>ink / clay-wash</td><td><code>#2a2420</code></td><td><code>#f5e0dc</code></td><td class="num">12.09</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / paper</td><td><code>#7d5209</code></td><td><code>#faf4ea</code></td><td class="num">6.23</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / card</td><td><code>#7d5209</code></td><td><code>#fffcf6</code></td><td class="num">6.65</td><td class="num">4.5</td></tr><tr class=""><td>ochre-ink / ochre-wash</td><td><code>#7d5209</code></td><td><code>#f9ebd1</code></td><td class="num">5.78</td><td class="num">4.5</td></tr><tr class=""><td>ink / ochre-wash</td><td><code>#2a2420</code></td><td><code>#f9ebd1</code></td><td class="num">13.00</td><td class="num">4.5</td></tr><tr class=""><td>sage / paper</td><td><code>#0f5c5e</code></td><td><code>#faf4ea</code></td><td class="num">7.08</td><td class="num">4.5</td></tr><tr class=""><td>sage / card</td><td><code>#0f5c5e</code></td><td><code>#fffcf6</code></td><td class="num">7.56</td><td class="num">4.5</td></tr><tr class=""><td>sage / sage-wash</td><td><code>#0f5c5e</code></td><td><code>#deeceb</code></td><td class="num">6.38</td><td class="num">4.5</td></tr><tr class=""><td>ink / sage-wash</td><td><code>#2a2420</code></td><td><code>#deeceb</code></td><td class="num">12.62</td><td class="num">4.5</td></tr><tr class=""><td>clay-2 / paper (large)</td><td><code>#a4392f</code></td><td><code>#faf4ea</code></td><td class="num">5.99</td><td class="num">3</td></tr><tr class=""><td>ochre / paper (large)</td><td><code>#c07d14</code></td><td><code>#faf4ea</code></td><td class="num">3.10</td><td class="num">3</td></tr><tr class=""><td>clay-line / clay-wash (bdr)</td><td><code>#e6bdb6</code></td><td><code>#f5e0dc</code></td><td class="num">1.35</td><td class="num">1.2</td></tr><tr class=""><td>ochre-line / ochre-wash (bdr)</td><td><code>#ebd3a6</code></td><td><code>#f9ebd1</code></td><td class="num">1.24</td><td class="num">1.2</td></tr><tr class=""><td>sage-line / sage-wash (bdr)</td><td><code>#b6d5d4</code></td><td><code>#deeceb</code></td><td class="num">1.29</td><td class="num">1.2</td></tr></tbody></table>
+        <p class="note">Font: <code>'Fraunces'</code> display · <code>'Inter'</code> text · line-height <code>1.55</code> · tracking <code>0.12em</code> · word-break <code>normal</code></p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <h3>Three things this page is deliberately not doing</h3>
+  <p><b>It is not inventing a Greek, Turkish, Nigerian or American palette.</b> For those four the repo's own research says there is no reliable locale-specific colour semantics, or that the adjacent locale's paper explicitly does not apply. el-GR still changes its display face, because the Google Fonts API serves Fraunces in latin, latin-ext and vietnamese only — a Greek headline in Fraunces silently falls back to Georgia.</p>
+  <p><b>It is not treating the Korean red-name taboo as pan-CJK.</b> No source says either way, so <code>--name-ink</code> is simply applied in every theme: a visitor's name renders in body ink everywhere, red stays in the icon and the border. It costs nothing outside ko-KR and it cannot be forgotten.</p>
+  <p><b>It is not silently fixing the base.</b> One measured finding is reported rather than patched: the base <code>--ochre</code> (<code>#c58a2b</code>), which app/globals.css uses for the <code>.ring-pulse</code> border, measures 2.72:1 against <code>--paper</code>. WCAG 1.4.11 asks 3:1 of a graphical object that carries state, and for a Deaf resident that ring <em>is</em> the doorbell. <code>#b8801f</code> would clear it at 3.12:1. Changing it restyles the shipped alert in all fourteen locales, so it is a decision for the product, not for a theming pass. Themes that choose their own <code>--ochre</code> — ja-JP, hi-IN, sw-KE, es-MX, fr-FR, ar-*, pt-BR — already clear 3:1.</p>
+
+  <h3>Where the numbers come from</h3>
+  <p>docs/locale-colour-typography.md (ja, ko, zh) · docs/gesture-research-mena.md (ar, tr) · docs/locale-research-fr-us-ke.md (fr, en-US, sw) · docs/gesture-research-greece-africa.md (el, en-NG) · the <code>colour</code> and <code>text</code> fields on every entry in lib/gestures/locales.ts. Contrast computed with the WCAG 2.x relative-luminance formula over the sRGB values in lib/theme/themes.ts.</p>
+  <p class="small">en-GB is not themed here: it does not exist in lib/gestures/locales.ts, and adding a locale to invent a theme for it would be the exact failure this page is trying to avoid.</p>
+</footer>
+
+</div>
+</body>
+</html>

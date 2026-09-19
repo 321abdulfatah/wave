@@ -483,6 +483,44 @@ export const LOCALES: Record<string, LocaleSpec> = {
       'not try. Use plural-as-respect instead — age-neutral deference.',
   },
 
+  'en-NG': {
+    code: 'en-NG',
+    name: 'English (Nigeria)',
+    nativeName: 'English',
+    dir: 'ltr',
+    signLanguage: {
+      name: 'Nigerian Sign Language',
+      iso: 'nsi',
+      note:
+        'No government recognition. Distinct from the indigenous Hausa Sign Language (Maganar Hannu), ' +
+        'Yoruba and Bura sign languages. Whether NSL is properly "a dialect of ASL" is disputed.',
+    },
+    blocked: {
+      open_palm: {
+        reason:
+          'A spread palm thrust may carry an offensive reading here. We act on this because the cost ' +
+          'of being wrong is asymmetric — NOT because it is well sourced. The "waka" claim carries no ' +
+          'citation anywhere we could find, including in the Wikipedia sentence that states it, and ' +
+          'searches of Punch, Vanguard, Guardian Nigeria and Premium Times returned nothing. Two ' +
+          'relevant papers (Agwuele 2014; Orie 2009, both in Gesture) were paywalled. Avoid the ' +
+          'gesture; do not state the claim as fact.',
+        severity: 'offensive',
+        evidence: 'unverified',
+        substitute: 'index_up',
+      },
+    },
+    colour: [
+      'Flag: green = agriculture, white = unity and peace. Green also carries an Islamic association ' +
+        'in the north.',
+    ],
+    text: [
+      'Latin, LTR. If you ever localise beyond English: Yoruba diacritics (ẹ ọ ṣ plus tone marks) are ' +
+        'semantically load-bearing and absent from standard keyboards; Hausa Boko uses ɓ ɗ ƙ; and ' +
+        'Hausa Ajami is Arabic script and therefore RTL.',
+    ],
+    register: 'Sir/ma for any senior or higher-ranking person. Honorific plurals for singular persons.',
+  },
+
   'fr-FR': {
     code: 'fr-FR',
     name: 'French',

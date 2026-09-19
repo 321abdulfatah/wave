@@ -2,281 +2,281 @@
   "en-US": {
     "language": "English (United States)",
     "dir": "ltr",
-    "signLanguage": "American Sign Language (ASL)",
-    "verified": false,
+    "signLanguage": "American Sign Language (ASL) [ase]",
+    "verified": true,
     "gestures": {
-      "thumbs_up": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Baseline positive. This is the locale the default vocabulary was designed for." },
-      "open_palm": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Reads as stop/wait without insult." },
-      "wave": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Standard greeting." },
-      "point": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Pointing downward at the ground is unremarkable; pointing at a person is mildly rude but that is not what we detect." },
-      "fist": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "A raised fist carries a protest/solidarity reading in US public life, but a fist held at chest height toward a doorbell is not read that way. Low risk." }
+      "thumbs_up": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Recognised as 'good' at 100% in the US/Latin America cell of Matsumoto & Hwang (2013). The 'Gen Z finds it passive-aggressive' story traces to a Reddit post amplified by a TODAY article with no expert analysis; the cited survey asked which emoji make you look old, which is a different claim, and it concerns the emoji in text chat, not a hand at a door. Ship it." },
+      "open_palm": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "'Stop' is the single highest-recognition emblem measured, pan-cultural at 100% (Matsumoto & Hwang 2013)." },
+      "wave": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "A US emblem at 98.20% recognition. Note that this is a regional emblem, not a universal one — it is exactly why it fails elsewhere." },
+      "point": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "A US emblem at 98.20%. The downward case is unsourced everywhere, but no US source treats it as rude." },
+      "fist": { "safe": false, "severity": "unclear", "substitute": "thumbs_down", "substituteShape": "Thumb extended with the tip below the wrist (landmark 4 y greater than landmark 0 y); all four fingers curled. Maximally separable from thumbs_up on a single scalar, so yes and no can never silently swap.", "note": "Withdrawn globally, not for a US-specific reason: a fist is pan-culturally 'Threat' at 98.15% (Matsumoto & Hwang 2013). The US-specific caution is about RENDERING, not recognition — the politically loaded instances are all arm-overhead, not handshape, so a chest-height fist is not the salute. But never render a raised fist in UI or marketing, and consider who is at the door before publicly labelling a courier's fist 'protest-adjacent'." }
     },
     "colors": {
-      "red": "Danger, stop, error. Safe for an alert state.",
-      "green": "Go, safe, accepted.",
-      "white": "Neutral, clean. No mourning association.",
-      "yellow": "Caution, pending."
+      "red": "ANSI Z535: DANGER, white-on-red. Conventional.",
+      "green": "Safe, proceed.",
+      "white": "Neutral. No mourning reading.",
+      "yellow": "ANSI Z535: CAUTION, black-on-yellow; WARNING is black-on-orange."
     },
-    "politeness": "Direct address is acceptable; plain, brief, first-person system voice is the norm."
+    "politeness": "Direct, warm, brief. Over-formality reads as stilted from a machine."
   },
   "el-GR": {
     "language": "Greek (Greece)",
     "dir": "ltr",
-    "signLanguage": "Ελληνική Νοηματική Γλώσσα (Greek Sign Language, ΕΝΓ/GSL)",
-    "verified": false,
+    "signLanguage": "Ελληνική Νοηματική Γλώσσα (Greek Sign Language, ΕΝΓ) — recognised as equal to Greek by Law 4488/2017 art. 65 §2",
+    "verified": true,
     "gestures": {
-      "thumbs_up": { "safe": false, "severity": "unclear", "substitute": "closed fist with index and middle finger extended together, palm sideways", "substituteShape": "Index (8) and middle (12) tips extended and adducted — inter-tip distance under ~0.3 of index finger length; ring (16) and pinky (20) curled to palm; thumb folded across. Palm normal roughly perpendicular to the camera axis, not facing it.", "note": "CONTESTED. Morris et al. (1979) recorded insulting readings of the raised thumb at Mediterranean sites including parts of Greece. Many later accounts hold that the Western approving sense has largely displaced it, especially among younger speakers. Evidence for the present day is genuinely mixed — treat as ambiguous rather than either safe or obscene, and do not rely on it as the affirmative." },
-      "open_palm": { "safe": false, "severity": "offensive", "substitute": "vertical flat hand, fingers together, palm turned edge-on to the camera", "substituteShape": "All four fingers extended and strongly adducted (maximum pairwise fingertip separation small relative to palm width); thumb held alongside the index, not abducted; hand vertical, palm plane roughly parallel to the camera axis so the palm is NOT presented flat to the lens.", "note": "HIGHEST-SEVERITY FINDING IN THE SET. The moútza (μούτζα) — an open hand with the fingers splayed, thrust palm-forward toward a person — is a serious and still-current Greek insult. Our default open_palm is close to exactly that shape aimed at a camera. The proposed discriminator is finger adduction plus palm orientation: the moútza requires splayed fingers and a forward-facing palm. VERIFY that adduction alone genuinely defuses it before shipping; if it does not, drop the flat hand in Greece entirely." },
-      "wave": { "safe": false, "severity": "offensive", "substitute": "raised vertical flat hand, fingers together, held still", "substituteShape": "As the open_palm substitute, held static for the dwell period rather than oscillated. Oscillation of a splayed palm toward the lens is the risk; a still, fingers-together hand is not.", "note": "A palm-forward hand oscillated toward the camera risks being read as a repeated moútza, which is worse than a single one. Same mitigation as open_palm." },
-      "point": { "safe": false, "severity": "impolite", "substitute": "flat hand, fingers together, angled downward", "substituteShape": "All fingers extended and adducted, thumb alongside; whole hand inclined downward so the fingertip centroid sits below the wrist (0). No isolated index extension.", "note": "Isolated index pointing is impolite in much of the Mediterranean. An open-hand indication carries the same information without the jab." },
-      "fist": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No specific Greek insult reading identified. Note that a fist is also the safest shape here precisely because it has no extended fingers to splay." }
+      "thumbs_up": { "safe": false, "severity": "unclear", "substitute": "head nod (out of the hand channel)", "substituteShape": "Not a hand gesture. Requires MediaPipe Face or Pose Landmarker. Pan-cultural 'yes' at 98.18%.", "note": "CONTESTED. Morris et al. (1979) recorded insulting readings at Mediterranean sites; many later accounts hold the Western sense has displaced it. No age-stratified study exists. Accept as input; never prompt for it." },
+      "open_palm": { "safe": false, "severity": "offensive", "substitute": "raised index finger («μια στιγμή»)", "substituteShape": "Index extended and vertical (tip 8 above MCP 5 in image space); middle, ring and pinky curled; thumb against the middle phalanx; palm EDGE-ON to the camera; static hold ~1s, no forward thrust. Separates from the downward point by the sign of (tip.y − mcp.y), from fist by index extension, from open_palm by three curled fingers, from thumbs_up by which digit is extended.", "note": "THE SEVEREST FINDING IN THE MATRIX. This is the moútza. Greek Wikipedia: the insulter extends the hand toward the insulted and shows the open palm with fingers stretched out. Crucially, the fingers-together 'fix' that travel sites recommend is itself a named milder insult — the «ευγενική» μούντζα, the polite moútza. NO palm-toward-camera flat hand of any finger spacing is safe in Greece. Statically the moútza and our open_palm are the same 21 landmarks; only wrist-translation velocity separates them. Insult by deed is also criminal under Greek Penal Code art. 361/361A. Never render an on-screen prompt telling a Greek visitor to hold up an open palm — that is instructing them to moútza the customer's doorbell." },
+      "wave": { "safe": false, "severity": "offensive", "substitute": "raised index finger, static", "substituteShape": "As above, held still.", "note": "A palm-forward hand oscillated at the camera is repeated moútza exposure. INFERENCE from the open_palm finding, not separately sourced." },
+      "point": { "safe": false, "severity": "unclear", "substitute": "flat-hand present", "substituteShape": "Four fingers extended and adducted, thumb alongside, whole hand angled 30–60° downward, palm oriented upward/obliquely — offering, not commanding. Held ~1s.", "note": "UNSOURCED for Greece specifically. Substituted on the general 'whole hand, never one finger' rule rather than a Greek citation." },
+      "fist": { "safe": false, "severity": "offensive", "substitute": "thumbs_down", "substituteShape": "Thumb tip below the wrist; four fingers curled.", "note": "Globally withdrawn — pan-cultural 'Threat' at 98.15% (Matsumoto & Hwang 2013)." }
     },
     "colors": {
-      "red": "Warning, and a strong Orthodox liturgical presence (Easter). Safe for alerts.",
-      "green": "Generally positive, no strong taboo identified.",
-      "white": "Positive — purity, and with blue the national pairing. No mourning reading.",
-      "yellow": "Byzantine/ecclesiastical gold association; otherwise neutral."
+      "red": "ISO 3864-4 base: prohibition/stop. No Greek-specific override found.",
+      "green": "Safe, proceed.",
+      "white": "No mourning reading identified.",
+      "yellow": "Warning. No Greek-specific override found."
     },
-    "politeness": "Use the plural εσείς for a stranger; a greeting before any request is expected."
+    "politeness": "Plural εσείς for a stranger; greeting before any request. TYPOGRAPHY: Greek uppercase DROPS the tonos but KEEPS the dialytika, and the disjunctive ή keeps its tonos. CSS text-transform: uppercase gets this wrong — supply pre-composed uppercase strings."
   },
   "fr-FR": {
     "language": "French (France)",
     "dir": "ltr",
-    "signLanguage": "Langue des signes française (LSF)",
-    "verified": false,
+    "signLanguage": "Langue des signes française (LSF) — recognised « comme une langue à part entière » by loi n° 2005-102 du 11 février 2005 art. 75, codified at Code de l'éducation L312-9-1",
+    "verified": true,
     "gestures": {
-      "thumbs_up": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Positive. Note it also serves as the counting hand-shape for 'one', so it can be produced unintentionally while a visitor is counting — a reason to require a dwell time rather than firing on a single frame." },
-      "open_palm": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No moútza reading in France." },
-      "wave": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Standard greeting." },
-      "point": { "safe": false, "severity": "impolite", "substitute": "flat hand, fingers together, angled downward", "substituteShape": "Fingers extended and adducted, thumb alongside, hand inclined so the fingertip centroid is below the wrist (0).", "note": "Pointing the index at a person is impolite; pointing at the ground is far milder. Substituting costs nothing, so substitute." },
-      "fist": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No offensive reading identified. The French offensive gesture most often cited, the bras d'honneur, is a whole-arm movement we do not detect." }
+      "thumbs_up": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No negative reading sourced. Note it is also the counting handshape for 'one', so require a dwell time rather than firing on a single frame." },
+      "open_palm": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "'Stop' pan-cultural at 100%. France is not on the moútza-analogue list." },
+      "wave": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No negative reading sourced." },
+      "point": { "safe": false, "severity": "unclear", "substitute": "flat-hand present", "substituteShape": "Four fingers extended and adducted, thumb alongside, hand angled 30–60° downward, palm upward/oblique, held ~1s.", "note": "UNSOURCED for the downward case. Substituted on the general whole-hand rule; cost of substituting is zero." },
+      "fist": { "safe": false, "severity": "offensive", "substitute": "thumbs_down", "substituteShape": "Thumb tip below the wrist; four fingers curled.", "note": "France has a specific and nasty failure mode on top of the global one. The bras d'honneur — bent arm, fist up, other hand gripping the biceps — is obscene and common across the Romance-speaking world. The insult lives in the FOREARM and the SECOND HAND, neither of which a single-hand 21-landmark model can see, so a handshape-only classifier logs 'Visitor said no' for someone making an obscene gesture at the camera. That is a false-accept embarrassment. Also live: the poing levé of May 1968 and trade unionism. Discriminator if fist is ever reinstated: bras d'honneur has the forearm vertical, fist above elbow height, knuckles away from the signer; our 'no' is chest height, palm toward camera." }
     },
     "colors": {
-      "red": "Danger, stop. Conventional Western reading.",
-      "green": "Go, permitted.",
-      "white": "Neutral/positive, no mourning reading.",
-      "yellow": "Caution. Some contemporary political association (gilets jaunes) — irrelevant at a doorstep but worth knowing."
+      "red": "ISO 3864-4 prohibition. Conventional.",
+      "green": "Safe, proceed.",
+      "white": "Neutral.",
+      "yellow": "AVOID LARGE FILLS. Gilets jaunes iconography (Nov 2018 – Jun 2020, peak 287,710 per the Ministry of the Interior; ubiquitous because since 2008 every French driver must carry a hi-vis vest). Older layer per Pastoureau, 'Jaune. Histoire d'une couleur' (Seuil, 2019): medieval greenish yellow signified Judas and forgers, lexicalised in « rire jaune ». Use yellow only as thin border, small icon or text accent — or substitute orange for the caution tier, which is also the ANSI-correct choice."
     },
-    "politeness": "Vous, always, for a stranger. 'Bonjour' before any request is close to obligatory — omitting it reads as rude in a way that has no English equivalent. The system's first utterance should be a greeting, not an instruction."
+    "politeness": "Always vous — there is no register in which a machine tutoies a stranger at a French door. Kerbrat-Orecchioni (2001) found 'Bonjour !' in ~90% of shop interactions, with politeness work occupying about half the material exchanged, and the greeting typically INITIATED BY THE SHOPKEEPER. Our system is in the shopkeeper's seat, so greeting first is structurally expected of us, not of the visitor. Never open with the question. Consequence: the French flow needs one more turn than the American one — do not build a turn-count-identical graph and localise strings into it. TYPOGRAPHY: accented capitals are required (« SUPPRIMER LES RETRAITES ? » vs « SUPPRIMER LES RETRAITÉS ? »); narrow no-break space U+202F before ; ! ? and inside « », U+00A0 before :; never degrade to a plain space."
   },
   "es-MX": {
     "language": "Spanish (Mexico)",
     "dir": "ltr",
-    "signLanguage": "Lengua de Señas Mexicana (LSM)",
+    "signLanguage": "Lengua de Señas Mexicana (LSM) [mfs]",
     "verified": false,
     "gestures": {
-      "thumbs_up": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Positive and widely used." },
-      "open_palm": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No insult reading identified." },
-      "wave": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Standard greeting." },
-      "point": { "safe": false, "severity": "impolite", "substitute": "flat hand, fingers together, angled downward", "substituteShape": "Fingers extended and adducted, thumb alongside, hand inclined so the fingertip centroid is below the wrist (0).", "note": "Index pointing at people is impolite; indicating with the whole hand, or with the lips/chin, is common. Downward pointing at a parcel is mild, so this is a courtesy substitution rather than a safety one." },
-      "fist": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No offensive reading identified." }
+      "thumbs_up": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "UNSOURCED LOCALE. No negative reading found, but this locale did not get a research pass." },
+      "open_palm": { "safe": false, "severity": "unclear", "substitute": "raised index finger, palm edge-on", "substituteShape": "Index extended and vertical, other three curled, thumb against the middle phalanx, palm edge-on, static hold ~1s.", "note": "UNRESOLVED AND IMPORTANT. Wikipedia's moútza article lists Mexico among locales with close analogues to the spread-palm thrust, while the same article elsewhere says a steady repeated version means 'patience' in Mexico and Brazil. Those two claims are in tension and neither was verified. Treated as unsafe on the asymmetric-cost rule until someone checks it." },
+      "wave": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "UNSOURCED LOCALE." },
+      "point": { "safe": false, "severity": "impolite", "substitute": "flat-hand present", "substituteShape": "Four fingers extended and adducted, thumb alongside, hand angled 30–60° downward, palm upward/oblique.", "note": "UNSOURCED for Mexico specifically; lip- and chin-pointing are widely described but were not verified in this pass. Substituted on the general whole-hand rule." },
+      "fist": { "safe": false, "severity": "offensive", "substitute": "thumbs_down", "substituteShape": "Thumb tip below the wrist; four fingers curled.", "note": "Globally withdrawn. The bras d'honneur is documented as common across the Romance-speaking world, which includes Mexico — same invisible-forearm false-accept risk as France." }
     },
     "colors": {
-      "red": "Warning; also strongly national (flag).",
-      "green": "Go; also strongly national.",
-      "white": "Neutral/positive, part of the national triad.",
-      "yellow": "Marigold/cempasúchil carries a Day of the Dead association — commemorative rather than negative. Purple, not white or black, is the mourning colour to avoid for a neutral UI."
+      "red": "UNSOURCED. ISO 3864-4 base applies by default.",
+      "green": "UNSOURCED. ISO 3864-4 base.",
+      "white": "UNSOURCED.",
+      "yellow": "UNSOURCED."
     },
-    "politeness": "Usted for a stranger. A greeting and a softener before a request are expected; bare imperatives read as brusque."
+    "politeness": "UNSOURCED LOCALE. Usted for a stranger is the safe default, but this was not researched."
   },
   "pt-BR": {
     "language": "Portuguese (Brazil)",
     "dir": "ltr",
-    "signLanguage": "Língua Brasileira de Sinais (Libras)",
+    "signLanguage": "Língua Brasileira de Sinais (Libras) [bzs]",
     "verified": false,
     "gestures": {
-      "thumbs_up": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Strongly positive — Brazil is often described as the most thumbs-up-positive locale in this set, where it substitutes for 'thanks', 'yes' and 'OK'. The best affirmative available here." },
-      "open_palm": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No insult reading identified." },
-      "wave": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Standard greeting." },
-      "point": { "safe": false, "severity": "impolite", "substitute": "flat hand, fingers together, angled downward", "substituteShape": "Fingers extended and adducted, thumb alongside, hand inclined so the fingertip centroid is below the wrist (0).", "note": "Mildly impolite at a person; low risk downward." },
-      "fist": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Plain fist is fine. CLASSIFIER RISK, not a cultural one: the figa (thumb protruding between index and middle fingers) is a distinct Brazilian good-luck shape that differs from a plain fist only in thumb position, and our current classifier keys on thumb extension. Make sure a figa does not silently land in the fist bucket and get read as 'no'." }
+      "thumbs_up": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "UNSOURCED LOCALE, though Brazil is widely described as strongly thumbs-up-positive. Matsumoto & Hwang put 'good' at 100% in the US/Latin America cell, which supports this." },
+      "open_palm": { "safe": false, "severity": "unclear", "substitute": "raised index finger, palm edge-on", "substituteShape": "Index extended and vertical, other three curled, palm edge-on, static hold ~1s.", "note": "UNRESOLVED. Same tension as es-MX: Brazil appears on Wikipedia's moútza-analogue list, while the same article says a steady repeated version means 'patience' in Brazil. Unverified and self-contradicting. Treated as unsafe on asymmetric cost." },
+      "wave": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "UNSOURCED LOCALE." },
+      "point": { "safe": false, "severity": "impolite", "substitute": "flat-hand present", "substituteShape": "Four fingers extended and adducted, thumb alongside, hand angled 30–60° downward, palm upward/oblique.", "note": "UNSOURCED for Brazil specifically. Substituted on the general whole-hand rule." },
+      "fist": { "safe": false, "severity": "offensive", "substitute": "thumbs_down", "substituteShape": "Thumb tip below the wrist; four fingers curled.", "note": "Globally withdrawn, plus two Brazil-specific hazards. The bras d'honneur is common across the Romance-speaking world. And the figa — thumb protruding between index and middle — is LUCKY in Brazil but is one landmark from our fist, so a courier wishing you luck gets logged as 'no'. Keep figa as an explicit REJECT class; never snap the intermediate thumb state to fist. Separately, never offer the OK ring here: it is obscene in Brazil (the 1950s Nixon incident in São Paulo)." }
     },
     "colors": {
-      "red": "Warning. No strong taboo identified.",
-      "green": "Go; strongly national with yellow.",
-      "white": "Peace, and the customary New Year colour. Positive.",
-      "yellow": "Positive and national. Purple is the mourning colour to avoid for a neutral UI."
+      "red": "UNSOURCED. ISO 3864-4 base applies by default.",
+      "green": "UNSOURCED. ISO 3864-4 base.",
+      "white": "UNSOURCED.",
+      "yellow": "UNSOURCED."
     },
-    "politeness": "Você is normal and not impolite; o senhor / a senhora for deference. Warm greeting expected before a request."
+    "politeness": "UNSOURCED LOCALE. Você is normal and not impolite; o senhor / a senhora for deference. Not researched."
   },
   "ar-SA": {
     "language": "Arabic (Gulf / Saudi Arabia)",
     "dir": "rtl",
-    "signLanguage": "لغة الإشارة السعودية (Saudi Sign Language); note the unified pan-Arab lexicon لغة الإشارة العربية الموحدة is an institutional standardisation effort, not the natural language of any Deaf community, and is contested",
-    "verified": false,
+    "signLanguage": "لغة الإشارة السعودية (Saudi Sign Language) — never ship 'Arabic Sign Language' as one language; Al-Fityani (2010, UC San Diego) found five natural Arab sign languages unlikely to share a common ancestor, and Deaf Arabs object that they cannot understand the unified lexicon",
+    "verified": true,
     "gestures": {
-      "thumbs_up": { "safe": false, "severity": "unclear", "substitute": "bunched fingertips held still, or a plain nod substitute in UI", "substituteShape": "See open_palm substitute for the bunched-fingertip shape. For an affirmative specifically, prefer an explicit on-screen confirm target over any thumb gesture until the ambiguity is resolved.", "note": "CONTESTED, and one of the most over-asserted claims in popular writing. An obscene reading of the raised thumb is widely reported for parts of the Arab world, much of it traceable to Iraq-war-era anecdote rather than systematic fieldwork; many contemporary accounts hold the Western approving sense now dominates among younger and online-exposed speakers. Do not assert either way. Treat as ambiguous and avoid relying on it." },
-      "open_palm": { "safe": false, "severity": "unclear", "substitute": "bunched fingertips pointing upward ('wait / slow down')", "substituteShape": "All five fingertips (4, 8, 12, 16, 20) drawn together so that their pairwise distances collapse to a small fraction of palm width; the tip centroid sits above the wrist (0); hand held upright, optional slow vertical oscillation. Highly distinctive in landmark space — tip convergence is a clean, single-threshold test and nothing else in the vocabulary looks like it.", "note": "A splayed palm thrust toward a person can read as aggressive. The bunched-fingertip gesture is the idiomatic Arab 'wait / take it easy' and is both culturally apt and unusually easy to detect, which is a rare combination. Strongly recommended." },
-      "wave": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Acceptable as a greeting." },
-      "point": { "safe": false, "severity": "impolite", "substitute": "flat right hand, fingers together, angled downward", "substituteShape": "Fingers extended and adducted, thumb alongside, hand inclined so the fingertip centroid is below the wrist (0). Prefer the right hand — MediaPipe returns handedness, so this is enforceable.", "note": "Index pointing at people is impolite. Additionally the left hand carries an impurity association for giving and eating; whether that extends to a gesture made at a camera is unclear and under-evidenced, but since handedness is free to read, preferring the right hand costs nothing." },
-      "fist": { "safe": false, "severity": "unclear", "substitute": "flat hand held vertically, fingers together, small side-to-side negation", "substituteShape": "Fingers extended and adducted, palm edge-on, rotated slightly about the wrist. Distinct from both the bunched fingertips and the downward flat hand.", "note": "A fist presented to a camera can read as threat rather than negation. Low confidence — this is a judgement call, not a sourced finding." }
+      "thumbs_up": { "safe": false, "severity": "unclear", "substitute": "head nod (out of the hand channel)", "substituteShape": "Not a hand gesture; needs Face or Pose Landmarker. Pan-cultural 'yes' at 98.18%.", "note": "GENUINELY SPLIT EVIDENCE, and the popular version overstates it. Slate (2003) via Axtell and the US Army DLI manual call it 'the foulest of Iraqi insults'; the SAME DLI manual says Arabian Peninsula populations adopted it post-1991 as a cooperation symbol; Cultural Atlas's Saudi page enumerates offensive gestures and does not list it. Ambiguous, not offensive by default. Accept as input, never prompt for it." },
+      "open_palm": { "safe": false, "severity": "offensive", "substitute": "purse hand (fingertips converged, 'wait')", "substituteShape": "Tips 4, 8, 12, 16 and 20 collapse into a cluster whose mutual distances are small relative to palm width, centroid above wrist 0; forearm vertical; slow small vertical oscillation. Key on tip-cluster tightness and vertical oscillation and stay AGNOSTIC about palm normal — palm orientation is the least reliable quantity to recover from 21 landmarks at doorbell distance. Cultural Atlas also describes a three-digit variant (thumb + forefinger + middle), so accept both.", "note": "Wikipedia's moútza article lists the Persian Gulf region and Iraq among close analogues. The load-bearing variable is finger SPREAD AND TENSION — Axtell via Wikipedia's Waving article notes an outward palm with fingers fully stretched under tension is an insult rather than a greeting. That is exactly the feature our classifier keys on. If open_palm survives anywhere in the Arabic locales it must not require spread fingers. The purse hand is sourced as 'wait' in Arabic: Morris et al. (1979: 44) via Alsubhi (2017), Kendon (2004: 229) calls it the purse hand / finger bunch, and Alsubhi, a native Saudi speaker, glosses it as 'slowly' or 'wait' (sabar, shway shway). Middle East Eye notes the same pinched hand done FAST with hard eye contact becomes a threat — if the UI animates it as a prompt, animate slowly and with small amplitude." },
+      "wave": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No negative reading sourced for ar-SA. Note Cultural Atlas's Saudi page extends the left-hand disfavour explicitly to waving and gesturing, unlike the Egyptian page." },
+      "point": { "safe": false, "severity": "offensive", "substitute": null, "substituteShape": null, "note": "NO HAND-BASED SUBSTITUTE FOUND, and this is an open problem rather than a solved one. Cultural Atlas: index-finger pointing is 'considered very rude' in Saudi Arabia, and the sourced alternative is a chin raise plus gaze — a HEAD gesture, invisible to Hand Landmarker. Every source concerns pointing at a PERSON; nothing addresses pointing downward at the ground, which is our actual case and the mitigating one. Withhold the gesture here rather than substituting something invented." },
+      "fist": { "safe": false, "severity": "offensive", "substitute": "thumbs_down", "substituteShape": "Thumb tip below the wrist; four fingers curled.", "note": "Globally withdrawn — pan-cultural 'Threat' at 98.15%. No source says a plain closed fist is itself offensive in ar-SA; that is 'unsourced, probably fine', not 'verified safe'." }
     },
     "colors": {
-      "red": "Warning. Usable for alerts.",
-      "green": "Strongly positive and religiously significant in Islam. Excellent for an accept/safe state.",
-      "white": "Purity, and the colour of ihram. Positive — no mourning reading, unlike East Asia.",
-      "yellow": "No strong convention identified."
+      "red": "Love and revolution, but also execution and death (Hasan, Al-Sammerai & Abdul Kadir 2011). Fine for alerts — the negative valence is the one we want.",
+      "green": "Islam, paradise, growth. The paper explicitly gives 'green light = good sign'. Safe for proceed/OK.",
+      "white": "Purity and weddings, AND the shroud and coffin — described as 'nearly impossible to change'. NOT a neutral background the way Western UI assumes.",
+      "yellow": "NOT caution. Envy, sickness, cruelty, dishonesty — 'yellow smile = mean'. Do not use for a pending state. (Blue is also negative here — envy, jealousy, death, gloom — which means the default 'informational' colour of every design system reads badly. Rests on one paper; get a second opinion.)"
     },
-    "politeness": "High formality. Open with a greeting (السلام عليكم) rather than an instruction; use a softener or apology before asking anything of a stranger. A bare imperative from a machine at the door would read as rude."
+    "politeness": "Indirect register. RTL layout per W3C ALReq: mirror, use logical start/end, do not mirror logos. السلام عليكم for an automated agent is UNRESOLVED and is not a web-search question — the fiqh sources concern person-to-person greeting between people of known faith, while a door agent greets anyone; needs native-speaker review. Also sourced and directly relevant to a camera product: do not photograph people, especially women, without permission."
   },
   "ar-EG": {
     "language": "Arabic (Egypt)",
     "dir": "rtl",
-    "signLanguage": "لغة الإشارة المصرية (Egyptian Sign Language)",
-    "verified": false,
+    "signLanguage": "لغة الإشارة المصرية (Egyptian Sign Language) — ~1.2 million deaf and HoH people aged 5+; no grammatical description exists and Al-Fityani (2010) records four different manual alphabets in use as of 2006",
+    "verified": true,
     "gestures": {
-      "thumbs_up": { "safe": false, "severity": "unclear", "substitute": "bunched fingertips held still, or an explicit on-screen confirm target", "substituteShape": "See open_palm substitute.", "note": "Same contested picture as ar-SA. Egyptian usage is generally described as more Westernised than Gulf usage, but the evidence is anecdotal in both directions. Treat as ambiguous." },
-      "open_palm": { "safe": false, "severity": "unclear", "substitute": "bunched fingertips pointing upward ('istanna' / wait)", "substituteShape": "All five fingertips (4, 8, 12, 16, 20) converged to a small pairwise spread; tip centroid above the wrist (0); upright hand, optional slow vertical oscillation.", "note": "The bunched-fingertip 'wait' is strongly associated with Egyptian gesture in particular. Same recommendation as ar-SA and the same detectability advantage." },
-      "wave": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Acceptable as a greeting." },
-      "point": { "safe": false, "severity": "impolite", "substitute": "flat right hand, fingers together, angled downward", "substituteShape": "Fingers extended and adducted, thumb alongside, inclined downward; prefer the right hand via MediaPipe handedness.", "note": "As ar-SA." },
-      "fist": { "safe": false, "severity": "unclear", "substitute": "flat hand held vertically, fingers together, small side-to-side negation", "substituteShape": "Fingers extended and adducted, palm edge-on, rotated slightly about the wrist.", "note": "Low confidence, same reasoning as ar-SA." }
+      "thumbs_up": { "safe": false, "severity": "unclear", "substitute": "head nod (out of the hand channel)", "substituteShape": "Not a hand gesture; needs Face or Pose Landmarker.", "note": "No source found for Egypt specifically — the Iraq/Iran evidence does not transfer. Ambiguous by absence of evidence, not by evidence of offence. Accept as input, never prompt." },
+      "open_palm": { "safe": false, "severity": "offensive", "substitute": "purse hand (fingertips converged, 'wait')", "substituteShape": "Egyptian form: all four fingers to the thumb, PALM FACING INWARDS, shaken up and down. Detector: tips 4, 8, 12, 16, 20 collapse to a tight cluster, centroid above wrist 0, vertical oscillation; stay agnostic about palm normal so both the Saudi and Egyptian forms pass.", "note": "THE HIGHEST-CONSEQUENCE CLASSIFIER BUG IN THE PROJECT. An open palm WITH THE THUMB FOLDED ONTO THE PALM is the Rabia sign (Rabaa al-Adawiya, 2013). Egypt designated the Muslim Brotherhood a terrorist organisation in December 2013; documented punishments for displaying it include footballer Ahmed Abd El-Zaher (suspended for a goal celebration) and kung fu champion Mohamed Youssef (banned for a year). A thumb-position-tolerant open_palm classifier WILL emit Rabia on a four-finger hand. The four-fingers-up/thumb-folded configuration must be HARD REJECTED, not absorbed into open_palm, and must never be rendered as an on-screen prompt icon. This is not a politeness issue — it is a gesture with criminal-law and employment consequences that our classifier would produce by accident." },
+      "wave": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No negative reading sourced for ar-EG. The Egyptian left-hand page confines the taboo to eating and passing items, unlike Saudi." },
+      "point": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Explicitly FINE here, and this is why there is no pan-Arab rule: Cultural Atlas states 'Egyptians use their index finger to point at someone or something.' Pointing diverges WITHIN Arabic — do not generalise the Saudi prohibition across ar-*." },
+      "fist": { "safe": false, "severity": "offensive", "substitute": "thumbs_down", "substituteShape": "Thumb tip below the wrist; four fingers curled.", "note": "Globally withdrawn — pan-cultural 'Threat' at 98.15%." }
     },
     "colors": {
-      "red": "Warning. Usable for alerts.",
-      "green": "Positive, religiously significant.",
-      "white": "Positive/neutral.",
-      "yellow": "A mourning association for yellow is sometimes claimed for Egypt. UNVERIFIED and possibly folklore — do not design around it without checking."
+      "red": "Love and revolution, also execution and death. Fine for alerts.",
+      "green": "Islam, paradise, growth. Safe for proceed.",
+      "white": "Purity and weddings, and the shroud and coffin. Not a neutral background.",
+      "yellow": "Envy, sickness, cruelty, dishonesty — NOT caution. Note the popular 'yellow = mourning in Egypt' claim DOES NOT SURVIVE: the only peer-reviewed treatment read in full assigns mourning to black and a death association to white, and the yellow claim traces to ancient Egypt where sources indicate white was worn to funerals. Avoid yellow — but for the sourced envy/sickness reading, not for mourning."
     },
-    "politeness": "Formal but warmer and less distant than Gulf register. Greeting first, softener before a request."
+    "politeness": "Indirect register, and operationally important: Egyptians 'typically avoid saying no directly' (Cultural Atlas). A door agent that forces a binary yes/no is demanding a culturally dispreferred speech act — make the 'no' path expressible as deferral rather than refusal. RTL layout per W3C ALReq."
   },
   "tr-TR": {
     "language": "Turkish (Turkey)",
     "dir": "ltr",
-    "signLanguage": "Türk İşaret Dili (TİD)",
-    "verified": false,
+    "signLanguage": "Türk İşaret Dili (TİD) — ~250,000 signers, a language isolate, SOV with clause-final modals; partial recognition via Disability Law No. 5378 (1 July 2005) arts. 15 and 30. Uses a TWO-HANDED manual alphabet, so a single-hand 21-landmark pipeline structurally cannot do TİD fingerspelling — do not imply otherwise in the pitch.",
+    "verified": true,
     "gestures": {
-      "thumbs_up": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Generally positive in contemporary use. Some older accounts report a rude or obscene reading; this appears largely historical and is CONTESTED. Lower risk than the Arabic locales." },
-      "open_palm": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No moútza-equivalent identified in Turkey despite the shared Aegean geography — worth noting, because it shows the moútza is Greek-specific rather than regional." },
-      "wave": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Standard greeting." },
-      "point": { "safe": false, "severity": "impolite", "substitute": "flat hand, fingers together, angled downward", "substituteShape": "Fingers extended and adducted, thumb alongside, inclined downward.", "note": "Index pointing at a person is impolite; downward is mild." },
-      "fist": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No offensive reading identified. The strongly offensive Turkish gestures usually cited — the fig sign, and the ring/'OK' shape as a homophobic slur — are not in our vocabulary, which is worth stating explicitly so nobody adds an 'OK' gesture later." }
+      "thumbs_up": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No negative reading sourced for Turkey in the Denizci (2015) corpus study or Cultural Atlas." },
+      "open_palm": { "safe": false, "severity": "offensive", "substitute": null, "substituteShape": null, "note": "POLITICAL, NOT RUDE, and no substitute is available. The four-fingers-up/thumb-folded configuration is the Rabia sign, which in Turkey is Erdoğan's personal and party emblem — strongly partisan in the opposite direction from Egypt, where the same sign is prosecutable. A machine emitting or prompting it at a stranger's door takes a political side in the resident's name. Hard-reject the configuration and never render it as a prompt icon. Turkey is NOT on the moútza-analogue list, so a plain non-tense open palm is not itself an insult here — but the thumb-fold hazard makes the whole class unsafe to prompt for. No sourced Turkish 'wait' emblem was found: the purse hand is ruled OUT (see below), and nothing is ruled IN. Open question — do not let anyone fill it from intuition." },
+      "wave": { "safe": false, "severity": "unclear", "substitute": null, "substituteShape": null, "note": "A DIRECT SEMANTIC INVERSION — remove from tr-TR entirely. Denizci (2015), citing Calbris & Montredon (1986: 119): arm slightly extended toward the addressee, palm facing outwards, moving side to side in the transversal plane, designates 'refusal of an offer' — no, thanks. That is a near-exact description of our wave, and it maps to our FIST semantics, not our wave semantics. Not a nuance." },
+      "point": { "safe": false, "severity": "unclear", "substitute": "flat-hand present", "substituteShape": "Four fingers extended and adducted, thumb alongside, hand angled 30–60° downward, palm upward/oblique.", "note": "UNSOURCED for Turkey. Substituted on the general whole-hand rule." },
+      "fist": { "safe": false, "severity": "offensive", "substitute": "thumbs_down", "substituteShape": "Thumb tip below the wrist; four fingers curled, thumb clearly wrapped ACROSS the fingers.", "note": "Globally withdrawn, plus a Turkey-specific adjacency: Axtell (1998: 159) via Denizci — the fig gesture, a fist with the thumb protruding between the first two fingers, is obscene in Turkey, and a closed fist with a partially emerged thumb is metrically adjacent. Require the thumb clearly wrapped across the fingers and REJECT the intermediate state rather than snapping it to fist. Also never offer the OK ring: a sexual insult in Turkey (Morris 1997: 51–53 via Denizci)." }
     },
     "colors": {
-      "red": "Strongly positive and national (flag), not primarily a danger colour. Using red for an alert state may read as less alarming here than intended — pair it with an icon and text.",
-      "green": "Positive, religiously significant.",
-      "white": "Positive, national pairing with red.",
-      "yellow": "No strong convention identified. Blue carries the nazar/evil-eye protective association."
+      "red": "UNSOURCED for Turkey — the Arabic colour paper (Hasan et al. 2011) does NOT apply here. ISO 3864-4 base by default.",
+      "green": "UNSOURCED for Turkey. ISO 3864-4 base.",
+      "white": "UNSOURCED for Turkey.",
+      "yellow": "UNSOURCED for Turkey. Snippet-level only; do not import the Arabic envy/sickness reading."
     },
-    "politeness": "Siz for a stranger. Moderate formality; a greeting before a request is expected. TYPOGRAPHY: Turkish has dotted and dotless i (İ/i and I/ı). Any case conversion must be locale-aware (toLocaleUpperCase('tr')) or the UI will produce visibly wrong words."
+    "politeness": "siz for any unfamiliar adult; buyurun as the all-purpose service opener; efendim for sir/madam; honorifics Bey/Hanım follow the FIRST name. Since a door agent is effectively an automated announcement, -(y)InIz imperatives are arguably the correct register. Needs a native check. ENGINEERING: Turkish has four I-letters — toUpperCase('i') is 'İ' U+0130, not 'I'; toLowerCase('I') is 'ı' U+0131. Never use locale-sensitive case folding for identifiers, gesture names, config keys or locale codes; use an invariant comparison. Locale casing is for displayed text only."
   },
   "ja-JP": {
     "language": "Japanese (Japan)",
     "dir": "ltr",
-    "signLanguage": "日本手話 (Japanese Sign Language, JSL)",
-    "verified": false,
+    "signLanguage": "日本手話 (Japanese Sign Language, JSL) [jsl]",
+    "verified": true,
     "gestures": {
-      "thumbs_up": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Understood positively in contemporary Japan." },
-      "open_palm": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "A static open palm is acceptable. The risk is in the motion — see wave." },
-      "wave": { "safe": false, "severity": "unclear", "substitute": "static raised open hand, held still, at shoulder height", "substituteShape": "Fingers extended, palm toward camera, hand held STILL for the dwell period — the classifier must require low inter-frame motion of the fingertip centroid. The discriminator is motion, not shape.", "note": "KEY JAPAN FINDING. A hand waved side to side with the palm outward, especially in front of the face, conventionally means 'no', 'not at all' or 'I don't understand' in Japan — close to the opposite of the greeting we intend. Our wave is defined by exactly that oscillation. Detecting a hello and acting on a refusal is the worst kind of failure because both parties think they were understood." },
-      "point": { "safe": false, "severity": "impolite", "substitute": "flat hand, fingers together, palm angled upward, presenting toward the ground", "substituteShape": "Fingers extended and adducted, thumb alongside, palm rotated upward-facing, whole hand inclined so the fingertip centroid is below the wrist (0). This is the conventional Japanese presentation/indication hand.", "note": "Index pointing at people or things is markedly impolite; the open presenting hand is the standard polite alternative and is a clean landmark shape." },
-      "fist": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No offensive reading identified." }
+      "thumbs_up": { "safe": false, "severity": "unclear", "substitute": "head nod (out of the hand channel)", "substituteShape": "Not a hand gesture; needs Face or Pose Landmarker. Pan-cultural 'yes' at 98.18%.", "note": "SEMANTIC, NOT OFFENSIVE. Matsumoto & Hwang (2013) measure 'good' at 74.85% in East Asia versus 100% in the US — and pan-cultural 'yes' is a head nod at 98.18%, not a thumb. Keep the gesture, RELABEL it 'good' rather than 'yes', and move the affirmative to the head channel." },
+      "open_palm": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "The one gesture that survives everywhere in East Asia: 'Stop' is pan-cultural at 100%. Reinforced in Japan by children being taught an open hand at crosswalks for 'please stop'. Incidental: Japanese finger counting runs in reverse, so a closed fist is FIVE, not zero." },
+      "wave": { "safe": false, "severity": "unclear", "substitute": "move greeting out of the gesture channel", "substituteShape": "NOT SOLVABLE FROM HANDS. The East Asian greeting emblem is a waist bow (79.10%), which needs Pose Landmarker. Do not invent a hand substitute.", "note": "VERIFIED COLLISION AND THE MOST INSIDIOUS FAILURE IN THE MATRIX. Per the National Japan Bowl 2024 Gestures Guide (Japan-America Society of Washington DC): ちがう、ちがう — 'palm facing out, right in front of your nose, wave your arm back and forth' — means that is wrong / no. So two of our five gestures would both read as 'no' in Japan and neither would mean what we intend. This is not an insult; it is a silent semantic inversion where both parties believe they were understood. Note the discriminator would be MOTION, not shape — and classifyLandmarks is currently single-frame with no temporal dimension at all." },
+      "point": { "safe": false, "severity": "unclear", "substitute": "flat-hand present", "substituteShape": "Four fingers extended and adducted, thumb alongside, palm angled up 30–45°. Best substitute found in the whole corpus: finger adduction and palm normal are both robust features, and adduction cleanly separates it from the spread-finger open_palm.", "note": "Two collisions. East Asian 'No' (82.20%) is an index finger moving side to side — our point handshape, moved sideways, IS their no. And East Asian 'Insult—little finger' is a digit pointing downward (70.00%), so downward digits are not inert here. The service-industry open-hand prescription comes from NPO法人日本サービスマナー協会, but note that source prescribes the open hand without stating that index pointing is rude — that inference is ours and is under-sourced." },
+      "fist": { "safe": false, "severity": "offensive", "substitute": "thumbs_down", "substituteShape": "Thumb tip below the wrist; four fingers curled.", "note": "Globally withdrawn, and Japan has NO supporting reading for fist = no: a raised fist is ガッツポーズ, triumph. Combined with the pan-cultural 'Threat' reading at 98.15%, there is no interpretation under which this means refusal here." }
     },
     "colors": {
-      "red": "Dual: danger/warning, but also festive and auspicious (red-and-white, kōhaku). Ambiguous on its own — always pair with an icon.",
-      "green": "Safe, go. No strong taboo.",
-      "white": "MOURNING and funerals, as well as purity. Do not use a white-dominant panel for a neutral or success state without a second cue.",
-      "yellow": "Caution; historically also courage. No strong taboo."
+      "red": "DO NOT USE RED-ON-WHITE AS THE ALERT TREATMENT. 紅白 (kōhaku) is the visual grammar of celebration — 紅白幕, 紅白餅, 紅白饅頭, all 縁起物, tracing to the Genpei War banners. A red alert on a white card reads as bunting. Use red on a neutral, grey or dark surface.",
+      "green": "Safe, proceed. ISO 3864-4 base (Japanese adoption of ISO 3864 is presumed, not verified).",
+      "white": "Historically the funeral colour (16th-c. Jesuit records, Edo-period white hemp) but BLACK today — datable to Ōkubo Toshimichi's funeral in 1878, where the upper classes wore black in imitation of Western black formal wear. So our dark UI carries a funerary tint in Japan that it does not carry elsewhere; worth a second look.",
+      "yellow": "Warning. ISO 3864-4 base."
     },
-    "politeness": "Keigo matters. A door agent addressing a stranger should use at minimum teineigo (です/ます), and open with an apology-softener (失礼します / 恐れ入ります) rather than a direct instruction. Plain-form output would be markedly rude."
+    "politeness": "Minimum teineigo (です/ます) for a stranger; an apology-softener rather than a direct instruction. TYPOGRAPHY: set lang on <html> (not <body>, which misses <head>) — Han unification means the codepoint does not carry the locale and a ja-JP user seeing kanji through a Simplified-Chinese fallback font sees subtly wrong glyphs, which is a trust signal a security product cannot afford. Use line-break: strict (loose breaking strands 。 or 」 at line start). line-height 1.6–1.7. NEVER name a colour in copy — 青 (ao) still covers greens, including the 'go' colour on a traffic light."
   },
   "ko-KR": {
     "language": "Korean (South Korea)",
     "dir": "ltr",
-    "signLanguage": "한국수어 (Korean Sign Language, KSL)",
-    "verified": false,
+    "signLanguage": "한국수어 (Korean Sign Language, KSL) [kvk] — always use the ISO code, never the bare abbreviation, which collides with Kenyan Sign Language",
+    "verified": true,
     "gestures": {
-      "thumbs_up": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Positive — conventionally 'best' / 'number one'." },
-      "open_palm": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Acceptable static." },
-      "wave": { "safe": false, "severity": "unclear", "substitute": "static raised open hand, held still", "substituteShape": "Fingers extended, palm toward camera, held still for the dwell period; require low inter-frame motion.", "note": "Lower confidence than the Japanese case, but a side-to-side palm-out wave can carry a negating 'no / no thanks' sense in Korea too. Since the static-hand mitigation is free, apply it in both locales. VERIFY the Korean reading specifically — I could not source it." },
-      "point": { "safe": false, "severity": "impolite", "substitute": "flat hand, fingers together, palm angled upward, presenting toward the ground", "substituteShape": "Fingers extended and adducted, thumb alongside, palm upward-facing, fingertip centroid below the wrist (0).", "note": "Index pointing at a person is impolite. Note also that palm-up beckoning is used for animals and is offensive toward a person — not in our vocabulary, but do not add it." },
-      "fist": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No offensive reading identified." }
+      "thumbs_up": { "safe": false, "severity": "unclear", "substitute": "head nod (out of the hand channel)", "substituteShape": "Not a hand gesture; needs Face or Pose Landmarker.", "note": "Same semantic issue as Japan — 'good' at 74.85% in the pooled East Asia cell, not 'yes'. Relabel rather than remove." },
+      "open_palm": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "'Stop' pan-cultural at 100%." },
+      "wave": { "safe": false, "severity": "unclear", "substitute": "static held open hand, or move greeting out of the gesture channel", "substituteShape": "If retained: fingers extended, palm toward camera, held STILL for the dwell period, requiring low inter-frame motion of the fingertip centroid.", "note": "CONTESTED, AND KOREA HAS THE WEAKEST EVIDENCE IN THE MATRIX. The Matsumoto & Hwang East Asia numbers include 40 Korea-born decoders but CANNOT be disaggregated from China and Japan. Counter-evidence points the other way: a tertiary source on Korean etiquette says younger South Koreans commonly greet by waving side to side, which would make Korea tolerate our wave far better than Japan. Gated conservatively because the mitigation is free, not because the collision is established." },
+      "point": { "safe": false, "severity": "unclear", "substitute": "flat-hand present", "substituteShape": "Four fingers extended and adducted, thumb alongside, palm angled up 30–45°.", "note": "Inherits the pooled East Asian collisions (index side-to-side = 'no'). Not separately sourced for Korea. NOTE: the widely repeated 'palm-up beckoning is for dogs in Korea' claim COULD NOT BE SOURCED — every hit was a listicle or expat blog, and the one credible lead failed on a TLS error. It is documented for JAPAN, cited to Brown & Brown (2006). Do not ship the Korean version as a claim." },
+      "fist": { "safe": false, "severity": "offensive", "substitute": "thumbs_down", "substituteShape": "Thumb tip below the wrist; four fingers curled.", "note": "Globally withdrawn — pan-cultural 'Threat' at 98.15%." }
     },
     "colors": {
-      "red": "Dual and context-dependent: strongly positive in contemporary popular and sporting use, but a personal name written in red ink carries a death association. Never render a visitor's or resident's NAME in red.",
-      "green": "Safe, go.",
-      "white": "Mourning association alongside purity. Same caution as Japan.",
-      "yellow": "No strong convention identified."
+      "red": "Usable as an alert, with ONE SHARP RULE: never render a person's name in red. Attested by Korea.net and the Dartmouth Folklore Archive (multiple independent informants). The practice is well attested; the origin stories conflict, so cite the taboo and never the explanation. Implementation: if the agent renders a visitor's name — 'Unknown person at door', a saved contact, a recognition label — that string must not be red even inside an otherwise-red alert. Keep red in the icon, border or badge. One CSS rule.",
+      "green": "Safe, proceed.",
+      "white": "'White means death in East Asia' IS NOT VERIFIED FOR KOREA, and the evidence cuts the other way — 백의민족, 'the white-clad people', describes white as ordinary everyday Korean dress for centuries (Records of Wei on Buyeo, Choe Nam-seon, Oppert, Yanagi Muneyoshi). The English Korean funeral article contains no colour claims at all, and the modern hemp burial-garment convention is described as substantially a Japanese colonial imposition. Do not build a Korean design rule on white in EITHER direction without a Korean reviewer.",
+      "yellow": "Warning. ISO 3864-4 base."
     },
-    "politeness": "Korean grammaticalises deference. A stranger at the door warrants a formal speech level (hapsyo-che, or at minimum haeyo-che); casual banmal would be a serious discourtesy from a system speaking in the resident's name."
+    "politeness": "Formal speech level for a stranger — hapsyo-che, or at minimum haeyo-che. TYPOGRAPHY: Korean line breaking is the OPPOSITE of Japanese and Chinese. 한글 맞춤법 Article 2 (문화체육관광부 고시 제2017-12호) requires spaces between words, so use word-break: keep-all plus overflow-wrap: break-word — do not share one CSS rule with ja/zh. Korean text CONTRACTS (~0.8×: 'views' → 조회), so centre labels rather than stretching. Never name a colour in copy — 푸르다 covers both blue and green."
   },
   "zh-CN": {
     "language": "Chinese (mainland China, Simplified)",
     "dir": "ltr",
-    "signLanguage": "中国手语 (Chinese Sign Language, CSL)",
-    "verified": false,
+    "signLanguage": "中国手语 (Chinese Sign Language, CSL) [csl]",
+    "verified": true,
     "gestures": {
-      "thumbs_up": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Positive — 'good', 'number one'." },
-      "open_palm": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No insult reading identified." },
-      "wave": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Standard greeting. The Japanese negating reading does not appear to transfer, but this is asserted with low confidence." },
-      "point": { "safe": false, "severity": "impolite", "substitute": "flat hand, fingers together, angled downward", "substituteShape": "Fingers extended and adducted, thumb alongside, fingertip centroid below the wrist (0).", "note": "Index pointing at a person is impolite; open-hand indication is the polite form." },
-      "fist": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No offensive reading identified. Optional upgrade: the gongshou/baoquan salute (one fist covered by the other open palm) is a respectful traditional greeting and is detectable, since MediaPipe tracks two hands — but it requires num_hands >= 2 and a two-hand relative-position test, which the current single-hand classifier does not do." }
+      "thumbs_up": { "safe": false, "severity": "unclear", "substitute": "head nod (out of the hand channel)", "substituteShape": "Not a hand gesture; needs Face or Pose Landmarker.", "note": "No negative reading found in any East Asian locale — the sourced negative readings are Iran and Tibet, both out of scope, and the widely repeated 'means number one in China' line is tagged citation-needed on Wikipedia. The issue is semantic: 'good' at 74.85%, not 'yes'. Relabel rather than remove." },
+      "open_palm": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "'Stop' pan-cultural at 100%." },
+      "wave": { "safe": false, "severity": "unclear", "substitute": "move greeting out of the gesture channel", "substituteShape": "The East Asian greeting emblem is a waist bow (79.10%), which needs Pose Landmarker.", "note": "No China-specific negative reading found. Gated because our wave is a measured US emblem (98.20%) with no East Asian counterpart, so it is unlikely to be produced or read as intended — a recognition gap rather than an offence." },
+      "point": { "safe": false, "severity": "unclear", "substitute": "flat-hand present", "substituteShape": "Four fingers extended and adducted, thumb alongside, palm angled up 30–45°.", "note": "NUMERIC COLLISION, and it is regional so it misfires in the south and not the north: in coastal southern China, 7 is the index pointing down with the thumb extended — our point plus a thumb. An extended index alone is 1. Plus the pooled East Asian 'no' (index side to side)." },
+      "fist": { "safe": false, "severity": "offensive", "substitute": "thumbs_down", "substituteShape": "Thumb tip below the wrist; four fingers curled.", "note": "Globally withdrawn, and in China a closed fist is also the numeral 10. DO NOT substitute 拱手/抱拳 (the fist-and-palm salute): hand order inverts for inauspicious occasions (吉事尚左，凶事尚右) and again by gender, so getting it backwards produces a funeral salute, delivered by a machine, to a stranger, at a door. MediaPipe reports handedness so it is gateable, but the sources are thin and partly self-contradicting. Not without a native reviewer." }
     },
     "colors": {
-      "red": "Luck, celebration, prosperity — strongly positive, NOT primarily a danger colour. In Chinese financial displays red conventionally marks a rise, the inverse of Western convention. A red alert panel may read as celebratory; do not rely on red alone to signal a problem.",
-      "green": "Safe/go, with one trap: the phrase 'wearing a green hat' (戴绿帽子) means being cuckolded, so a green hat motif in any illustration is best avoided.",
-      "white": "MOURNING and funerals. Avoid white-dominant success states without a second cue.",
-      "yellow": "Historically imperial and honorific, but in modern slang 黄色 also denotes pornographic content. Neutral-to-risky; prefer another accent colour."
+      "red": "Red-as-alert WORKS here and is legally standardised — the Chinese national safety-colour standard assigns 红 to 禁止、停止、紧急告警, mapping cleanly onto ISO 3864. The festive red of 红包 and weddings is a different register, cued by gold, pattern and seasonal framing, not by hue. But do not lean on red/green ALONE: Kawai et al. (2022), Psychological Research 87(3):704–724, measured red's implicit negativity at a 32.42 ms congruence effect in Mainland China versus 76.84 ms in the Western group — roughly 2.4× weaker. Attenuated, not absent. Pair every state with an ISO 7010 icon shape and a text label.",
+      "green": "绿 = 提示、安全、通行 in the national standard, and Kawai et al. found green consistently positive across all cultures. The correct 'all clear' colour. 戴绿帽子 is about HATS, not green — it derives from 綠頭巾 and is bound to the worn object; it does not generalise to green surfaces, text, status dots or buttons. The one real caveat is an illustration review item: no green hats on any illustrated character or avatar.",
+      "white": "Attested funerary — rites are 白事 (báishì, 'white affairs'), white tied to yin and ghosts. This is the locale where the East Asian white-mourning claim actually holds.",
+      "yellow": "黄 = 危险、警告、注意 in the national standard, so the yellow SWATCH is correct for warning. The hazard is LEXICAL, not chromatic: 黄色 carries a pornographic sense attributively (黃色書籍, 黃色電影) and — the part usually missed — the single character 黄 carries it alone (黃片, 黃賭毒, 掃黃). 「黄色警报」 is fine and idiomatic; a filter chip reading just 「黄色」 next to content categories is asking for it. Watch the copy, not the palette."
     },
-    "politeness": "Use 您 rather than 你 for a stranger. Moderate formality; a brief greeting before the request."
+    "politeness": "您 rather than 你 for a stranger. TYPOGRAPHY: tag the REGION, not just the script — per W3C CLReq, use zh-Hans-CN, not bare zh and not bare zh-Hans, because most typographic rules vary by region rather than by Simplified/Traditional. Set lang on <html>. Use default line breaking; do NOT use word-break: keep-all, which causes overflow. line-height 1.6–1.7; text expands ~1.2× ('views' → 次檢視). Never name a colour in copy — 青 (qīng) spans light yellowish-green through deep blue to black."
   },
   "hi-IN": {
     "language": "Hindi (India)",
     "dir": "ltr",
-    "signLanguage": "Indian Sign Language (ISL), part of the Indo-Pakistani Sign Language grouping",
+    "signLanguage": "Indian Sign Language (ISL) [ins] — ~6 million signers, the most-used sign language in the world",
     "verified": false,
     "gestures": {
-      "thumbs_up": { "safe": false, "severity": "unclear", "substitute": "namaste (two palms pressed together)", "substituteShape": "Both hands present; fingers extended and adducted on each; the two palms parallel and near-touching, so corresponding fingertips across hands are within a small distance; hands centred near the midline at chest height. Requires num_hands = 2 and a cross-hand distance test.", "note": "Generally understood positively in urban India, but rude readings are reported for some regions. CONTESTED and regionally variable — 'hi-IN' is a language tag standing in for an enormous and non-uniform gestural area, which is itself a limitation of modelling India as one locale." },
-      "open_palm": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No insult reading identified." },
-      "wave": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Acceptable, though namaste is the more respectful greeting and is the better default here." },
-      "point": { "safe": false, "severity": "impolite", "substitute": "flat right hand, fingers together, angled downward", "substituteShape": "Fingers extended and adducted, thumb alongside, fingertip centroid below the wrist (0). Prefer the right hand via MediaPipe handedness.", "note": "Index pointing at a person is impolite; the whole hand or a chin tilt is used instead. The left hand carries an impurity association for giving and eating, so prefer the right hand where we can tell." },
-      "fist": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No offensive reading identified." }
+      "thumbs_up": { "safe": false, "severity": "unclear", "substitute": "head nod (out of the hand channel)", "substituteShape": "Not a hand gesture; needs Face or Pose Landmarker.", "note": "UNSOURCED LOCALE. India did not get a research pass. Gated conservatively." },
+      "open_palm": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "UNSOURCED LOCALE. India is not on the moútza-analogue list (Pakistan is), but this was not verified." },
+      "wave": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "UNSOURCED LOCALE." },
+      "point": { "safe": false, "severity": "impolite", "substitute": "flat-hand present", "substituteShape": "Four fingers extended and adducted, thumb alongside, hand angled 30–60° downward, palm upward/oblique. Prefer the right hand — but see the handedness warning in the report, because MediaPipe's label is backwards for a non-mirrored doorbell camera.", "note": "UNSOURCED for India specifically. Substituted on the general whole-hand rule." },
+      "fist": { "safe": false, "severity": "offensive", "substitute": "thumbs_down", "substituteShape": "Thumb tip below the wrist; four fingers curled.", "note": "Globally withdrawn — pan-cultural 'Threat' at 98.15%." }
     },
     "colors": {
-      "red": "Auspicious — marriage, sindoor, celebration. Positive rather than dangerous. A red alert will not read as alarming on its own.",
-      "green": "Prosperity and fertility; also religiously significant for Indian Muslims. Positive.",
-      "white": "MOURNING and widowhood. This is the single most important colour caution for India — a white 'clean/neutral' UI can read as funerary.",
-      "yellow": "Auspicious (turmeric, haldi). Saffron/orange is sacred in Hinduism and also politically loaded — avoid it as a decorative accent."
+      "red": "UNSOURCED. ISO 3864-4 base applies by default.",
+      "green": "UNSOURCED. ISO 3864-4 base.",
+      "white": "UNSOURCED. The widely repeated mourning/widowhood association was NOT verified in this pass — do not promote it to fact.",
+      "yellow": "UNSOURCED."
     },
-    "politeness": "Use आप (aap), never तुम/तू, for a stranger. Deference to age is expected. NOTE: the Indian head movement often called the head wobble is a real and important affirmative signal but it is a HEAD gesture — MediaPipe Hands cannot see it, so a visitor who answers that way will register as no response at all."
+    "politeness": "UNSOURCED LOCALE. आप rather than तुम/तू for a stranger is the safe default, but this was not researched. NOTE A HARD LIMITATION: the Indian head movement often called the head wobble is an important affirmative, but it is a HEAD gesture — MediaPipe Hands cannot see it, so a visitor who answers that way registers as no response at all."
   },
   "en-NG": {
     "language": "English (Nigeria)",
     "dir": "ltr",
-    "signLanguage": "Nigerian Sign Language (NSL), historically ASL-derived through Andrew Foster's mission schools",
-    "verified": false,
+    "signLanguage": "Nigerian Sign Language (NSL) [nsi] — no government recognition; historically ASL-derived through Andrew Foster's mission schools",
+    "verified": true,
     "gestures": {
-      "thumbs_up": { "safe": false, "severity": "unclear", "substitute": "open right hand raised, fingers together, held still", "substituteShape": "Fingers extended and adducted, palm toward camera, hand still. Note this conflicts with the open_palm caution below — in Nigeria specifically, prefer a non-hand confirmation path.", "note": "WIDELY ASSERTED, POORLY EVIDENCED. Popular travel writing routinely calls the thumbs-up obscene in West Africa and Nigeria, but I could not trace this to Nigerian linguistic or anthropological literature, and the canonical fieldwork usually cited for it (Morris et al. 1979) covers only Europe and the Mediterranean and therefore says nothing about Nigeria. Treat as unresolved. The project's PLAN.md currently states this as fact and should be softened until it is checked." },
-      "open_palm": { "safe": false, "severity": "offensive", "substitute": "raised fist held still, or a vertical fingers-together hand", "substituteShape": "Either a closed fist (all fingertips within palm radius of the wrist) held still, or fingers extended and strongly adducted with the palm edge-on rather than presented flat to the lens. The critical property is that the fingers must NOT be splayed toward the camera.", "note": "The spread-five-fingers gesture thrust toward a person — commonly called 'waka' — is reported as a serious Nigerian insult, functionally parallel to the Greek moútza. If that holds, our default open_palm is the single worst gesture we could ship in Nigeria. I could not verify it from academic sources in this session; VERIFY BEFORE SHIPPING, and in the meantime treat it as unsafe, since the cost of being wrong in the cautious direction is small." },
-      "wave": { "safe": false, "severity": "offensive", "substitute": "raised fingers-together hand, held still", "substituteShape": "Fingers extended and adducted, palm edge-on or angled, held still.", "note": "Same concern as open_palm, compounded by motion — a repeatedly thrust splayed palm is the insulting form." },
-      "point": { "safe": false, "severity": "impolite", "substitute": "flat right hand, fingers together, angled downward", "substituteShape": "Fingers extended and adducted, thumb alongside, fingertip centroid below the wrist (0). Prefer the right hand.", "note": "Index pointing at people is impolite; left-hand use is disfavoured." },
-      "fist": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No offensive reading identified, and it has the advantage of having no extended fingers to be read as splayed." }
+      "thumbs_up": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "CLAIM WITHDRAWN. This project previously asserted the thumbs-up is obscene in West Africa. It does not hold up: the claim traces to Roger Axtell, 'Gestures: The Do's and Taboos of Body Language Around the World' (1991), and secondary sources recirculate Axtell without examining him. Wikipedia's Thumb signal article does not mention West Africa or Nigeria at all; its only sourced negative reading is Iran. A 35-year-old travel book is thin ground for a product decision, and thumbs-up is ubiquitous in Nigerian digital culture today. We should stop repeating this." },
+      "open_palm": { "safe": false, "severity": "unclear", "substitute": "raised index finger, palm edge-on", "substituteShape": "Index extended and vertical, other three curled, thumb against the middle phalanx, palm edge-on, static hold ~1s, no forward thrust.", "note": "PLAUSIBLE, WIDELY ATTESTED INFORMALLY, EVIDENTIALLY THIN — and stated that way deliberately. The 'waka' reading was asserted by this project and could not be sourced: Wikipedia's Mountza article says the gesture 'can be viewed as offensive in particular tribes' in Nigeria with Hausa uwar ka, but that sentence carries NO CITATION; Wikipedia's Obscene gesture article contains no mention of Nigeria, West Africa, Hausa or 'waka' anywhere, and its nearest claim cites a paywalled 1996 NYT piece that does not name Nigeria; searches scoped to Punch, Vanguard, Guardian Nigeria and Premium Times returned nothing. Two genuinely relevant papers — Agwuele (2014), 'A repertoire of Yoruba hand and face gestures', Gesture 14(1), and Orie (2009), 'Pointing the Yoruba way', Gesture 9(2) — both 403'd and may well document it. Avoid a spread-palm thrust anyway because the cost of being wrong is asymmetric, but DO NOT state 'waka' as established fact with a citation — it would not survive a judge checking it." },
+      "wave": { "safe": false, "severity": "unclear", "substitute": "raised index finger, static", "substituteShape": "As above, held still.", "note": "Inherits the open_palm uncertainty, compounded by motion. Same honest caveat: unverified." },
+      "point": { "safe": false, "severity": "impolite", "substitute": "flat-hand present", "substituteShape": "Four fingers extended and adducted, thumb alongside, hand angled 30–60° downward, palm upward/oblique.", "note": "UNSOURCED for Nigeria specifically. Substituted on the general whole-hand rule, which IS sourced for neighbouring contexts." },
+      "fist": { "safe": false, "severity": "offensive", "substitute": "thumbs_down", "substituteShape": "Thumb tip below the wrist; four fingers curled.", "note": "Globally withdrawn — pan-cultural 'Threat' at 98.15%." }
     },
     "colors": {
-      "red": "Danger, and a mourning association in some Nigerian communities. Use with care.",
-      "green": "Strongly positive and national; also religiously significant in the largely Muslim north.",
-      "white": "Peace; part of the national pairing with green. Positive.",
-      "yellow": "No strong convention identified."
+      "red": "UNSOURCED for Nigeria. ISO 3864-4 base applies by default.",
+      "green": "UNSOURCED for Nigeria beyond the flag. ISO 3864-4 base.",
+      "white": "UNSOURCED for Nigeria.",
+      "yellow": "UNSOURCED for Nigeria."
     },
-    "politeness": "Greeting is obligatory before business, and deference to age is strongly marked. A system that opens with a bare instruction will read as disrespectful. Nigerian English is the appropriate register; do not assume a non-English-speaking visitor."
+    "politeness": "UNSOURCED beyond general West African norms — greeting before business and deference to age are widely described but were not verified in this pass. Do not assume an English-speaking visitor. NOTE: en-NG is absent from lib/gestures/locales.ts and is carried only here; a single tag is also standing in for a country with several hundred languages."
   },
   "sw-KE": {
     "language": "Swahili (Kenya)",
     "dir": "ltr",
-    "signLanguage": "Kenyan Sign Language (KSL) — note this abbreviation collides with Korean Sign Language; disambiguate as KSL-KE in any shared namespace",
-    "verified": false,
+    "signLanguage": "Kenyan Sign Language (KSL) [xki] — never use the bare abbreviation as a locale key, since Korean Sign Language is also KSL [kvk]. Constitutional status is narrower than usually stated: Art. 7(3)(b) creates a promotion duty and Art. 120(1) makes KSL an official language OF PARLIAMENT, while Art. 7(2) lists only Kiswahili and English as official languages of the Republic. KSL is NOT ASL — no more than 20% full cognates (Roberts 2009, via Morgan & Mayberry 2010).",
+    "verified": true,
     "gestures": {
-      "thumbs_up": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Generally reported as acceptable in Kenya, in contrast to the West African claims. LOW CONFIDENCE — unverified in this session." },
-      "open_palm": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No insult reading identified for Kenya. Note the contrast with the Nigerian 'waka' concern — this is exactly the kind of difference that makes 'Africa' useless as a locale and is the reason en-NG and sw-KE are modelled separately." },
-      "wave": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Standard greeting." },
-      "point": { "safe": false, "severity": "impolite", "substitute": "flat right hand, fingers together, angled downward", "substituteShape": "Fingers extended and adducted, thumb alongside, fingertip centroid below the wrist (0). Prefer the right hand via MediaPipe handedness.", "note": "Index pointing at people is impolite; the left hand is disfavoured for giving and indicating." },
-      "fist": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No offensive reading identified." }
+      "thumbs_up": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No reputable source either way. This is an ASSUMPTION, not a finding — stated as such." },
+      "open_palm": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "Not flagged for Kenya, and Kenya is not on the moútza-analogue list. The contrast with the Nigerian uncertainty is the point of carrying both locales: 'Africa' is useless as a locale." },
+      "wave": { "safe": true, "severity": null, "substitute": null, "substituteShape": null, "note": "No negative reading sourced. ALSO A CORRECTED ASSUMPTION: the 'palm-up come-here is for dogs' rule is documented for JAPAN, cited to Brown & Brown (2006). Wikipedia's Beckoning sign article documents only US and Japan variants and names no African country; Cultural Atlas says Kenyan beckoning uses all fingers of one hand, palm facing either up OR down. The Africa version of that claim is a travel-blog mutation — do not encode it." },
+      "point": { "safe": false, "severity": "impolite", "substitute": "flat-hand present", "substituteShape": "Four fingers extended and adducted, thumb alongside, whole hand angled 30–60° downward, palm oriented upward/obliquely — offering, not commanding. Held ~1s. Better conditioned than what we have: it differs from open_palm on TWO orthogonal high-reliability features, fingers together vs spread and hand axis down vs up.", "note": "BEST-SOURCED POINT FINDING IN THE MATRIX, and it removes an exemption we were hoping for. Cultural Atlas: 'Pointing with the index finger is discouraged'; people 'point with their chin or lips.' Village Volunteers: 'It is considered improper to point at someone with your index finger. When pointing to someone OR SOMETHING, it is polite to use all fingers of the hand.' That second source extends the norm to OBJECTS explicitly — so we do not get the 'pointing at a parcel is different' exemption. The transferable rule, and the most useful single constraint in the whole corpus: whole hand, never one finger." },
+      "fist": { "safe": false, "severity": "offensive", "substitute": "thumbs_down", "substituteShape": "Thumb tip below the wrist; four fingers curled.", "note": "Globally withdrawn — pan-cultural 'Threat' at 98.15%." }
     },
     "colors": {
-      "red": "Warning; also strongly present in Maasai dress and in the national flag, where it signifies the blood of the independence struggle. Not a neutral danger colour.",
-      "green": "Land and prosperity; national. Positive.",
-      "white": "Peace; national. Positive — no mourning reading.",
-      "yellow": "No strong convention identified."
+      "red": "Sacrificial in official Kenyan symbolism, not merely 'danger' — the Kenya High Commission (Ottawa) gives red as blood shed for independence. Usable for alerts, never as the sole signal.",
+      "green": "The land (official flag meaning). Safe for proceed.",
+      "white": "Peace and honesty (official flag meaning). Note the flag assigns BLACK to the people, which cuts against the Western assumption. Kenyan mourning colour conventions: nothing found.",
+      "yellow": "AVOID YELLOW+GREEN TOGETHER — UDA, the governing party. And AVOID ORANGE ENTIRELY: it is ODM's election symbol. Orange is the natural warning tier between yellow and red in most design systems, which makes this an easy trap. Use amber-toward-red, or drop the middle tier."
     },
-    "politeness": "Greeting is not optional. Swahili norms require an exchange of salamu (hujambo / habari) before any transactional request, and shikamoo is the respectful greeting to an elder. A door agent that skips straight to an instruction breaches a real and strongly felt norm — this is probably the clearest politeness-register requirement in the whole set."
+    "politeness": "GREETING IS A PRECONDITION FOR TRANSACTING, NOT A GARNISH. The canonical treatment is Yahya-Othman, Saida (1995), 'Aren't you going to greet me? Impoliteness in Swahili greetings', Text 15(2): 209–227 — the title frames failure-to-greet explicitly as impoliteness (citation verified via Crossref; De Gruyter blocked the full text, so the detailed argument is inferred from the title, stated honestly). A device whose first utterance is 'Show your hand to the camera' has skipped a required move, speaking on the household's behalf at the household's door. Use Habari? as the default — safe, age-neutral, common. Never Jambo (reads as tourist-Swahili). Never generate Shikamoo: it is age-graded, and a camera cannot know a visitor's age and should not try — age estimation from video is inaccurate, demographically biased, and turns a doorbell into a profiling device. Use plural-as-respect instead (hamjambo, karibuni). TYPOGRAPHY: the apostrophe in ng' is a LETTER, not punctuation — ngoma (drum) vs ng'ombe (cow) is a minimal pair. Normalise U+2019 to U+0027 on ingest; \\b\\w+\\b and split(/\\W/) will split ng'ombe into ng + ombe, so use Intl.Segmenter; never break a line after the apostrophe. CI test strings: ng'ombe, ng'ambo, kung'aa, Ng'ang'a. Budget unbreakable tokens of 15–18 characters (haijatambuliwa, Uwasilishaji); measured expansion is only ~1.06× overall."
   }
 }

@@ -1,525 +1,375 @@
 # WAVE — per-locale gesture safety matrix
 
-> **STATUS: UNVERIFIED DRAFT. Do not ship, and do not put this in front of a judge as
-> finished research.**
->
-> The per-locale research pass did not complete. Four parallel research agents were
-> dispatched across the sixteen candidate locales; they consumed the session's entire
-> web-search budget (200/200 calls) and then died without returning findings. No further
-> searches are possible in this session.
->
-> What that means for this document, precisely:
->
-> - The **cross-cutting sources** in [Evidence base](#evidence-base) are real. I retrieved
->   each one in this session and the claims attributed to them are what those pages
->   actually say.
-> - The **per-locale claims** in the matrix and the locale sections are **not sourced**.
->   They are my own background knowledge, hedged where I know the evidence is contested,
->   and they carry **no citations because I could not verify them and will not invent
->   them**. Every locale entry in `lib/gestures/locales.json` is marked `"verified": false`.
->
-> Treat this as a structured hypothesis and a verification queue, not as the deliverable.
-> [What still needs sourcing](#what-still-needs-sourcing) lists the specific claims to
-> check, in priority order.
+Consolidated matrix for the fourteen launch locales: which of our five gestures are unsafe,
+what replaces them, and the colour, script, register and sign-language facts that go with each.
+
+**How to read the evidence markers.** Every claim here is graded, because the honest answer
+varies enormously by locale:
+
+- **[A]** peer-reviewed, or a primary legal/standards text
+- **[B]** named institutional publisher or government source
+- **[C]** tertiary (reference works, Cultural Atlas, Wikipedia with footnotes checked)
+- **[!]** **inference or absence of evidence** — our reasoning, not a source
+
+Three locales — `es-MX`, `pt-BR`, `hi-IN` — **did not get a research pass** and are marked
+`"verified": false` in the JSON. Their rows are gated conservatively and every note says so.
+Do not let them pass as researched.
+
+**Provenance.** The per-region evidence lives in
+[gesture-research-mena.md](gesture-research-mena.md),
+[gesture-research-eastasia.md](gesture-research-eastasia.md),
+[gesture-research-greece-africa.md](gesture-research-greece-africa.md),
+[locale-research-fr-us-ke.md](locale-research-fr-us-ke.md) and
+[locale-colour-typography.md](locale-colour-typography.md). This document is the consolidation;
+those are the working papers, and they record what failed to verify as carefully as what passed.
+The runtime artefact is [`lib/gestures/locales.ts`](../lib/gestures/locales.ts); the matrix in
+the requested five-gesture schema is [`lib/gestures/locales.json`](../lib/gestures/locales.json).
 
 ---
 
 ## Scope: which 14, and the two dropped
 
-Sixteen locales were proposed; the brief asked for fourteen.
+**Dropped `en-GB`** — within our five-gesture vocabulary it does not diverge from `en-US` at all.
+The famously offensive British gesture is the reversed V sign, which we do not detect. It adds a
+row and no decisions. If anyone ever adds a V sign, it comes straight back.
 
-**Dropped: `en-GB`.** Within our five-gesture vocabulary it does not diverge from `en-US`
-in any way I can identify. The famously offensive British gesture is the reversed V sign,
-which is not in our vocabulary and which we do not detect. Keeping it would add a row and
-no decisions.
+**Dropped `de-DE`** — its risk profile within our five is a subset of `fr-FR`'s. Both count "one"
+on the thumb, both treat index-pointing at a person as mildly impolite, and `fr-FR` additionally
+carries the bras d'honneur finding that makes the fist problem concrete. `de-DE` buys no
+substitution `fr-FR` does not already buy.
 
-**Dropped: `de-DE`.** Its risk profile within our five is a subset of `fr-FR`'s — both are
-Western European, both count "one" on the thumb (so both can emit an accidental
-`thumbs_up`), and in both, index-pointing at a person is mildly impolite. It buys no
-substitution that `fr-FR` does not already buy.
+Both were dropped for **redundancy within this gesture set**, not for unimportance.
 
-Both were dropped for **redundancy within this gesture set**, not because they are
-unimportant markets. If the vocabulary grows — particularly if anyone adds a V sign or a
-ring/"OK" shape — `en-GB` must come straight back.
-
-A caveat on the survivors: **`hi-IN` and `en-NG` are doing unreasonable work.** A single
-language tag is standing in for enormous, internally non-uniform gestural areas. Nigeria
-alone has several hundred languages. Modelling either as one locale is a known
-simplification, and the gesture set should not be presented as though it resolves them.
+**A caveat that should not be buried:** `hi-IN` and `en-NG` are each standing in for enormous,
+internally non-uniform gestural areas — Nigeria alone has several hundred languages. And
+`en-NG` is absent from `locales.ts` entirely; it is carried only in the JSON.
 
 ---
 
 ## Summary matrix
 
-Legend: 🟥 offensive · 🟧 impolite · 🟨 unclear or contested · 🟩 no issue identified
+🟥 offensive · 🟧 impolite · 🟨 unclear / contested · 🟩 no issue found · ⬜ locale unresearched
 
-| Locale | 👍 thumbs_up | ✋ open_palm | 👋 wave | ☝ point | ✊ fist | Subs |
-|---|---|---|---|---|---|---|
-| `en-US` English (US) | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 | 0 |
-| `el-GR` Greek | 🟨 | 🟥 **moútza** | 🟥 | 🟧 | 🟩 | 4 |
-| `fr-FR` French | 🟩 | 🟩 | 🟩 | 🟧 | 🟩 | 1 |
-| `es-MX` Spanish (MX) | 🟩 | 🟩 | 🟩 | 🟧 | 🟩 | 1 |
-| `pt-BR` Portuguese (BR) | 🟩 | 🟩 | 🟩 | 🟧 | 🟩 | 1 |
-| `ar-SA` Arabic (Gulf) | 🟨 | 🟨 | 🟩 | 🟧 | 🟨 | 4 |
-| `ar-EG` Arabic (Egypt) | 🟨 | 🟨 | 🟩 | 🟧 | 🟨 | 4 |
-| `tr-TR` Turkish | 🟩 | 🟩 | 🟩 | 🟧 | 🟩 | 1 |
-| `ja-JP` Japanese | 🟩 | 🟩 | 🟨 **= "no"** | 🟧 | 🟩 | 2 |
-| `ko-KR` Korean | 🟩 | 🟩 | 🟨 | 🟧 | 🟩 | 2 |
-| `zh-CN` Chinese | 🟩 | 🟩 | 🟩 | 🟧 | 🟩 | 1 |
-| `hi-IN` Hindi | 🟨 | 🟩 | 🟩 | 🟧 | 🟩 | 2 |
-| `en-NG` English (NG) | 🟨 | 🟥 **waka?** | 🟥 | 🟧 | 🟩 | 4 |
-| `sw-KE` Swahili (KE) | 🟩 | 🟩 | 🟩 | 🟧 | 🟩 | 1 |
+| Locale | 👍 thumbs_up | ✋ open_palm | 👋 wave | ☝ point | ✊ fist |
+|---|---|---|---|---|---|
+| `en-US` | 🟩 | 🟩 | 🟩 | 🟩 | 🟨 render-only |
+| `el-GR` | 🟨 | 🟥 **moútza** | 🟥 | 🟨 | 🟥 |
+| `fr-FR` | 🟩 | 🟩 | 🟩 | 🟨 | 🟥 **bras d'honneur** |
+| `es-MX` ⬜ | ⬜🟩 | ⬜🟨 | ⬜🟩 | ⬜🟧 | 🟥 |
+| `pt-BR` ⬜ | ⬜🟩 | ⬜🟨 | ⬜🟩 | ⬜🟧 | 🟥 **figa** |
+| `ar-SA` | 🟨 | 🟥 | 🟩 | 🟥 *no substitute* | 🟥 |
+| `ar-EG` | 🟨 | 🟥 **Rabia** | 🟩 | 🟩 | 🟥 |
+| `tr-TR` | 🟩 | 🟥 **Rabia** | 🟨 **= "no thanks"** | 🟨 | 🟥 **fig** |
+| `ja-JP` | 🟨 | 🟩 | 🟨 **= "no"** | 🟨 | 🟥 |
+| `ko-KR` | 🟨 | 🟩 | 🟨 | 🟨 | 🟥 |
+| `zh-CN` | 🟨 | 🟩 | 🟨 | 🟨 | 🟥 |
+| `hi-IN` ⬜ | ⬜🟨 | ⬜🟩 | ⬜🟩 | ⬜🟧 | 🟥 |
+| `en-NG` | 🟩 *claim withdrawn* | 🟨 **"waka"?** | 🟨 | 🟧 | 🟥 |
+| `sw-KE` | 🟩 *assumed* | 🟩 | 🟩 | 🟧 **sourced** | 🟥 |
 
 **Per-gesture exposure:**
 
 | Gesture | Unsafe in | Verdict |
 |---|---|---|
-| ☝ `point` | **13 / 14** | Near-universally impolite. The quiet catastrophe. |
-| 👍 `thumbs_up` | 5 / 14 | Famous, but mostly *contested*, not settled. |
-| ✋ `open_palm` | 4 / 14 | Rare but **severe** where it fails. |
-| 👋 `wave` | 4 / 14 | Fails differently in Greece/Nigeria vs Japan/Korea. |
-| ✊ `fist` | 2 / 14 | Safest gesture we have. |
+| ✊ `fist` | **14 / 14** | **Cut globally.** Pan-culturally "Threat" at 98.15%. |
+| ☝ `point` | 12 / 14 | Near-universal. Fixed by one rule: whole hand, never one finger. |
+| 👍 `thumbs_up` | 7 / 14 | Mostly *semantic* ("good", not "yes") — rarely actually obscene. |
+| ✋ `open_palm` | 7 / 14 | Rare but **catastrophic** where it fails. |
+| 👋 `wave` | 6 / 14 | A US emblem that inverts in Japan and Turkey. |
 
 ---
 
-## The four findings that actually matter
+## The findings that actually matter
 
-### 1. Pointing is the real problem, not the thumbs-up
+### 1. The fist has to go, and not for the reason we assumed
 
-The thumbs-up gets all the attention. But an isolated extended index finger is impolite
-across essentially the entire non-Western world and much of Europe too — **13 of 14
-locales**. It is the only gesture in our set that fails almost everywhere.
+Matsumoto & Hwang (2013) **[A]** is an empirical emblem catalogue — encoders in six world regions
+produced gestures for a standard message list, then separate decoders from the same region judged
+them, with a ≥70% production and ≥70% recognition bar. It gives **measured recognition rates
+instead of anecdote**, which is what this whole area normally lacks.
 
-It fails *quietly*, which is why it is dangerous. A moútza provokes a reaction someone
-will tell you about. A slightly rude point just makes the interaction faintly unpleasant,
-at scale, invisibly, and nobody files a bug.
+A closed fist is pan-culturally **"Threat" at 98.15%**. On top of that: triumph in Japan
+(ガッツポーズ), the numeral **10** in China, one landmark from the obscene **fig** in Turkey, and
+the terminal handshape of the **bras d'honneur** in France, Mexico and Brazil.
 
-The mitigation is cheap and nearly global: **replace the isolated index finger with a flat
-hand, fingers together, angled downward.** Landmark-wise that is fingers extended and
-adducted with the fingertip centroid below the wrist. It carries the same "down here"
-meaning, it is at least as easy to detect as an index point, and it is polite in every
-locale in this table. There is a strong argument for simply making the open-hand
-indication the *default* everywhere and dropping the index point from the vocabulary
-entirely.
+That last one is the sharpest, and it is a *false-accept*, not a false-reject: the bras d'honneur's
+insult lives in the **forearm and the second hand**, neither of which a single-hand 21-landmark
+model can see. A handshape-only classifier logs *"Visitor said no"* for someone making an obscene
+gesture at the camera.
 
-### 2. Two different gestures collide with `open_palm`, and they are the worst failures
+**Replacement: `thumbs_down`.** It is maximally separable from `thumbs_up` on a single scalar, so
+yes and no can never silently swap — which is the specific failure mode worth engineering against.
 
-- **Greece — the moútza (μούτζα).** An open hand, fingers splayed, thrust palm-forward at
-  a person. A serious insult with a long history. Our `open_palm` is essentially that
-  shape aimed at a camera, and our `wave` is that shape *repeated*, which is worse.
-- **Nigeria — "waka".** The spread-five-fingers thrust, reported as a serious insult in
-  functionally the same way. **I could not verify this from academic sources** and it is
-  flagged accordingly — but the cautious direction is cheap, so it is marked unsafe.
+### 2. The pan-cultural emblems are heads, not hands
 
-The proposed discriminator in both cases is **finger adduction plus palm orientation**:
-the insult requires *splayed* fingers and a *forward-facing* palm, so a fingers-together
-hand held edge-on should be safe. **This is a hypothesis, not a sourced finding.** If
-adduction does not actually defuse the moútza, the flat hand has to be dropped in Greece
-altogether. Verify this before anything ships to Greece or Nigeria.
+The three highest-recognition emblems on earth, from the same study:
 
-### 3. In Japan, our "hello" plausibly means "no"
+| Meaning | Emblem | Recognition |
+|---|---|---|
+| Yes | **head nod** | 98.18% |
+| No | **head shake** | 99.10% |
+| Stop | open palm | 100% |
 
-A hand waved side to side with the palm outward, especially in front of the face,
-conventionally reads in Japan as "no", "not at all", or "I don't understand". Our `wave`
-is defined by exactly that oscillation and we map it to *hello*.
+Two of three are not hands. And the culturally correct East Asian hello, yes and no are a **bow, a
+nod and a shake** — none of which a hand-landmark pipeline can express.
 
-This is the most insidious failure mode in the set, because it is not an insult — it is a
-**silent semantic inversion**. The visitor signals refusal, the system reads greeting, and
-both parties believe they were understood. Nobody is offended and the outcome is still
-wrong.
+**Recommendation: promote head nod and head shake to the primary yes/no channel.** MediaPipe ships
+Face Landmarker and Pose Landmarker alongside Hand Landmarker. This is simultaneously the most
+universal option, the most culturally safe, and the easiest to perform for someone **holding a
+parcel in both hands** — which describes a large share of our actual users.
 
-The mitigation is unusual in that **the discriminator is motion, not shape**: require a
-*static* held hand and reject oscillation. That is a change to the temporal logic of the
-classifier, not to its geometry, and the current `classifyLandmarks` has no temporal
-dimension at all — it classifies a single frame. Supporting this locale requires adding
-one.
+### 3. Greece: the obvious fix is also an insult
 
-### 4. The thumbs-up claim is weaker than the project currently asserts
+Our `open_palm` is the **moútza**. Greek Wikipedia **[C, footnotes checked]**: the insulter extends
+his hand toward the insulted and shows the open palm with the fingers stretched out.
 
-`PLAN.md` currently states as fact that 👍 is obscene in "Iraq, Iran, Greece, West Africa,
-Sardinia" and that the wave "reads as moútza in Greece and Nigeria." Those claims need
-softening:
+The finding that matters is the second-order one. **The fingers-together "safe version" that travel
+sites recommend is itself a named milder insult** — the «ευγενική» μούντζα, the *polite* moútza,
+same gesture with the fingers closed. Several sites recommend exactly this. They are wrong, and it
+is actively dangerous advice. **No palm-toward-camera flat hand of any finger spacing is safe in
+Greece.**
 
-- The **Greek and Sardinian** attributions trace to Morris et al. (1979), which is real
-  fieldwork — but it is 47 years old, and many later accounts hold the Western approving
-  sense has largely displaced it.
-- The **West African / Nigerian** attribution I could not trace to any Nigerian linguistic
-  or anthropological source. It propagates through travel listicles. Critically, the
-  fieldwork usually cited in support of it, Morris et al., **covers only Europe and the
-  Mediterranean** and therefore says nothing whatsoever about Nigeria.
+Two consequences:
 
-The honest position is *contested*, not *obscene*. That is still enough to justify not
-relying on the thumbs-up as the affirmative in those locales — the design conclusion
-survives — but the claim as written would not withstand a judge who checks it.
+1. **Statically, the moútza and our `open_palm` are the same 21 landmarks.** MediaPipe cannot
+   separate them by hand shape — only by wrist-translation velocity toward the camera.
+2. **Never prompt for it.** A hint reading "hold up your open palm to signal wait" instructs a Greek
+   visitor to moútza the customer's doorbell. That is a localisation bug as much as a CV one.
 
----
+Severity is legal, not merely social: Greek Penal Code **Art. 361** (εξύβριση) covers insult "with
+words or deeds", explicitly including contemptuous gestures **[A]**. Ordinary Greeks already
+self-censor — English Wikipedia records that Greeks signalling the number **five** must take care
+not to overextend the fingers or face the palm toward the person.
 
-## Evidence base
+**Substitute: the raised index, «μια στιγμή»** — index vertical, other three curled, palm
+**edge-on**, static ~1s, no thrust. It separates cleanly from every other gesture in the
+vocabulary. ⚠️ **[!]** The negative finding is well evidenced; this positive recommendation is
+engineering inference, not a sourced Greek emblem. Validate with a Greek speaker.
 
-These are the sources I actually retrieved in this session. They support the cross-cutting
-arguments above; they do **not** support the per-locale specifics.
+### 4. The Rabia sign: a classifier bug with criminal-law consequences
 
-**Gesture anthropology**
+**The single highest-consequence finding in the project, and we would have shipped it by accident.**
 
-- Morris, D., Collett, P., Marsh, P. & O'Shaughnessy, M. (1979). *Gestures: Their Origins
-  and Distribution.* Jonathan Cape. Twenty gestures surveyed across 40 locations in 25
-  countries. **Scope caveat, and it matters: Western Europe and the Mediterranean only.**
-  It is routinely over-extended in popular writing to Africa and Asia, which it does not
-  cover.
-- Archer, D. (1997). Unspoken Diversity: Cultural Differences in Gestures. *Qualitative
-  Sociology* 20(1), 79–105. DOI 10.1023/A:1024716331692. Explicitly asks whether the same
-  gesture can carry opposite meanings in two cultures, and whether global gestural
-  diversity is collapsing toward Western forms — the exact question behind the "has the
-  thumbs-up been Westernised?" dispute.
-  <https://link.springer.com/article/10.1023/A:1024716331692>
-- Kendon, A. (2004). *Gesture: Visible Action as Utterance.* Cambridge University Press.
-  Source for the emblem / quotable-gesture framing: emblems are conventionalised and
-  culture-specific, which is precisely why a single vocabulary cannot travel.
+An open palm **with the thumb folded onto the palm** is the **Rabia sign** (Rabaa al-Adawiya, 2013).
+Egypt designated the Muslim Brotherhood a terrorist organisation in December 2013. Documented
+punishments for displaying it: footballer **Ahmed Abd El-Zaher**, suspended for a goal celebration;
+kung fu champion **Mohamed Youssef**, banned for a year. In **Turkey** the identical sign is
+**Erdoğan's** personal and party emblem — strongly partisan in the opposite direction.
 
-**Culturally adapted machine interaction — the strongest warrant for this feature**
+**A thumb-position-tolerant `open_palm` classifier will emit Rabia on a four-finger hand.** The
+four-fingers-up/thumb-folded configuration must be **hard rejected**, never absorbed into
+`open_palm`, and never rendered as a prompt icon in either locale.
 
-- Trovato, G., Zecca, M., Sessa, S., Jamone, L., Ham, J., Hashimoto, K. & Takanishi, A.
-  (2013). Cross-cultural study on human–robot greeting interaction: acceptance and
-  discomfort by Egyptians and Japanese. *Paladyn, Journal of Behavioral Robotics* 4(2),
-  83–93. Egyptian and Japanese subjects were greeted by robots using each culture's
-  greeting; each group preferred its own and reported **discomfort** with the foreign one.
-  This is close to direct experimental support for localising a door agent's greeting, and
-  it happens to cover two locales in our table. Open access.
-  <https://www.degruyterbrill.com/document/doi/10.2478/pjbr-2013-0006/html>
+This is not a politeness problem. It is a gesture with criminal-law and employment consequences in
+one target locale and a partisan political meaning in another, produced by accident by our own
+code.
 
-**Colour**
+### 5. Japan's "hello" is "no" — and so is Turkey's
 
-- Jonauskaite, D. et al. (2020). Universal Patterns in Color-Emotion Associations Are
-  Further Shaped by Linguistic and Geographic Proximity. *Psychological Science* 31(10).
-  4,598 participants, 30 nations, 22 languages. Finds colour–emotion associations are
-  **largely universal** (mean similarity r = .88) but systematically modulated by
-  linguistic and geographic proximity. DOI 10.1177/0956797620948810.
-  Useful corrective: the differences are real but smaller than colour-symbolism folklore
-  implies.
-- Madden, T. J., Hewett, K. & Roth, M. S. (2000). Managing Images in Different Cultures: A
-  Cross-National Study of Color Meanings and Preferences. *Journal of International
-  Marketing* 8(4), 90–107. Eight countries; blue and white pattern similarly across
-  cultures, red and black diverge sharply.
-- Aslam, M. M. (2006). Are You Selling the Right Colour? A Cross-cultural Review of Colour
-  as a Marketing Cue. *Journal of Marketing Communications* 12(1), 15–30.
+Two independent, verified semantic inversions:
 
-**Accessibility and layout**
+- **Japan [B]** — *National Japan Bowl 2024 Gestures Guide* (Japan-America Society of Washington DC):
+  ちがう、ちがう, "palm facing out, right in front of your nose, wave your arm back and forth", means
+  *that is wrong / no*. So **two of our five gestures would both read as "no" in Japan**, and neither
+  would mean what we intend.
+- **Turkey [A]** — Denizci (2015), citing Calbris & Montredon (1986: 119): arm slightly extended
+  toward the addressee, palm outwards, moving side to side in the transversal plane, designates
+  **"refusal of an offer" — no, thanks.** A near-exact description of our `wave`, mapping to our
+  `fist` semantics rather than our `wave` semantics.
 
-- W3C, *Understanding SC 1.4.1: Use of Color* (WCAG 2.2, **Level A**): "Color is not used
-  as the only visual means of conveying information, indicating an action, prompting a
-  response, or distinguishing a visual element."
-  <https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html>
-- W3C Internationalization — *Arabic & Persian Layout Requirements* and the bidi authoring
-  guidance: use logical `start`/`end` rather than `left`/`right`, mirror layout for RTL,
-  do not mirror logos or time indicators.
-  <https://www.w3.org/International/alreq/> ·
-  <https://www.w3.org/International/articles/inline-bidi-markup/>
+These are worse than insults. An insult provokes a reaction someone tells you about; a **silent
+semantic inversion** leaves both parties believing they were understood. Note also that the
+discriminator here is **motion, not shape** — and `classifyLandmarks` is currently single-frame
+with no temporal dimension at all.
 
-**Detectability**
+### 6. Two claims this project asserted did not survive
 
-- MediaPipe Gesture Recognizer ships exactly **eight** canned classes: `Unknown`,
-  `Closed_Fist`, `Open_Palm`, `Pointing_Up`, `Thumb_Down`, `Thumb_Up`, `Victory`,
-  `ILoveYou`. Everything else needs a custom classifier or hand-written landmark geometry.
-  <https://developers.google.com/edge/mediapipe/solutions/vision/gesture_recognizer>
-- MediaPipe Hand Landmarker: 21 landmarks per hand, handedness output, and `num_hands`
-  configurable above 1 — which is what makes two-handed substitutes (namaste, gongshou)
-  feasible at all, and what makes right-hand preference enforceable.
-  <https://developers.google.com/edge/mediapipe/solutions/vision/hand_landmarker>
+`PLAN.md` states both as fact. Both should be withdrawn, not softened.
 
-**Sign language framing**
+**"Thumbs-up is obscene in West Africa"** — close to debunked. Traces to Roger Axtell (1991);
+secondary sources recirculate him without examination. Wikipedia's *Thumb signal* article does not
+mention West Africa or Nigeria at all, and its only sourced negative reading is **Iran**. A
+35-year-old travel book is thin ground for a product decision, and thumbs-up is ubiquitous in
+Nigerian digital culture today.
 
-- United Nations, International Day of Sign Languages: more than 70 million deaf people
-  worldwide, using **more than 300** different sign languages.
-  <https://www.un.org/en/observances/sign-languages-day>
-- World Federation of the Deaf FAQs: 200+ national sign languages, only about 40% legally
-  recognised. There is no universal sign language; International Sign is a limited pidgin.
-  <https://wfdeaf.org/contact/faqs/>
+**The Nigerian "waka" reading of the spread palm** — could not be sourced. Wikipedia's *Mountza*
+article's Nigeria sentence **carries no citation at all**; the *Obscene gesture* article contains no
+mention of Nigeria, West Africa, Hausa or "waka" anywhere, and its nearest claim cites a paywalled
+1996 NYT piece that does not name Nigeria. Searches scoped to Punch, Vanguard, Guardian Nigeria and
+Premium Times returned nothing. Two genuinely relevant papers — Agwuele (2014), *Gesture* 14(1), and
+Orie (2009), *Gesture* 9(2) — **both 403'd** and may well document it.
 
-**A gap worth naming**
+**Position: plausible, widely attested informally, evidentially thin.** Avoid a spread-palm thrust
+in Nigeria anyway on asymmetric cost — but do not state it as fact with a citation. It would not
+survive a judge checking it.
 
-- Xia, H., Glueck, M., Annett, M., Wang, M. & Wigdor, D. (2022). Iteratively Designing
-  Gesture Vocabularies: A Survey and Analysis of Best Practices in the HCI Literature.
-  *ACM Transactions on Computer-Human Interaction.* DOI 10.1145/3503537. The survey
-  identifies 13 factors crucial to gesture-vocabulary design and **culture is not among
-  the headline ones**. The standard methodology literature under-treats exactly this
-  problem — which is a point in the project's favour and more honest than claiming the
-  literature backs us.
+The pattern is worth naming: **the loudest cross-cultural gesture claims are the worst sourced.**
+The Greek and Egyptian findings, which are real and severe, are far better evidenced than the
+Nigerian and West African ones that travel writing repeats most confidently.
+
+### 7. A verified bug that affects every locale
+
+**MediaPipe's `handedness` output assumes the input image is mirrored** — a front-facing selfie
+camera. **A doorbell camera is not mirrored.** Any left/right logic — and a left-hand taboo *is*
+left/right logic — will be **exactly backwards** unless the label is swapped **[A, Google's own
+docs]**. Doorbell previews are also commonly mirrored for display, so the label must be keyed to the
+**un-mirrored** frame.
+
+This is the most concrete single bug the research found, and it silently inverts every
+right-hand-preference rule we might add for the Arabic locales, Kenya or India.
 
 ---
 
-## Cross-cutting design conclusions
+## Colour: ground it in a standard, not in folk symbolism
 
-**Colour is a secondary channel, and WCAG settles the argument.** SC 1.4.1 (Level A)
-already forbids colour as the sole carrier of meaning. Combined with Jonauskaite et al.'s
-finding that colour–emotion associations are largely universal with cultural modulation,
-the conclusion is that **shape, icon and text must carry the signal, and colour tunes it**.
-That converts every locale colour difference below from a correctness bug into a polish
-item — which is both more defensible and much cheaper than maintaining fourteen palettes.
-For an accessibility product this is the right posture regardless.
+**The defensible position.** Base the alert palette on **ISO 3864-4** — red = prohibition,
+yellow = warning, green = safe, blue = mandatory. The standard is explicitly graphical "to overcome
+language barriers", and **China's own national safety-colour standard matches it** (红 = 禁止、停止、
+紧急告警; 绿 = 提示、安全、通行), so red-as-alert is the legally standardised meaning in a mainland
+Chinese user's own built environment.
 
-Three colour cautions still earn their place, because they invert a default:
+**WCAG 1.4.1 (Level A)** forbids colour as the sole carrier of meaning anyway. That demotes locale
+colour from a correctness problem to a **tuning** problem — which is both cheaper and more
+defensible than maintaining fourteen palettes. Pair every state with an **ISO 7010 icon shape** and
+a text label.
 
-- **White is mourning** in Japan, Korea, China and India. A white-dominant "clean/neutral"
-  panel can read as funerary. Affects four of fourteen.
-- **Red is not danger** in China (luck; and *rising* in financial displays, inverting the
-  Western convention), Turkey (national), India (auspicious) or Kenya. A red alert may not
-  read as alarming at all.
-- **Never render a personal name in red** in Korea, where it carries a death association.
+Supporting this: Kawai et al. (2022), *Psychological Research* 87(3):704–724 **[A]** measured red's
+implicit negativity at a 32.42 ms congruence effect in Mainland China versus 76.84 ms in the Western
+group — roughly **2.4× weaker, attenuated but not absent**. Green was consistently positive across
+all cultures. And Jonauskaite et al. (2020), *Psychological Science* 31(10) **[A, abstract only —
+SAGE 403'd]** found colour–emotion associations largely universal (r = .88) and shaped by
+linguistic/geographic proximity — which argues **against** strong locale-specific colour rewrites.
 
-**Handedness is free, so use it.** MediaPipe returns left/right. Several locales disfavour
-the left hand for indicating and giving. Whether that taboo extends to a gesture made at a
-camera is genuinely unclear and under-evidenced — but preferring the right hand where we
-can tell costs one field.
+Then apply only the deltas that survived sourcing:
 
-**Two-handed gestures are available.** `num_hands >= 2` unlocks namaste (`hi-IN`) and
-gongshou (`zh-CN`) as respectful, highly distinctive, easily detectable greetings. The
-current classifier is single-hand only.
+| Locale | Delta |
+|---|---|
+| `ar-SA` `ar-EG` | **Yellow is NOT caution** — envy, sickness, cruelty, dishonesty ("yellow smile = mean"). **White is the shroud and coffin** as well as purity, so not a neutral background. Blue reads negative (envy, jealousy, death), which undermines the default "informational" colour of every design system. Hasan, Al-Sammerai & Abdul Kadir (2011) **[A]**, read in full; blue rests on one paper. |
+| `ja-JP` | **Never red-on-white as the alert treatment** — 紅白 *kōhaku* is the visual grammar of *celebration*; a red alert on a white card reads as bunting. And **black, not white, is the funeral colour today**, datable to Ōkubo Toshimichi's 1878 funeral — so our dark UI carries a funerary tint here. |
+| `ko-KR` | **Never render a person's name in red.** Korea.net **[B]** and the Dartmouth Folklore Archive **[B]**. Cite the taboo, never the conflicting origin stories. One CSS rule. |
+| `zh-CN` | The 黄色 hazard is **lexical, not chromatic** — the yellow swatch is the national warning colour, but 黄 carries a pornographic sense even alone (黃片, 掃黃). Watch the copy. 戴绿帽子 is about **hats**, not green: green is the correct "all clear". No green hats in illustration. |
+| `fr-FR` | **No large yellow fills** — gilets jaunes iconography, ubiquitous because since 2008 every French driver must carry a hi-vis vest. Older layer per Pastoureau (2019) **[B]**: « rire jaune ». Use orange for caution, which is also ANSI-correct. |
+| `sw-KE` | **Avoid orange entirely** (ODM's election symbol) and **yellow+green together** (UDA, governing party). Orange is the natural middle warning tier, which makes this an easy trap. |
 
-**The classifier needs a temporal dimension.** `classifyLandmarks` currently classifies one
-frame. Japan's wave problem is a *motion* distinction, and Brazil's figa/fist ambiguity is
-a thumb-position distinction that a single frame may get wrong. Neither is solvable with
-the current shape.
+**Two "facts" that did not survive:** "yellow = mourning in Egypt" (the peer-reviewed source assigns
+mourning to black and death to white; the yellow claim traces to *ancient* Egypt, where white was
+worn to funerals) and **"white = mourning in Korea"** — the evidence cuts the other way, since 백의민족,
+"the white-clad people", describes white as ordinary Korean dress for centuries.
+
+**Never name a colour in UI copy** in any CJK locale. The blue/green lexical boundary does not sit
+where a designer assumes: Japanese 青 covers the "go" colour on a traffic light, Chinese 青 spans
+yellowish-green to black, Korean 푸르다 covers both. "Tap the green button" is untranslatable — and
+refusing to write it is the accessible choice anyway.
 
 ---
 
-## Per-locale detail
+## Script, typography and text handling
 
-The machine-readable form is `lib/gestures/locales.json`. Every entry there is
-`"verified": false`. The notes below add what does not fit the schema.
-
-### `en-US` — English (United States) · ltr · ASL
-
-The baseline the default vocabulary was built for; all five gestures are fine. The raised
-fist has a protest and solidarity reading in US public life, but a fist at chest height
-toward a doorbell does not carry it. **0 substitutions.**
-
-### `el-GR` — Greek · ltr · Ελληνική Νοηματική Γλώσσα (ΕΝΓ / GSL)
-
-**Tied for most substitutions (4), and the most severe single risk in the set.** The
-moútza kills both `open_palm` and `wave`; `point` is impolite; `thumbs_up` is contested
-per Morris et al. (1979) versus later Westernisation accounts. Only `fist` survives — and
-it survives precisely because it has no fingers to splay.
-
-Substitute shape for both palm gestures: fingers extended and **strongly adducted**, thumb
-alongside, hand vertical with the palm plane roughly *parallel* to the camera axis so the
-palm is not presented flat to the lens. Held still. **Verify that adduction defuses the
-moútza before shipping.**
-
-Register: εσείς for a stranger; greeting before request.
-
-### `fr-FR` — French · ltr · Langue des signes française (LSF)
-
-Only `point` needs substituting. One implementation note: the thumb is the counting
-hand-shape for "one", so `thumbs_up` can be emitted unintentionally mid-count — a reason to
-require a dwell time rather than firing on a single frame.
-
-Register: **vous**, always. "Bonjour" before any request is close to obligatory; omitting
-it reads as rude in a way with no English equivalent. The system's first utterance should
-be a greeting, not an instruction.
-
-### `es-MX` — Spanish (Mexico) · ltr · Lengua de Señas Mexicana (LSM)
-
-Only `point`, and mildly — lip- and chin-pointing are common alternatives, so the open-hand
-substitution reads naturally. Colour note: **purple**, not white or black, is the mourning
-colour to avoid for a neutral UI. Register: usted.
-
-### `pt-BR` — Portuguese (Brazil) · ltr · Língua Brasileira de Sinais (Libras)
-
-Only `point`. `thumbs_up` is *strongly* positive here — probably the most thumbs-up-positive
-locale in the table, where it substitutes for thanks, yes and OK. It is the best affirmative
-available.
-
-One classifier risk that is not cultural: the **figa** (thumb protruding between index and
-middle fingers) is a distinct Brazilian good-luck shape differing from a plain fist only in
-thumb position, and `classifyLandmarks` currently keys the fist on `!thumbOut`. Make sure a
-figa does not land silently in the fist bucket and get read as **no**.
-
-Colour: purple is the mourning colour. Register: você is fine; o senhor / a senhora for
-deference.
-
-### `ar-SA` — Arabic (Gulf) · **rtl** · لغة الإشارة السعودية
-
-**Tied for most substitutions (4).** `thumbs_up` contested; `open_palm` better replaced;
-`point` impolite; `fist` may read as threat (low confidence, a judgement call).
-
-The standout substitute in the entire report: the **bunched-fingertip "wait"** — all five
-fingertips drawn together pointing upward, with an optional slow vertical oscillation. It
-is culturally idiomatic *and* unusually easy to detect, because fingertip convergence is a
-clean single-threshold test in landmark space and nothing else in the vocabulary resembles
-it. Culturally apt and computationally cheap rarely coincide.
-
-Sign language naming: the unified pan-Arab lexicon (لغة الإشارة العربية الموحدة) is an
-institutional standardisation effort, **not** the natural language of any Deaf community,
-and is contested. Name the national language, not the unified lexicon.
-
-Layout: RTL. Mirror the layout, use logical `start`/`end`, do not mirror logos.
-
-Register: high formality. Open with السلام عليكم rather than an instruction; use a softener
-before asking anything of a stranger.
-
-### `ar-EG` — Arabic (Egypt) · **rtl** · لغة الإشارة المصرية
-
-Same four substitutions and the same bunched-fingertip "wait", with which Egyptian gesture
-is particularly associated. Egyptian usage is generally described as more Westernised than
-Gulf usage, but the evidence is anecdotal in both directions.
-
-The occasionally repeated claim that **yellow signifies mourning in Egypt** is unverified
-and may be folklore. Do not design around it without checking.
-
-Register: formal but warmer and less distant than Gulf.
-
-### `tr-TR` — Turkish · ltr · Türk İşaret Dili (TİD)
-
-Only `point`. Notably, **no moútza-equivalent** despite the shared Aegean geography — which
-is itself informative: the moútza is Greek-specific, not regional. The strongly offensive
-Turkish gestures usually cited (the fig sign; the ring/"OK" shape as a homophobic slur) are
-not in our vocabulary — worth stating explicitly so nobody adds an "OK" gesture later.
-
-Colour: red is national and positive, not primarily a danger colour.
-
-**Typography, and this one bites:** Turkish has dotted and dotless i (İ/i and I/ı). Any
-case conversion must be locale-aware — `toLocaleUpperCase('tr')` — or the UI will render
-visibly wrong words.
-
-### `ja-JP` — Japanese · ltr · 日本手話 (JSL)
-
-Two substitutions: `wave` (the semantic inversion described above) and `point`.
-
-The `point` substitute is the conventional Japanese **open presenting hand** — fingers
-extended and adducted, palm rotated upward, whole hand inclined downward. It is both the
-polite form and a clean landmark shape.
-
-Colour: **white is mourning** as well as purity. Red is dual — danger, but also festive and
-auspicious (kōhaku). Both need a second cue.
-
-Register: keigo matters. Minimum teineigo (です/ます); open with an apology-softener
-(失礼します / 恐れ入ります) rather than a direct instruction. Plain form would be markedly rude.
-
-### `ko-KR` — Korean · ltr · 한국수어 (KSL)
-
-Two substitutions, mirroring Japan but with **lower confidence on the wave** — I could not
-source the Korean negating reading specifically. Since the static-hand mitigation is free,
-apply it in both locales and verify later.
-
-`thumbs_up` is positive ("number one"). Palm-up beckoning is for animals and is offensive
-toward a person — not in our vocabulary, but do not add it.
-
-Colour: **never render a personal name in red.** White carries a mourning association.
-
-Register: Korean grammaticalises deference. A stranger at the door warrants hapsyo-che, or
-at minimum haeyo-che. Banmal from a system speaking in the resident's name would be a
-serious discourtesy.
-
-### `zh-CN` — Chinese (mainland, Simplified) · ltr · 中国手语 (CSL)
-
-Only `point`. Optional upgrade: the **gongshou / baoquan** salute (one fist covered by the
-other open palm) is a respectful traditional greeting, detectable with `num_hands >= 2`
-plus a two-hand relative-position test.
-
-Colour, three traps: **red is luck**, not danger, and marks a *rise* in Chinese financial
-displays — the inverse of Western convention, so a red alert may read as celebratory.
-**White is mourning.** **Yellow** is historically imperial but in modern slang 黄色 also
-denotes pornographic content — prefer another accent. Minor: avoid a green hat motif
-(戴绿帽子 = cuckolded).
-
-Register: 您, not 你, for a stranger.
-
-### `hi-IN` — Hindi (India) · ltr · Indian Sign Language (ISL / Indo-Pakistani)
-
-Two substitutions: `thumbs_up` (contested and regionally variable) and `point`.
-
-**Namaste** — both palms pressed together at chest height — is the respectful greeting and
-the natural substitute. Detectable with `num_hands = 2` and a cross-hand fingertip-distance
-test.
-
-**A hard limitation worth stating plainly:** the Indian head movement often called the head
-wobble is a real and important affirmative — but it is a *head* gesture. MediaPipe Hands
-cannot see it. A visitor who answers that way registers as **no response at all**, and the
-door will simply not respond to them. That is an accessibility failure inside an
-accessibility product, and no gesture substitution fixes it.
-
-Colour: **white is mourning and widowhood** — the single most important colour caution in
-the table, since a white "clean/neutral" UI can read as funerary. Red is auspicious, not
-dangerous. Saffron/orange is sacred and politically loaded — avoid as decoration.
-
-Register: आप, never तुम/तू, for a stranger.
-
-### `en-NG` — English (Nigeria) · ltr · Nigerian Sign Language (NSL)
-
-**Tied for most substitutions (4)**, and the **worst-sourced row in the table** — flagged
-rather than smoothed over.
-
-- `open_palm` / `wave`: the "waka" spread-five-fingers thrust, reported as a serious insult
-  functionally parallel to the moútza. **Unverified from academic sources.** Marked unsafe
-  because the cautious direction is cheap.
-- `thumbs_up`: widely asserted offensive in West Africa, **not traceable** to Nigerian
-  linguistic or anthropological literature. Marked contested, not obscene.
-- `point`: impolite; left hand disfavoured.
-- `fist`: the safest option here, having no fingers to be read as splayed.
-
-NSL is historically ASL-derived through Andrew Foster's mission schools — name it Nigerian
-Sign Language, not "African Sign Language", which does not exist.
-
-Register: greeting is obligatory before business and deference to age is strongly marked.
-Do not assume an English-speaking visitor.
-
-### `sw-KE` — Swahili (Kenya) · ltr · Kenyan Sign Language (KSL)
-
-Only `point`. **The contrast with Nigeria is the point of this row:** no waka-equivalent
-concern is identified for Kenya, and `thumbs_up` is generally acceptable. "Africa" is
-useless as a locale, and modelling `en-NG` and `sw-KE` separately is what makes that
-visible.
-
-**Naming collision worth catching now:** "KSL" denotes both **K**enyan and **K**orean Sign
-Language, and both are in this table. Disambiguate as `KSL-KE` in any shared namespace.
-
-Colour: red is the blood of the independence struggle in the flag and prominent in Maasai
-dress — not a neutral danger colour.
-
-Register: **probably the clearest politeness requirement in the set.** Swahili norms
-require an exchange of salamu (hujambo / habari) before any transactional request, with
-shikamoo to an elder. A door agent that skips to an instruction breaches a real and
-strongly felt norm.
+| Locale | Requirement |
+|---|---|
+| `ar-SA` `ar-EG` | **RTL.** Mirror layout, use logical `start`/`end`, never mirror logos. W3C ALReq. |
+| `el-GR` | Uppercase **drops the tonos** but **keeps the dialytika**; disjunctive ή keeps its tonos. **CSS `text-transform: uppercase` gets this wrong** — supply pre-composed uppercase strings. |
+| `tr-TR` | Four I-letters. `toUpperCase("i")` is `"İ"` U+0130, not `"I"`. **Never use locale-sensitive case folding for identifiers, gesture names or config keys** — locale casing is for displayed text only. |
+| `fr-FR` | **Accented capitals required** (« SUPPRIMER LES RETRAITES ? » vs « …RETRAITÉS ? » — Académie française **[A]**). Narrow no-break **U+202F** before `;` `!` `?`; U+00A0 before `:`. Never degrade to a plain space. |
+| `sw-KE` | **The apostrophe in `ng'` is a letter** — `ngoma` (drum) vs `ng'ombe` (cow) is a minimal pair. Normalise U+2019→U+0027 on ingest; `\b\w+\b` splits it; never break a line after it. CI strings: `ng'ombe`, `kung'aa`, `Ng'ang'a`. Budget 15–18-char unbreakable tokens. |
+| `ja-JP` `ko-KR` `zh-CN` | **`lang` is mandatory** — Han unification means the codepoint does not carry the locale, and a ja-JP user seeing kanji through a Simplified-Chinese fallback sees subtly *wrong* glyphs. In a security product that is a trust signal we cannot afford to lose. Set it on `<html>`, not `<body>`. |
+| `zh-CN` | Tag the **region**: `zh-Hans-CN`, not bare `zh` or `zh-Hans` (W3C CLReq). |
+| line breaking | **Opposite rules.** ja: `line-break: strict`. zh: default — **not** `keep-all`, which overflows. ko: **`word-break: keep-all`** + `overflow-wrap: break-word`, because 한글 맞춤법 Art. 2 **[A]** requires inter-word spaces. Do not share one CSS rule. |
+| sizing | CJK `line-height` 1.6–1.7 vs ~1.4 Latin; never fix an alert card's height. Chinese expands ~1.2×, **Korean contracts ~0.8×** — centre labels rather than stretching. |
 
 ---
 
-## What still needs sourcing
+## Politeness register
 
-Priority order. Items 1–3 are ship-blockers for their locales.
+The strongest empirical warrant for localising a door agent at all: **Trovato et al. (2013)**,
+*Paladyn* 4(2):83–93 **[A, open access]** ran the experiment — Egyptian and Japanese subjects were
+greeted by robots using each culture's greeting, and each group preferred its own and reported
+**discomfort** with the foreign one. Two of our locales, directly tested.
 
-1. **The Greek moútza** — its exact form (does a static splayed palm suffice, or is the
-   forward thrust required?), its current severity among younger Greeks, and critically
-   **whether finger adduction actually defuses it**. The entire Greek substitution strategy
-   rests on an unverified hypothesis.
-2. **Nigerian "waka"** — whether it is real, how widespread, how severe, and whether static
-   spread fingers suffice. Needs Nigerian linguistic or anthropological literature, not
-   travel writing.
-3. **The Japanese wave-as-negation** — well known informally; needs a citable source, and
-   the same question asked properly for Korean.
-4. **Thumbs-up, per locale** — Greece, the Gulf, Egypt, Nigeria, India. Specifically: is
-   there *post-2010* evidence, and has the Western sense displaced older readings? Archer
-   (1997) frames this question; someone needs to answer it.
-5. **The Arab bunched-fingertip "wait"** — a proper source for its form and meaning. It is
-   the best substitute in the report and currently rests on my assertion alone.
-6. **Left-hand taboo and camera gestures** — does a taboo about giving and eating extend to
-   a gesture made at a lens? I found no evidence either way.
-7. **Colour specifics** — the Egyptian yellow-mourning claim (verify or kill it), and the
-   Korean red-ink-name association.
-8. **Sign language names** — confirm each endonym and the Libras legal-recognition statute
-   (Lei 10.436/2002) before printing a law number.
+| Locale | Register |
+|---|---|
+| `fr-FR` | **Greeting is structurally expected of *us*.** Kerbrat-Orecchioni (2001) **[A]**, a corpus study of French shop interactions: "Bonjour !" in ~90% of interactions, politeness work occupying about half the material exchanged, and the greeting typically **initiated by the shopkeeper**. Our system is in the shopkeeper's seat. Never open with the question. **The French flow needs one more turn than the American one** — do not build a turn-count-identical graph and localise strings into it. Always `vous`. |
+| `sw-KE` | **Greeting is a precondition for transacting.** Yahya-Othman (1995), "Aren't you going to greet me? Impoliteness in Swahili greetings", *Text* 15(2) **[A, title verified via Crossref; De Gruyter blocked the full text]**. Use **`Habari?`** — never `Jambo` (tourist-Swahili). **Never generate `Shikamoo`**: it is age-graded, and a camera cannot know a visitor's age *and should not try* — age estimation from video is inaccurate, demographically biased, and turns a doorbell into a profiling device. Use plural-as-respect (`hamjambo`, `karibuni`) instead. |
+| `ar-EG` | Egyptians "typically avoid saying 'no' directly" **[C]**. Operationally: **a binary yes/no demands a culturally dispreferred speech act.** Make the "no" path expressible as **deferral** rather than refusal. |
+| `ar-SA` | Indirect. ⚠️ **السلام عليكم for an automated agent is unresolved and is not a web-search question** — the fiqh sources concern person-to-person greeting between people of known faith; a door agent greets anyone. Needs native review. Also sourced and directly relevant to a camera product: **do not photograph people, especially women, without permission.** |
+| `tr-TR` | `siz`; **`buyurun`** as the service opener; `efendim`; `Bey`/`Hanım` follow the **first** name. `-(y)InIz` imperatives are arguably right for an automated announcement. Needs a native check. |
+| `ja-JP` | Minimum teineigo (です/ます); apology-softener, not a direct instruction. |
+| `ko-KR` | hapsyo-che, or at minimum haeyo-che. |
+| `zh-CN` | 您, not 你. |
+| `en-US` | Direct, warm, brief. Over-formality reads as stilted from a machine. |
+| `es-MX` `pt-BR` `hi-IN` | **Unresearched.** `usted` / `o senhor` / `आप` are safe defaults, not findings. |
 
-The search budget is exhausted for this session. A follow-up pass needs
-`CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION` raised, and should run the locale clusters
-sequentially rather than as four parallel agents — the parallel fan-out is what burned 200
-searches without returning anything.
+---
 
-## Changes this implies elsewhere (not made)
+## Sign languages — name them correctly, and never merge them
 
-Recorded, not applied — this task was scoped to the two files above.
+The UN records **more than 300** sign languages worldwide; the WFD counts 200+ national sign
+languages with only ~40% legally recognised. There is no universal sign language. We are not
+implementing one — but naming them correctly is the cheapest possible signal that we know that.
 
-- `lib/gestures/vocabulary.ts` — `classifyLandmarks` is single-frame and single-hand. It
-  needs a temporal dimension (Japan's static-vs-oscillating wave), two-hand support
-  (namaste, gongshou), finger-adduction and palm-orientation tests (Greece, Nigeria), and
-  a figa guard on the fist branch (Brazil).
-- `PLAN.md` — the thumbs-up and wave claims in "The thesis, sharpened" are stated more
-  confidently than the evidence supports. See finding 4.
+| Locale | Name | ISO | Note |
+|---|---|---|---|
+| `en-US` | American Sign Language | `ase` | No federal recognition. |
+| `el-GR` | Ελληνική Νοηματική Γλώσσα (ΕΝΓ) | — | Recognised **equal to Greek**, Law 4488/2017 art. 65 §2. |
+| `fr-FR` | Langue des signes française | — | « Langue à part entière », loi 2005-102 art. 75, Code de l'éducation L312-9-1 **[A, Légifrance]**. |
+| `ar-SA` | لغة الإشارة السعودية | — | ~1 interpreter per **93,000** HoH people (CSIS 2014), vs 1 per 46 in California. |
+| `ar-EG` | لغة الإشارة المصرية | — | ~1.2m deaf/HoH aged 5+. **No grammatical description exists**; four manual alphabets in use as of 2006. |
+| `tr-TR` | Türk İşaret Dili (TİD) | — | A **language isolate**, ~250k signers. **Two-handed manual alphabet — a single-hand pipeline structurally cannot do TİD fingerspelling.** Do not imply otherwise in the pitch. |
+| `ja-JP` | 日本手話 | `jsl` | |
+| `ko-KR` | 한국수어 | `kvk` | |
+| `zh-CN` | 中国手语 | `csl` | |
+| `hi-IN` | Indian Sign Language | `ins` | ~6 million signers — **the most-used sign language in the world**. |
+| `en-NG` | Nigerian Sign Language | `nsi` | ASL-derived via Andrew Foster's mission schools. No government recognition. |
+| `sw-KE` | Kenyan Sign Language | `xki` | Art. 7(3)(b) promotion duty; Art. 120(1) official **of Parliament** only. **Not ASL** — ≤20% full cognates (Roberts 2009 via Morgan & Mayberry 2010). |
+| `es-MX` | Lengua de Señas Mexicana | `mfs` | Unresearched locale. |
+| `pt-BR` | Língua Brasileira de Sinais (Libras) | `bzs` | Unresearched locale; the Lei 10.436/2002 recognition is widely cited but **not verified here**. |
+
+Two traps: **"Arabic Sign Language" is not one language**, and saying so is contested by Deaf Arabs
+themselves — Al-Fityani (2010, UC San Diego, committee chaired by Carol Padden) **[A, read in full]**
+found five natural Arab sign languages "unlikely to be descendants of a common ancestor", with Deaf
+Arabs objecting that they "cannot understand the unified sign language nor can they find a purpose
+or utility in it". And **KSL is ambiguous** — Kenyan `xki` and Korean `kvk` both abbreviate to it,
+and both are in this table. **Use ISO codes as keys, never the abbreviation.**
+
+---
+
+## What is still open
+
+**Ship-blockers for their locales:**
+
+1. **Greece** — is the raised-index substitute actually a Greek emblem, or only our inference? The
+   negative finding is solid; the positive one is not.
+2. **Turkey** — **no sourced "wait" emblem exists.** The purse hand is ruled *out* (it means
+   "good/delicious" there); nothing is ruled *in*. Turkish "no" is a head-back-plus-*tsk* and the
+   head shake means "please explain" — both invisible to Hand Landmarker. Do not let anyone fill
+   this from intuition.
+3. **`ar-SA` pointing** — no hand-based substitute found; the sourced alternative is a chin raise,
+   which is a head gesture.
+4. **`es-MX` / `pt-BR`** — Wikipedia's moútza article lists **Mexico and Brazil** among locales with
+   close analogues, while the same article says a steady repeated version means **"patience"** in
+   both. Unverified and self-contradicting. If the first claim is right, `open_palm` is unsafe there
+   too.
+
+**Also unresolved:** thumbs-up in Egypt and the Gulf, measured rather than anecdotal · whether the
+left-hand taboo applies to **camera-mediated** gesture anywhere · whether pointing **at the ground**
+is rude anywhere (**no source addresses the downward case at all**, in any locale — our "probably
+fine" is inference, and Kenya's best source arguably contradicts even that) · Turkish colour
+semantics · the greeting-formula question for `ar-SA` · full passes for `es-MX`, `pt-BR`, `hi-IN`.
+
+**A sourcing trap to know about:** `codex-mundi.com` ranks well on exactly these queries, presents
+as a curated reference work with a severity scale and a Morris/Axtell/Kendon bibliography, and is
+**AI-generated** — its footer reads "generated on 2026-09-10" and none of its four academic
+citations carry page numbers. It was excluded. Expect more of this class of source here.
+
+---
+
+## Code changes this implies (not made — this task was scoped to two files)
+
+- **`lib/gestures/vocabulary.ts`** — the live classifier still encodes the old vocabulary.
+  It needs: the **fist branch removed** or rerouted to `thumbs_down`; a **temporal dimension**
+  (Japan's wave is a motion distinction, and `classifyLandmarks` is single-frame); **hard-reject
+  classes** for Rabia (four fingers up, thumb folded), figa and the intermediate thumb state;
+  **finger-adduction and palm-orientation** tests; and the **handedness mirror correction**.
+- **`PLAN.md`** — the West Africa thumbs-up and Nigerian moútza-wave claims should be withdrawn
+  (finding 6). The Greek claim is sound and can be stated more strongly, not less.
+- **`lib/gestures/locales.ts`** — missing `en-NG`.

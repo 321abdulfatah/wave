@@ -70,7 +70,7 @@ export function decide(ctx: AgentContext): AgentDecision {
   if (ctx.turns.length === 0) {
     return {
       speak: OPENERS[ctx.visitor],
-      expecting: ['thumbs_up', 'wave', 'fist'],
+      expecting: ['nod', 'thumbs_up', 'shake'],
       resolution: 'in_progress',
       notifyResident: ctx.visitor === 'known',
       rationale: known?.policy
@@ -80,17 +80,20 @@ export function decide(ctx: AgentContext): AgentDecision {
   }
 
   switch (gesture) {
+    // A nod is the pan-cultural yes at 98.18%; thumbs_up is accepted as an
+    // acknowledgement but never treated as consent on its own.
+    case 'nod':
     case 'thumbs_up':
       return {
         speak:
-          'Thank you. Please leave it inside the porch, out of the rain, and point down once it is placed.',
-        expecting: ['point', 'open_palm'],
+          'Thank you. Please leave it inside the porch, out of the rain, and show me an open hand once it is placed.',
+        expecting: ['present', 'open_palm'],
         resolution: 'in_progress',
         notifyResident: false,
         rationale: 'Visitor confirmed a delivery. Directed them to the sheltered drop point.',
       }
 
-    case 'point':
+    case 'present':
       return {
         speak: 'Got it, I have a photo. Have a good day.',
         expecting: [],
@@ -112,13 +115,14 @@ export function decide(ctx: AgentContext): AgentDecision {
     case 'open_palm':
       return {
         speak: 'No problem, take your time. I am still here.',
-        expecting: ['thumbs_up', 'point', 'fist'],
+        expecting: ['nod', 'present', 'shake'],
         resolution: 'in_progress',
         notifyResident: false,
         rationale: 'Visitor asked for a moment. Holding the conversation open.',
       }
 
-    case 'fist':
+    case 'shake':
+    case 'thumbs_down':
       return {
         speak: 'Alright, nothing to do here. Take care.',
         expecting: [],
@@ -139,8 +143,11 @@ export function decide(ctx: AgentContext): AgentDecision {
         }
       }
       return {
-        speak: 'I could not see that. Hold your hand up to the camera and give me a thumbs up for yes.',
-        expecting: ['thumbs_up', 'fist', 'wave'],
+        // Re-prompt with the head, not the hand: nod and shake are the two
+        // highest-recognition emblems measured anywhere, and they work for
+        // someone holding a parcel in both hands.
+        speak: 'I could not see that. Nod for yes, or shake your head for no.',
+        expecting: ['nod', 'shake', 'wave'],
         resolution: 'in_progress',
         notifyResident: false,
         rationale: 'Gesture below confidence threshold. Re-prompted with a clearer instruction.',

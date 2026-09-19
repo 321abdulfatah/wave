@@ -8,7 +8,18 @@ export const dynamic = 'force-dynamic'
 
 const Body = z.object({
   eventId: z.string(),
-  gesture: z.enum(['thumbs_up', 'open_palm', 'wave', 'point', 'fist', 'none']),
+  gesture: z.enum([
+    'thumbs_up',
+    'thumbs_down',
+    'open_palm',
+    'wave',
+    'present',
+    'purse',
+    'index_up',
+    'nod',
+    'shake',
+    'none',
+  ]),
   confidence: z.number().min(0).max(1),
 })
 
@@ -34,7 +45,7 @@ export async function POST(req: Request) {
 
   // Below threshold the gesture is treated as unread rather than guessed at.
   // Acting on a half-seen hand at someone's front door is worse than asking again.
-  const spec = gestureSpec(gesture)
+  const spec = gesture === 'none' ? undefined : gestureSpec(gesture)
   const accepted = gesture !== 'none' && spec != null && confidence >= spec.threshold
 
   const withVisitor = accepted

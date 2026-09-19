@@ -1,3 +1,5 @@
+import type { GestureId } from '@/lib/gestures/locales'
+
 /**
  * Types mirroring the Ring Partner API (api.amazonvision.com).
  * Only the surface WAVE actually consumes is modelled here.
@@ -37,8 +39,14 @@ export interface RingDevice {
 /** What the vision pass believes is standing at the door. */
 export type VisitorKind = 'courier' | 'known' | 'stranger' | 'vehicle' | 'unknown'
 
-/** The hand shapes WAVE can read back from a visitor. */
-export type Gesture = 'thumbs_up' | 'open_palm' | 'wave' | 'point' | 'fist' | 'none'
+/**
+ * What WAVE can read back from a visitor.
+ *
+ * Derived from the locale table rather than declared here, so a gesture cannot
+ * exist in the UI without a sourced cultural record. 'none' is the unread case:
+ * below threshold is treated as unread, never guessed at.
+ */
+export type Gesture = GestureId | 'none'
 
 /** How a doorstep conversation ended. */
 export type Resolution =

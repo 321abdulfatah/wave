@@ -43,7 +43,7 @@ function TurnRow({ turn }: { turn: Turn }) {
         }}
         aria-hidden
       >
-        {isDoor ? '🔊' : (spec?.glyph ?? '🖐')}
+        {isDoor ? <SpeakerMark /> : <HandMark />}
       </div>
 
       <div className={`max-w-[78%] ${isDoor ? '' : 'text-right'}`}>
@@ -67,6 +67,34 @@ function TurnRow({ turn }: { turn: Turn }) {
         </p>
       </div>
     </div>
+  )
+}
+
+/* Emoji are deliberately absent. A gesture vocabulary that varies by locale
+   cannot be drawn from a fixed emoji set — 👍 is one glyph and several
+   meanings. The real hand glyphs are built from the 21 MediaPipe landmarks in
+   design/gestural.html and will replace these marks. */
+
+function SpeakerMark() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden>
+      <path d="M3 6h2.5L9 3v10L5.5 10H3z" fill="currentColor" />
+      <path d="M11.5 5.5a3.5 3.5 0 0 1 0 5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function HandMark() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden>
+      <path
+        d="M5 9V4.2a1 1 0 0 1 2 0V8m0-.5V3.2a1 1 0 0 1 2 0V8m0-.3V4.2a1 1 0 0 1 2 0V9m-8 0v2a4 4 0 0 0 4 4h1a4 4 0 0 0 4-4V6.7a1 1 0 0 1 2 0V9"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   )
 }
 

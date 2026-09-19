@@ -38,8 +38,12 @@ export default function GestureKey({
               borderColor: isExpected ? 'rgba(255,176,32,.45)' : 'var(--line)',
             }}
           >
-            <span className="text-2xl leading-none" aria-hidden>
-              {g.glyph}
+            <span
+              className="grid h-8 w-8 place-items-center rounded-full border text-[10px] font-bold"
+              style={{ borderColor: 'currentColor' }}
+              aria-hidden
+            >
+              {g.label.slice(0, 2).toUpperCase()}
             </span>
             <span
               className="text-center text-[10px] font-semibold leading-tight"

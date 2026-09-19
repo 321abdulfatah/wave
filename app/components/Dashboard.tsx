@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Conversation from './Conversation'
 import GestureKey from './GestureKey'
 import GestureReader from './GestureReader'
+import CaptionTrack from './CaptionTrack'
 import type { DoorEvent, Gesture, RingDevice, Resolution, VisitorMemory } from '@/lib/ring/types'
 
 const RESOLUTION_LABEL: Record<Resolution, string> = {
@@ -32,6 +33,7 @@ export default function Dashboard({ mock }: { mock: boolean }) {
   const [connected, setConnected] = useState(false)
   const [cameraOn, setCameraOn] = useState(false)
   const [useRing, setUseRing] = useState(false)
+  const [liveStream, setLiveStream] = useState<MediaStream | null>(null)
   const [polling, setPolling] = useState<{ started: boolean; reason?: string } | null>(null)
   const liveRegion = useRef<HTMLElement | null>(null)
   /** Event ids already seen, so a reconnect's snapshot does not re-announce. */
@@ -192,6 +194,8 @@ export default function Dashboard({ mock }: { mock: boolean }) {
             </div>
           )}
 
+          <CaptionTrack stream={liveStream} active={cameraOn} />
+
           <History events={events} selectedId={selected?.id} onSelect={setSelectedId} />
         </section>
 
@@ -244,6 +248,7 @@ export default function Dashboard({ mock }: { mock: boolean }) {
             <GestureReader
               enabled={cameraOn}
               ringDeviceId={useRing ? liveDevice?.id : undefined}
+              onStream={setLiveStream}
               onGesture={(g, c) => {
                 if (active) sendGesture(g, c)
               }}

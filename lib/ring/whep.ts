@@ -9,6 +9,8 @@
 
 export interface WhepSession {
   stream: MediaStream
+  /** True when Ring actually negotiated an audio track, not merely offered one. */
+  hasAudio: boolean
   /** Closes the peer connection and tells Ring to end the live view. */
   close: () => Promise<void>
 }
@@ -23,6 +25,12 @@ export async function openWhepSession(
 
   // Receive-only: WAVE never sends media to the doorbell.
   pc.addTransceiver('video', { direction: 'recvonly' })
+
+  // And audio — which the Ring documentation says does not exist. It does:
+  // the answer negotiates OPUS/48000/2 with a=sendonly. See FL-009. This track
+  // is the raw material for the caption layer, and captioning a visitor's
+  // speech for a Deaf resident is the one thing no shipping doorbell does.
+  pc.addTransceiver('audio', { direction: 'recvonly' })
 
   const streamReady = new Promise<MediaStream>((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error('Timed out waiting for video')), timeoutMs)
@@ -56,9 +64,11 @@ export async function openWhepSession(
   await pc.setRemoteDescription({ type: 'answer', sdp: answer })
 
   const stream = await streamReady
+  const hasAudio = stream.getAudioTracks().length > 0
 
   return {
     stream,
+    hasAudio,
     close: async () => {
       pc.close()
       if (!sessionUrl) return

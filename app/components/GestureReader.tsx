@@ -24,12 +24,15 @@ export default function GestureReader({
   enabled,
   ringDeviceId,
   onGesture,
+  onStream,
 }: {
   enabled: boolean
   /** When set, frames come from this Ring camera's WHEP live view instead of
    *  the local webcam. Same landmarks, same classifier, same everything after. */
   ringDeviceId?: string
   onGesture: (g: Gesture, confidence: number) => void
+  /** Surfaces the live stream so the caption layer can read its audio track. */
+  onStream?: (s: MediaStream | null) => void
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -144,6 +147,7 @@ export default function GestureReader({
             return
           }
           video.srcObject = session.stream
+          onStream?.(session.stream)
           closeSource = session.close
         } else {
           const stream = await navigator.mediaDevices.getUserMedia({
@@ -154,6 +158,7 @@ export default function GestureReader({
             return
           }
           video.srcObject = stream
+          onStream?.(stream)
           closeSource = () => {
             for (const t of stream.getTracks()) t.stop()
           }
@@ -182,6 +187,7 @@ export default function GestureReader({
           cancelAnimationFrame(frame)
           hands.close()
           void closeSource()
+          onStream?.(null)
           video.srcObject = null
         }
       } catch (err) {

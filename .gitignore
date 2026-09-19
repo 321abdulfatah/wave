@@ -11,3 +11,5 @@ reference/
 *credentials*.csv
 *.pem
 *.key
+
+.vercel/

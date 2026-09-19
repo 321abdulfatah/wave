@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { classifyVisitor, visionAvailable } from '@/lib/agent/vision'
 import { downloadSnapshot, isMockMode } from '@/lib/ring/client'
 import { getEvent, upsertEvent } from '@/lib/store'
+import { check, record } from '@/lib/ai/budget'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,6 +31,11 @@ export async function POST(req: Request) {
     )
   }
 
+  const budget = check('vision')
+  if (!budget.allowed) {
+    return NextResponse.json({ available: false, reason: budget.message }, { status: 429 })
+  }
+
   try {
     // The snapshot endpoint answers 303 with a pre-signed URL; the bytes come
     // from a second GET. See FL-007 — a bodyless POST there returns 403, which
@@ -41,6 +47,7 @@ export async function POST(req: Request) {
     if (!img.ok) throw new Error(`Snapshot fetch failed: ${img.status}`)
 
     const result = await classifyVisitor(new Uint8Array(await img.arrayBuffer()))
+    record('vision')
 
     // Only overwrite the event's own guess when the model is more sure than the
     // trigger was. A confident "unknown" should not erase a known courier.

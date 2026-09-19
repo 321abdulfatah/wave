@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { transcriberStatus, TRANSCRIBE_SAMPLE_RATE } from '@/lib/captions/transcriber'
 import type { CaptionChunk } from '@/lib/captions/transcriber'
 import { speechStatus, transcribeOpenAICompatible, pcmToWav } from '@/lib/ai/provider'
+import { check, record } from '@/lib/ai/budget'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,6 +19,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ chunks: [], reason: status.explanation }, { status: 503 })
   }
 
+  const budget = check('speech')
+  if (!budget.allowed) {
+    // 429 rather than an error: the caption panel renders this as a cap, not a
+    // failure, so a Deaf resident is told the captions stopped and why.
+    return NextResponse.json({ chunks: [], reason: budget.message }, { status: 429 })
+  }
+
   const pcm = await req.arrayBuffer()
   if (pcm.byteLength === 0) return NextResponse.json({ chunks: [] })
 
@@ -25,6 +33,7 @@ export async function POST(req: Request) {
 
   try {
     const chunks = await transcribe(new Int16Array(pcm), seconds)
+    record('speech')
     return NextResponse.json({ chunks })
   } catch (err) {
     // A failed chunk is a gap in the captions. Say so rather than silently

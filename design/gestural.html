@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WAVE — Your door, answered without a word.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62.5..125,100..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   WAVE — GESTURAL / TYPOGRAPHIC DIRECTION
+   A doorstep gesture protocol, set as an instructional plate.
+   ============================================================ */
+
+:root{
+  /* ink + paper */
+  --ink:        #0A0A0B;
+  --ink-2:      #121215;
+  --ink-3:      #191920;
+  --rule:       #2C2C35;
+  --rule-soft:  #1F1F26;
+  --paper:      #F4F1EA;
+  --paper-2:    #CFCBC1;
+  --paper-dim:  #9C988F;
+
+  /* signal system */
+  --signal:     #D8FF3E;   /* live / alert / tracking */
+  --signal-ink: #0A0A0B;   /* type that sits on signal */
+  --visitor:    #66E3FF;   /* the hand side of the conversation */
+  --door:       #F4F1EA;   /* the voice side of the conversation */
+
+  /* glyph system defaults */
+  --mass:  var(--paper);
+  --lineC: var(--ink);
+  --jt:    var(--ink);
+
+  /* metrics */
+  --gut: clamp(16px, 4vw, 64px);
+  --maxw: 1600px;
+  --hair: 1px solid var(--rule);
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+
+html{ -webkit-text-size-adjust:100%; }
+
+body{
+  margin:0;
+  background:var(--ink);
+  color:var(--paper);
+  font-family:"Archivo","Helvetica Neue",Arial,sans-serif;
+  font-variation-settings:"wdth" 100,"wght" 400;
+  font-size:16px;
+  line-height:1.4;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Background: a faint field grid — the tracking surface. */
+body::before{
+  content:"";
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    linear-gradient(to right, var(--rule-soft) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--rule-soft) 1px, transparent 1px);
+  background-size:96px 96px;
+  opacity:.5;
+  mask-image:radial-gradient(120% 80% at 50% 0%, #000 20%, transparent 85%);
+  -webkit-mask-image:radial-gradient(120% 80% at 50% 0%, #000 20%, transparent 85%);
+}
+
+.shell{ position:relative; z-index:1; max-width:var(--maxw); margin:0 auto; }
+
+/* ---------- typography primitives ---------- */
+.mono{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.66rem;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  font-weight:500;
+}
+.dim{ color:var(--paper-dim); }
+
+h1,h2,h3,h4,p,ol,ul,dl,dd,dt,figure{ margin:0; }
+ol,ul{ list-style:none; padding:0; }
+
+.display{
+  font-variation-settings:"wdth" 125,"wght" 800;
+  line-height:.82;
+  letter-spacing:-.03em;
+  text-transform:uppercase;
+}
+
+/* ============================================================
+   GLYPH SYSTEM — hands drawn as mass + tracked skeleton
+   ============================================================ */
+.glyph{ display:block; width:100%; height:auto; }
+.glyph .g-mass{
+  fill:none;
+  stroke:var(--mass);
+  stroke-width:33;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  --palm-fill:var(--mass);
+}
+.glyph .g-line{
+  fill:none;
+  stroke:var(--lineC);
+  stroke-width:2.4;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  --palm-fill:none;
+  opacity:.9;
+}
+.glyph .g-dots{ fill:var(--jt); stroke:none; }
+.glyph .g-mark{
+  fill:none;
+  stroke:var(--mass);
+  stroke-width:9;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  opacity:.85;
+}
+
+/* wireframe mode — the same hand, read by the camera */
+.glyph--wire{ --mass:transparent; --lineC:var(--signal); --jt:var(--signal); }
+.glyph--wire .g-mass{ display:none; }
+.glyph--wire .g-line{ stroke-width:2; opacity:1; }
+.glyph--wire .g-mark{ stroke:var(--signal); stroke-width:2; opacity:.7; }
+
+/* signal mode — hand printed in the alert colour */
+.glyph--signal{ --mass:var(--signal); --lineC:var(--signal-ink); --jt:var(--signal-ink); }
+
+/* ============================================================
+   MASTHEAD
+   ============================================================ */
+.mast{ padding:0 var(--gut); }
+
+.slug{
+  display:flex; flex-wrap:wrap; gap:.6rem 1.6rem;
+  align-items:baseline;
+  padding:14px 0;
+  border-bottom:var(--hair);
+  color:var(--paper-dim);
+}
+.slug__mark{ color:var(--signal); }
+.slug__spacer{ flex:1 1 auto; }
+
+.hero{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:clamp(8px,2vw,24px);
+  padding:clamp(20px,3vw,40px) 0 0;
+}
+.hero > *{ min-width:0; }
+@media (min-width:900px){
+  .hero{ grid-template-columns:minmax(0,1fr) clamp(220px,24vw,360px); align-items:end; }
+}
+
+.wordmark{
+  font-variation-settings:"wdth" 125,"wght" 900;
+  font-size:clamp(3.9rem,21vw,17rem);
+  line-height:.74;
+  letter-spacing:-.045em;
+  text-transform:uppercase;
+  margin-left:-.035em;
+  color:var(--paper);
+}
+.wordmark em{ font-style:normal; color:var(--signal); }
+
+.tagline{
+  font-variation-settings:"wdth" 112,"wght" 600;
+  font-size:clamp(1.5rem,4.6vw,3.1rem);
+  line-height:.98;
+  letter-spacing:-.025em;
+  max-width:16ch;
+  margin-top:clamp(14px,2vw,26px);
+  text-wrap:balance;
+}
+.tagline span{ color:var(--signal); }
+
+.deck{
+  margin-top:clamp(14px,2vw,22px);
+  max-width:46ch;
+  font-size:clamp(.92rem,1.05vw,1.02rem);
+  line-height:1.5;
+  color:var(--paper-2);
+}
+.deck b{ color:var(--paper); font-variation-settings:"wdth" 100,"wght" 700; }
+
+.hero-hand{
+  justify-self:end;
+  width:clamp(170px,44vw,340px);
+  transform-origin:50% 88%;
+  animation:handwave 3.6s cubic-bezier(.45,0,.55,1) infinite;
+  margin-bottom:clamp(0px,1vw,12px);
+}
+@keyframes handwave{
+  0%,100%{ transform:rotate(-9deg); }
+  50%    { transform:rotate(9deg);  }
+}
+@media (max-width:899px){
+  .hero-hand{ justify-self:start; margin-top:8px; }
+}
+
+/* ============================================================
+   ALERT — the doorbell that makes no sound
+   ============================================================ */
+.alert{
+  position:relative;
+  overflow:hidden;
+  margin:clamp(22px,3vw,44px) var(--gut) 0;
+  background:var(--signal);
+  color:var(--signal-ink);
+  border-radius:2px;
+  display:grid;
+  grid-template-columns:1fr;
+}
+@media (min-width:860px){
+  .alert{ grid-template-columns:minmax(0,1.45fr) minmax(0,1fr); }
+}
+
+.alert__flare{
+  position:absolute; inset:-40% -60%;
+  background:linear-gradient(100deg,transparent 42%,rgba(255,255,255,.85) 50%,transparent 58%);
+  transform:translateX(-60%);
+  animation:flare 2.6s cubic-bezier(.4,0,.2,1) infinite;
+  pointer-events:none;
+  mix-blend-mode:screen;
+}
+@keyframes flare{
+  0%  { transform:translateX(-70%); }
+  60% { transform:translateX(70%); }
+  100%{ transform:translateX(70%); }
+}
+
+.alert__main{
+  position:relative;
+  padding:clamp(20px,2.6vw,36px) clamp(18px,2.4vw,36px);
+  display:flex; gap:clamp(14px,2vw,26px); align-items:flex-start;
+  min-width:0;
+}
+.alert__main > div{ min-width:0; }
+
+.beacon{ position:relative; flex:0 0 auto; width:54px; height:54px; margin-top:4px; }
+.beacon__core{
+  position:absolute; inset:38%;
+  background:var(--signal-ink); border-radius:50%;
+  animation:corepulse 1.3s steps(1,end) infinite;
+}
+@keyframes corepulse{ 0%,60%{opacity:1} 61%,100%{opacity:.25} }
+.beacon__ring{
+  position:absolute; inset:0;
+  border:2px solid var(--signal-ink);
+  border-radius:50%;
+  opacity:0;
+  animation:ripple 2.1s cubic-bezier(.2,.6,.3,1) infinite;
+}
+.beacon__ring:nth-child(2){ animation-delay:.7s; }
+.beacon__ring:nth-child(3){ animation-delay:1.4s; }
+@keyframes ripple{
+  0%  { transform:scale(.32); opacity:.95; }
+  80% { transform:scale(1);   opacity:0; }
+  100%{ transform:scale(1);   opacity:0; }
+}
+
+.alert__kicker{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.68rem; letter-spacing:.24em; text-transform:uppercase; font-weight:600;
+}
+.alert__title{
+  font-variation-settings:"wdth" 125,"wght" 900;
+  font-size:clamp(2.2rem,6.2vw,4.6rem);
+  line-height:.84; letter-spacing:-.04em; text-transform:uppercase;
+  margin:.12em 0 .16em;
+}
+.alert__sub{
+  font-variation-settings:"wdth" 108,"wght" 650;
+  font-size:clamp(1rem,1.9vw,1.4rem);
+  line-height:1.1; letter-spacing:-.015em;
+}
+
+.alert__data{
+  position:relative;
+  border-top:1.5px solid rgba(10,10,11,.28);
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+@media (min-width:860px){
+  .alert__data{ border-top:0; border-left:1.5px solid rgba(10,10,11,.28); align-content:center; }
+}
+.datum{
+  padding:clamp(12px,1.6vw,20px) clamp(14px,1.8vw,24px);
+  border-bottom:1.5px solid rgba(10,10,11,.18);
+  border-right:1.5px solid rgba(10,10,11,.18);
+}
+.datum:nth-child(2n){ border-right:0; }
+.datum:nth-last-child(-n+2){ border-bottom:0; }
+.datum dt{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.6rem; letter-spacing:.2em; text-transform:uppercase;
+  opacity:.72; margin-bottom:.45em;
+}
+.datum dd{
+  font-variation-settings:"wdth" 108,"wght" 750;
+  font-size:clamp(1rem,1.7vw,1.32rem);
+  line-height:1.05; letter-spacing:-.02em;
+}
+.datum dd small{
+  display:block;
+  font-variation-settings:"wdth" 100,"wght" 500;
+  font-size:.74rem; letter-spacing:0; opacity:.7; margin-top:.3em;
+}
+
+/* confidence bar */
+.bar{
+  display:block; height:7px; margin-top:.6em;
+  background:rgba(10,10,11,.2);
+}
+.bar i{
+  display:block; height:100%;
+  width:var(--pct);
+  background:var(--signal-ink);
+  animation:grow .9s cubic-bezier(.2,.7,.2,1) both;
+}
+@keyframes grow{ from{ width:0 } }
+.bar--dark{ background:var(--rule); }
+.bar--dark i{ background:var(--visitor); }
+
+/* ============================================================
+   MAIN GRID — camera + transcript
+   ============================================================ */
+.main{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:0;
+  margin-top:clamp(28px,4vw,56px);
+  border-top:var(--hair);
+}
+@media (min-width:1020px){
+  .main{ grid-template-columns:minmax(0,5fr) minmax(0,7fr); }
+}
+
+.panel{ padding:clamp(20px,2.6vw,38px) var(--gut); min-width:0; }
+@media (min-width:1020px){
+  .panel--cam{ border-right:var(--hair); }
+}
+@media (max-width:1019px){
+  .panel--cam{ border-bottom:var(--hair); }
+}
+
+.panel__head{
+  display:flex; align-items:baseline; gap:1rem; flex-wrap:wrap;
+  padding-bottom:12px; margin-bottom:clamp(14px,2vw,22px);
+  border-bottom:var(--hair);
+}
+.panel__title{
+  font-variation-settings:"wdth" 118,"wght" 800;
+  font-size:clamp(1.15rem,2vw,1.6rem);
+  letter-spacing:-.02em; text-transform:uppercase; line-height:1;
+}
+.panel__head .mono{ margin-left:auto; }
+
+.live{
+  display:inline-flex; align-items:center; gap:.45em;
+  color:var(--signal);
+}
+.live::before{
+  content:""; width:8px; height:8px; background:var(--signal); border-radius:50%;
+  animation:corepulse 1.3s steps(1,end) infinite;
+}
+
+/* ---------- camera ---------- */
+.cam{
+  position:relative;
+  aspect-ratio:4/3;
+  background:
+    radial-gradient(120% 110% at 62% 34%, #1c1c23 0%, #0d0d11 62%, #08080a 100%);
+  border:1px solid var(--rule);
+  overflow:hidden;
+}
+.cam__svg{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+.cam__scan{
+  position:absolute; left:0; right:0; height:32%;
+  background:linear-gradient(to bottom, transparent, rgba(216,255,62,.10) 65%, rgba(216,255,62,.22));
+  border-bottom:1px solid rgba(216,255,62,.5);
+  animation:scan 4.2s linear infinite;
+  pointer-events:none;
+}
+@keyframes scan{
+  0%  { transform:translateY(-110%); }
+  100%{ transform:translateY(330%); }
+}
+.cam__tag{
+  position:absolute; left:10px; bottom:10px; right:10px;
+  display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+  color:var(--paper-dim);
+}
+.cam__tag b{ color:var(--signal); font-weight:600; }
+.cam__ph{
+  position:absolute; left:12px; top:36%;
+  max-width:36%;
+  color:var(--paper-2);
+  font-variation-settings:"wdth" 100,"wght" 600;
+  font-size:.76rem; line-height:1.3; letter-spacing:.01em;
+}
+.cam__ph span{ display:block; color:var(--paper-dim); font-weight:400; margin-top:.35em; }
+
+.camfoot{
+  display:grid; grid-template-columns:repeat(3,1fr);
+  border:1px solid var(--rule); border-top:0;
+}
+.camfoot div{ padding:10px 12px; border-right:1px solid var(--rule); }
+.camfoot div:last-child{ border-right:0; }
+.camfoot b{ display:block; color:var(--paper); font-variation-settings:"wdth" 108,"wght" 750;
+  font-size:1rem; letter-spacing:-.01em; margin-top:.3em; font-family:"Archivo",sans-serif; }
+
+/* ---------- transcript ---------- */
+.turns{ display:flex; flex-direction:column; }
+
+.turn{
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr);
+  gap:clamp(10px,1.4vw,18px);
+  padding:clamp(16px,2vw,24px) 0;
+  border-bottom:1px dashed var(--rule-soft);
+}
+.turn:last-child{ border-bottom:0; }
+
+.turn__rail{
+  position:relative;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.68rem; letter-spacing:.08em; font-weight:600;
+  color:var(--paper-dim);
+  text-align:right;
+}
+.turn__rail::after{
+  content:""; position:absolute; right:-1px; top:1.9em; bottom:-2.6em;
+  border-right:1px solid var(--rule);
+}
+.turn:last-child .turn__rail::after{ display:none; }
+
+.turn__who{
+  display:flex; align-items:center; gap:.7em; flex-wrap:wrap;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.63rem; letter-spacing:.2em; text-transform:uppercase; font-weight:600;
+  margin-bottom:.7em;
+}
+.turn__who i{ font-style:normal; color:var(--paper-dim); letter-spacing:.12em; font-weight:400; }
+
+.turn--door .turn__who{ color:var(--door); }
+.turn--visitor .turn__who{ color:var(--visitor); }
+
+.say{
+  font-variation-settings:"wdth" 106,"wght" 600;
+  font-size:clamp(1.12rem,1.85vw,1.62rem);
+  line-height:1.22; letter-spacing:-.022em;
+  text-wrap:pretty;
+}
+.turn--door .say{ color:var(--paper); }
+
+/* visitor turn = glyph plate + reading */
+.turn--visitor .turn__body{
+  display:grid;
+  grid-template-columns:clamp(74px,12vw,116px) minmax(0,1fr);
+  gap:clamp(12px,1.6vw,22px);
+  align-items:start;
+  background:var(--ink-2);
+  border:1px solid var(--rule);
+  border-left:3px solid var(--visitor);
+  padding:clamp(14px,1.8vw,20px);
+}
+.turn--visitor .turn__who{ margin-bottom:.55em; }
+
+.gname{
+  font-variation-settings:"wdth" 125,"wght" 850;
+  font-size:clamp(1.3rem,3vw,2.2rem);
+  line-height:.9; letter-spacing:-.035em; text-transform:uppercase;
+  color:var(--visitor);
+}
+.turn--visitor .say{
+  color:var(--paper);
+  margin-top:.42em;
+  font-size:clamp(1rem,1.5vw,1.28rem);
+}
+.gconf{
+  margin-top:.85em;
+  display:flex; align-items:center; gap:.7em;
+}
+.gconf .num{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.78rem; font-weight:600; letter-spacing:.06em; color:var(--visitor);
+}
+.gconf .bar{ flex:1 1 auto; margin-top:0; max-width:220px; }
+
+.chime{
+  display:inline-flex; align-items:center; gap:.4em;
+  color:var(--signal);
+}
+.chime svg{ width:13px; height:13px; display:block; }
+
+.transcript-note{
+  margin-top:clamp(16px,2vw,24px);
+  padding-top:14px;
+  border-top:var(--hair);
+  color:var(--paper-dim);
+  max-width:62ch;
+  font-size:.86rem; line-height:1.5;
+  font-family:"Archivo",sans-serif; letter-spacing:0; text-transform:none;
+}
+
+/* ============================================================
+   GESTURE KEY — the plate worth pinning
+   ============================================================ */
+.key{
+  border-top:var(--hair);
+  padding:clamp(28px,4vw,64px) var(--gut) clamp(26px,3vw,48px);
+  background:var(--ink-2);
+}
+.key__head{
+  display:grid; gap:clamp(12px,2vw,28px);
+  grid-template-columns:1fr;
+  align-items:end;
+  margin-bottom:clamp(20px,3vw,40px);
+}
+@media (min-width:860px){ .key__head{ grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); } }
+.key__title{
+  font-variation-settings:"wdth" 125,"wght" 900;
+  font-size:clamp(2.1rem,6.6vw,5.2rem);
+  line-height:.8; letter-spacing:-.045em; text-transform:uppercase;
+  margin-left:-.03em;
+}
+.key__title span{ display:block; color:var(--signal); }
+.key__blurb{ color:var(--paper-2); max-width:48ch; font-size:clamp(.9rem,1.05vw,1rem); line-height:1.5; }
+
+.key__grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:1px;
+  background:var(--rule);
+  border:1px solid var(--rule);
+}
+@media (min-width:640px){ .key__grid{ grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media (min-width:1100px){ .key__grid{ grid-template-columns:repeat(5,minmax(0,1fr)); } }
+
+.keycard{
+  position:relative;
+  background:var(--ink);
+  padding:clamp(14px,1.6vw,22px) clamp(12px,1.4vw,20px) clamp(16px,1.8vw,24px);
+  display:flex; flex-direction:column;
+  min-width:0;
+}
+.keycard__no{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.64rem; letter-spacing:.18em; font-weight:600;
+  color:var(--signal);
+}
+.keycard__art{
+  margin:clamp(8px,1.2vw,14px) 0 clamp(12px,1.4vw,18px);
+  padding:0 4%;
+}
+.keycard__name{
+  font-variation-settings:"wdth" 118,"wght" 850;
+  font-size:clamp(1rem,1.55vw,1.45rem);
+  line-height:.94; letter-spacing:-.03em; text-transform:uppercase;
+  color:var(--paper);
+}
+.keycard__mean{
+  margin-top:.5em;
+  display:inline-block;
+  align-self:flex-start;
+  background:var(--signal); color:var(--signal-ink);
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.62rem; letter-spacing:.18em; font-weight:600; text-transform:uppercase;
+  padding:.36em .6em .3em;
+}
+.keycard__note{
+  margin-top:.75em;
+  color:var(--paper-dim);
+  font-size:.78rem; line-height:1.4;
+}
+.key__foot{
+  margin-top:clamp(14px,2vw,22px);
+  display:flex; flex-wrap:wrap; gap:.6rem 1.6rem;
+  color:var(--paper-dim);
+}
+.key__foot .rule{ flex:1 1 60px; border-bottom:var(--hair); align-self:center; height:1px; }
+
+/* ============================================================
+   RECENT
+   ============================================================ */
+.recent{ border-top:var(--hair); padding:clamp(24px,3vw,48px) var(--gut) clamp(28px,3vw,52px); }
+.recent__head{
+  display:flex; justify-content:space-between; align-items:baseline; gap:1rem; flex-wrap:wrap;
+  margin-bottom:clamp(14px,2vw,22px);
+}
+.recent__title{
+  font-variation-settings:"wdth" 118,"wght" 800;
+  font-size:clamp(1.15rem,2vw,1.6rem);
+  letter-spacing:-.02em; text-transform:uppercase; line-height:1;
+}
+.rlist{ border-top:var(--hair); }
+.rrow{
+  display:grid;
+  grid-template-columns:44px minmax(0,1fr);
+  gap:clamp(12px,1.6vw,22px);
+  align-items:center;
+  padding:clamp(14px,1.6vw,20px) 0;
+  border-bottom:var(--hair);
+}
+@media (min-width:760px){
+  .rrow{ grid-template-columns:52px minmax(0,1.2fr) minmax(0,1.6fr) minmax(0,.8fr); }
+}
+.rrow__art{ width:44px; }
+@media (min-width:760px){ .rrow__art{ width:52px; } }
+.rrow__art .glyph{ --mass:var(--paper-2); }
+.rrow__none{
+  width:44px; height:44px; border:1px dashed var(--rule);
+  display:grid; place-items:center; color:var(--rule);
+}
+.rrow__none span{ width:14px; height:1px; background:var(--paper-dim); display:block; }
+.rrow__what{
+  font-variation-settings:"wdth" 108,"wght" 700;
+  font-size:clamp(1rem,1.4vw,1.2rem); letter-spacing:-.02em; line-height:1.12;
+}
+.rrow__what small{
+  display:block; margin-top:.35em;
+  font-variation-settings:"wdth" 100,"wght" 400;
+  font-size:.82rem; color:var(--paper-dim); letter-spacing:0;
+}
+.tagpill{
+  display:inline-block;
+  border:1px solid var(--rule);
+  color:var(--paper-2);
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.6rem; letter-spacing:.16em; text-transform:uppercase; font-weight:500;
+  padding:.4em .6em .34em;
+}
+.tagpill--ok{ border-color:var(--signal); color:var(--signal); }
+.tagpill--no{ border-color:#FF7A5C; color:#FF9B84; }
+@media (max-width:759px){
+  .rrow__meta{ grid-column:2; }
+  .rrow__tag{ grid-column:2; }
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.foot{
+  border-top:var(--hair);
+  padding:clamp(22px,3vw,40px) var(--gut) clamp(40px,5vw,72px);
+  display:grid; gap:clamp(14px,2vw,28px);
+  grid-template-columns:1fr;
+  align-items:end;
+}
+@media (min-width:860px){ .foot{ grid-template-columns:minmax(0,1fr) minmax(0,1fr); } }
+.foot__mark{
+  font-variation-settings:"wdth" 125,"wght" 900;
+  font-size:clamp(3rem,11vw,8rem);
+  line-height:.78; letter-spacing:-.05em; text-transform:uppercase;
+  color:var(--ink-3);
+  margin-left:-.035em;
+}
+.foot__txt{ color:var(--paper-dim); max-width:52ch; font-size:.86rem; line-height:1.55; }
+.foot__txt b{ color:var(--paper-2); font-variation-settings:"wdth" 100,"wght" 700; }
+
+/* ============================================================
+   REDUCED MOTION — every animation collapses to a still,
+   still-legible state. Nothing here depends on movement.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    animation-delay:0ms !important;
+    transition-duration:.001ms !important;
+  }
+  .alert__flare{ display:none; }
+  .cam__scan{
+    animation:none;
+    top:0; height:100%;
+    background:linear-gradient(to bottom, rgba(216,255,62,.05), rgba(216,255,62,.11));
+    border-bottom:0;
+  }
+  .beacon__ring{ opacity:1; transform:scale(1); }
+  .beacon__ring:nth-child(2){ transform:scale(.7); opacity:.6; }
+  .beacon__ring:nth-child(3){ transform:scale(.45); opacity:.35; }
+  .beacon__core{ opacity:1; }
+  .live::before{ opacity:1; }
+  .hero-hand{ transform:rotate(-8deg); }
+  .bar i{ width:var(--pct); }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     GLYPH DEFINITIONS
+     Each hand is authored as the 21 MediaPipe hand landmarks
+     (0 wrist · 1-4 thumb · 5-8 index · 9-12 middle · 13-16 ring
+     · 17-20 pinky) joined by the standard connection topology.
+     The same path data is drawn twice: once as thick round-capped
+     mass (the hand), once as a hairline (the tracked skeleton).
+     ============================================================ -->
+<svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+  <defs>
+
+    <!-- ---------- OPEN PALM · wait ---------- -->
+    <g id="hand-palm">
+      <path fill="var(--palm-fill,none)" d="M120 216 L88 198 L94 134 L118 128 L142 132 L164 144 Z"/>
+      <path fill="none" d="M120 216 L88 198 L64 176 L48 154 L36 134"/>
+      <path fill="none" d="M120 216 L94 134 L88 102 L85 80 L83 60"/>
+      <path fill="none" d="M94 134 L118 128 L116 94 L115 70 L114 48"/>
+      <path fill="none" d="M118 128 L142 132 L146 100 L148 78 L150 58"/>
+      <path fill="none" d="M142 132 L164 144 L172 118 L177 100 L181 82"/>
+      <path fill="none" d="M120 216 L164 144"/>
+    </g>
+    <g id="jt-palm">
+      <circle cx="120" cy="216" r="5.2"/>
+      <circle cx="88" cy="198" r="3.4"/><circle cx="64" cy="176" r="3.4"/><circle cx="48" cy="154" r="3.4"/><circle cx="36" cy="134" r="5.2"/>
+      <circle cx="94" cy="134" r="3.4"/><circle cx="88" cy="102" r="3.4"/><circle cx="85" cy="80" r="3.4"/><circle cx="83" cy="60" r="5.2"/>
+      <circle cx="118" cy="128" r="3.4"/><circle cx="116" cy="94" r="3.4"/><circle cx="115" cy="70" r="3.4"/><circle cx="114" cy="48" r="5.2"/>
+      <circle cx="142" cy="132" r="3.4"/><circle cx="146" cy="100" r="3.4"/><circle cx="148" cy="78" r="3.4"/><circle cx="150" cy="58" r="5.2"/>
+      <circle cx="164" cy="144" r="3.4"/><circle cx="172" cy="118" r="3.4"/><circle cx="177" cy="100" r="3.4"/><circle cx="181" cy="82" r="5.2"/>
+    </g>
+
+    <!-- ---------- WAVE · hello, I am a person ---------- -->
+    <g id="hand-wave">
+      <g transform="rotate(-10 120 210)">
+        <path fill="var(--palm-fill,none)" d="M120 218 L86 198 L94 136 L118 128 L142 132 L164 146 Z"/>
+        <path fill="none" d="M120 218 L86 198 L58 178 L38 160 L24 146"/>
+        <path fill="none" d="M120 218 L94 136 L82 104 L74 82 L68 62"/>
+        <path fill="none" d="M94 136 L118 128 L114 92 L112 68 L110 46"/>
+        <path fill="none" d="M118 128 L142 132 L150 98 L155 76 L159 56"/>
+        <path fill="none" d="M142 132 L164 146 L180 120 L189 102 L196 86"/>
+        <path fill="none" d="M120 218 L164 146"/>
+      </g>
+    </g>
+    <g id="jt-wave">
+      <g transform="rotate(-10 120 210)">
+        <circle cx="120" cy="218" r="5.2"/>
+        <circle cx="86" cy="198" r="3.4"/><circle cx="58" cy="178" r="3.4"/><circle cx="38" cy="160" r="3.4"/><circle cx="24" cy="146" r="5.2"/>
+        <circle cx="94" cy="136" r="3.4"/><circle cx="82" cy="104" r="3.4"/><circle cx="74" cy="82" r="3.4"/><circle cx="68" cy="62" r="5.2"/>
+        <circle cx="118" cy="128" r="3.4"/><circle cx="114" cy="92" r="3.4"/><circle cx="112" cy="68" r="3.4"/><circle cx="110" cy="46" r="5.2"/>
+        <circle cx="142" cy="132" r="3.4"/><circle cx="150" cy="98" r="3.4"/><circle cx="155" cy="76" r="3.4"/><circle cx="159" cy="56" r="5.2"/>
+        <circle cx="164" cy="146" r="3.4"/><circle cx="180" cy="120" r="3.4"/><circle cx="189" cy="102" r="3.4"/><circle cx="196" cy="86" r="5.2"/>
+      </g>
+    </g>
+    <g id="mark-wave">
+      <path d="M196 62 C 212 82, 213 108, 200 130"/>
+      <path d="M214 44 C 236 74, 237 116, 218 148"/>
+    </g>
+
+    <!-- ---------- THUMBS UP · yes ---------- -->
+    <g id="hand-thumbsup">
+      <path fill="var(--palm-fill,none)" d="M134 228 L104 200 L126 150 L130 172 L134 194 L138 212 Z"/>
+      <path fill="none" d="M134 228 L104 200 L90 160 L86 120 L82 78"/>
+      <path fill="none" d="M134 228 L126 150 L154 142 L162 158 L144 166"/>
+      <path fill="none" d="M126 150 L130 172 L160 166 L166 182 L146 188"/>
+      <path fill="none" d="M130 172 L134 194 L160 190 L164 204 L146 208"/>
+      <path fill="none" d="M134 194 L138 212 L160 210 L162 222 L146 224"/>
+      <path fill="none" d="M134 228 L138 212"/>
+    </g>
+    <g id="jt-thumbsup">
+      <circle cx="134" cy="228" r="5.2"/>
+      <circle cx="104" cy="200" r="3.4"/><circle cx="90" cy="160" r="3.4"/><circle cx="86" cy="120" r="3.4"/><circle cx="82" cy="78" r="6"/>
+      <circle cx="126" cy="150" r="3.4"/><circle cx="154" cy="142" r="3.4"/><circle cx="162" cy="158" r="3.4"/><circle cx="144" cy="166" r="4.6"/>
+      <circle cx="130" cy="172" r="3.4"/><circle cx="160" cy="166" r="3.4"/><circle cx="166" cy="182" r="3.4"/><circle cx="146" cy="188" r="4.6"/>
+      <circle cx="134" cy="194" r="3.4"/><circle cx="160" cy="190" r="3.4"/><circle cx="164" cy="204" r="3.4"/><circle cx="146" cy="208" r="4.6"/>
+      <circle cx="138" cy="212" r="3.4"/><circle cx="160" cy="210" r="3.4"/><circle cx="162" cy="222" r="3.4"/><circle cx="146" cy="224" r="4.6"/>
+    </g>
+
+    <!-- ---------- POINT DOWN · leaving it here ---------- -->
+    <g id="hand-pointdown">
+      <path fill="var(--palm-fill,none)" d="M118 28 L90 54 L100 96 L124 92 L146 96 L164 106 Z"/>
+      <path fill="none" d="M118 28 L90 54 L78 80 L80 104 L94 118"/>
+      <path fill="none" d="M118 28 L100 96 L104 136 L106 166 L108 196"/>
+      <path fill="none" d="M100 96 L124 92 L130 122 L118 134 L110 120"/>
+      <path fill="none" d="M124 92 L146 96 L154 124 L142 136 L134 124"/>
+      <path fill="none" d="M146 96 L164 106 L174 132 L163 142 L155 130"/>
+      <path fill="none" d="M118 28 L164 106"/>
+    </g>
+    <g id="jt-pointdown">
+      <circle cx="118" cy="28" r="5.2"/>
+      <circle cx="90" cy="54" r="3.4"/><circle cx="78" cy="80" r="3.4"/><circle cx="80" cy="104" r="3.4"/><circle cx="94" cy="118" r="4.6"/>
+      <circle cx="100" cy="96" r="3.4"/><circle cx="104" cy="136" r="3.4"/><circle cx="106" cy="166" r="3.4"/><circle cx="108" cy="196" r="6"/>
+      <circle cx="124" cy="92" r="3.4"/><circle cx="130" cy="122" r="3.4"/><circle cx="118" cy="134" r="3.4"/><circle cx="110" cy="120" r="4.6"/>
+      <circle cx="146" cy="96" r="3.4"/><circle cx="154" cy="124" r="3.4"/><circle cx="142" cy="136" r="3.4"/><circle cx="134" cy="124" r="4.6"/>
+      <circle cx="164" cy="106" r="3.4"/><circle cx="174" cy="132" r="3.4"/><circle cx="163" cy="142" r="3.4"/><circle cx="155" cy="130" r="4.6"/>
+    </g>
+    <g id="mark-down">
+      <path d="M108 212 L108 224"/>
+      <path d="M90 232 L108 250 L126 232"/>
+    </g>
+
+    <!-- ---------- CLOSED FIST · no ---------- -->
+    <g id="hand-fist">
+      <path fill="var(--palm-fill,none)" d="M114 222 L86 194 L98 136 L124 130 L148 134 L168 146 Z"/>
+      <path fill="none" d="M114 222 L86 194 L80 164 L100 150 L126 148"/>
+      <path fill="none" d="M114 222 L98 136 L94 110 L106 100 L116 112"/>
+      <path fill="none" d="M98 136 L124 130 L122 102 L136 94 L142 110"/>
+      <path fill="none" d="M124 130 L148 134 L150 106 L164 102 L166 118"/>
+      <path fill="none" d="M148 134 L168 146 L172 120 L184 120 L182 134"/>
+      <path fill="none" d="M114 222 L168 146"/>
+    </g>
+    <g id="jt-fist">
+      <circle cx="114" cy="222" r="5.2"/>
+      <circle cx="86" cy="194" r="3.4"/><circle cx="80" cy="164" r="3.4"/><circle cx="100" cy="150" r="3.4"/><circle cx="126" cy="148" r="5.2"/>
+      <circle cx="98" cy="136" r="3.4"/><circle cx="94" cy="110" r="3.4"/><circle cx="106" cy="100" r="3.4"/><circle cx="116" cy="112" r="4.6"/>
+      <circle cx="124" cy="130" r="3.4"/><circle cx="122" cy="102" r="3.4"/><circle cx="136" cy="94" r="3.4"/><circle cx="142" cy="110" r="4.6"/>
+      <circle cx="148" cy="134" r="3.4"/><circle cx="150" cy="106" r="3.4"/><circle cx="164" cy="102" r="3.4"/><circle cx="166" cy="118" r="4.6"/>
+      <circle cx="168" cy="146" r="3.4"/><circle cx="172" cy="120" r="3.4"/><circle cx="184" cy="120" r="3.4"/><circle cx="182" cy="134" r="4.6"/>
+    </g>
+
+  </defs>
+</svg>
+
+
+<div class="shell">
+
+  <!-- =========================== MASTHEAD =========================== -->
+  <header class="mast">
+    <div class="slug mono">
+      <span class="slug__mark">WAVE</span>
+      <span>Doorstep gesture protocol</span>
+      <span class="slug__spacer"></span>
+      <span>Ring doorbell &middot; Alexa+ chime</span>
+      <span>Plate 01 / 01</span>
+    </div>
+
+    <div class="hero">
+      <div>
+        <h1 class="wordmark">WA<em>V</em>E</h1>
+        <p class="tagline">Your door, answered <span>without a word.</span></p>
+        <p class="deck">
+          Ring's API carries no inbound audio. So WAVE inverts the doorstep:
+          the door <b>speaks</b> to the visitor through the chime, and the visitor
+          <b>answers with their hands</b>, read by the camera. The resident reads a
+          transcript of a conversation they never heard.
+        </p>
+      </div>
+
+      <div class="hero-hand">
+        <svg class="glyph" viewBox="-16 -16 272 272" role="img" aria-label="A drawn open hand waving hello, with its 21 tracking landmarks marked">
+          <use class="g-mark" href="#mark-wave"/>
+          <use class="g-mass" href="#hand-wave"/>
+          <use class="g-line" href="#hand-wave"/>
+          <use class="g-dots" href="#jt-wave"/>
+        </svg>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================== ALERT =========================== -->
+  <section class="alert" aria-labelledby="alert-title">
+    <div class="alert__flare" aria-hidden="true"></div>
+
+    <div class="alert__main">
+      <div class="beacon" aria-hidden="true">
+        <span class="beacon__ring"></span>
+        <span class="beacon__ring"></span>
+        <span class="beacon__ring"></span>
+        <span class="beacon__core"></span>
+      </div>
+      <div>
+        <p class="alert__kicker">Someone is at the door</p>
+        <h2 class="alert__title" id="alert-title">Front Door</h2>
+        <p class="alert__sub">Pharmacy courier &mdash; at the door now, 2 minutes.</p>
+      </div>
+    </div>
+
+    <dl class="alert__data">
+      <div class="datum"><dt>Device</dt><dd>Front Door<small>Ring video doorbell</small></dd></div>
+      <div class="datum"><dt>Visitor</dt><dd>Pharmacy courier<small>Identified from uniform + parcel</small></dd></div>
+      <div class="datum">
+        <dt>Confidence</dt>
+        <dd>94%<span class="bar" style="--pct:94%" role="img" aria-label="94 percent confidence"><i></i></span></dd>
+      </div>
+      <div class="datum"><dt>Status</dt><dd>At the door now<small>Started 2 minutes ago</small></dd></div>
+    </dl>
+  </section>
+
+  <!-- =========================== MAIN =========================== -->
+  <div class="main">
+
+    <!-- ---------- CAMERA ---------- -->
+    <section class="panel panel--cam" aria-labelledby="cam-title">
+      <div class="panel__head">
+        <h2 class="panel__title" id="cam-title">Doorstep</h2>
+        <span class="mono live">Live</span>
+        <span class="mono dim">CAM 01</span>
+      </div>
+
+      <div class="cam">
+        <div class="cam__scan" aria-hidden="true"></div>
+
+        <svg class="cam__svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet" role="img"
+             aria-label="Placeholder for the live Ring camera view, with the visitor's hand drawn as a 21-point tracking skeleton">
+          <!-- field grid -->
+          <g stroke="#23232B" stroke-width="1">
+            <path d="M40 0V300M80 0V300M120 0V300M160 0V300M200 0V300M240 0V300M280 0V300M320 0V300M360 0V300"/>
+            <path d="M0 30H400M0 60H400M0 90H400M0 120H400M0 150H400M0 180H400M0 210H400M0 240H400M0 270H400"/>
+          </g>
+
+          <!-- frame brackets -->
+          <g stroke="#D8FF3E" stroke-width="2" fill="none" stroke-linecap="square">
+            <path d="M10 28V10H28"/><path d="M372 10H390V28"/>
+            <path d="M390 272V290H372"/><path d="M28 290H10V272"/>
+          </g>
+
+          <!-- tracked hand -->
+          <g transform="translate(160 44) scale(0.70)">
+            <svg class="glyph glyph--wire" x="0" y="0" width="240" height="240" viewBox="-16 -16 272 272" overflow="visible">
+              <use class="g-line" href="#hand-pointdown"/>
+              <use class="g-dots" href="#jt-pointdown"/>
+              <use class="g-mark" href="#mark-down"/>
+            </svg>
+          </g>
+
+          <!-- bounding box + read-out -->
+          <g fill="none" stroke="#D8FF3E" stroke-width="1" stroke-dasharray="5 4" opacity=".75">
+            <rect x="176" y="60" width="122" height="158"/>
+          </g>
+          <rect x="176" y="44" width="118" height="16" fill="#D8FF3E"/>
+          <text x="182" y="56" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600"
+                letter-spacing="1.1" fill="#0A0A0B">HAND 01 · 0.87</text>
+
+          <!-- landmark call-outs -->
+          <g font-family="IBM Plex Mono, monospace" font-size="9" font-weight="500" fill="#D8FF3E" opacity=".9">
+            <text x="312" y="76">00 WRIST</text>
+            <text x="308" y="180">08 TIP</text>
+          </g>
+          <g stroke="#D8FF3E" stroke-width="1" opacity=".55">
+            <path d="M308 73 L248 71"/>
+            <path d="M304 177 L240 175"/>
+          </g>
+        </svg>
+
+        <p class="cam__ph">Live Ring view renders here.
+          <span>Hand-tracking overlay composited client-side, 21 points per frame.</span></p>
+
+        <div class="cam__tag mono">
+          <span>21 landmarks &middot; 30 fps</span>
+          <span><b>No inbound audio</b></span>
+        </div>
+      </div>
+
+      <div class="camfoot mono dim">
+        <div>Gesture<b style="color:var(--signal)">Point down</b></div>
+        <div>Read at<b>87%</b></div>
+        <div>Latency<b>240 ms</b></div>
+      </div>
+    </section>
+
+    <!-- ---------- TRANSCRIPT ---------- -->
+    <section class="panel" aria-labelledby="tr-title">
+      <div class="panel__head">
+        <h2 class="panel__title" id="tr-title">The doorstep conversation</h2>
+        <span class="mono dim">5 turns &middot; 00:02:04</span>
+      </div>
+
+      <ol class="turns">
+
+        <li class="turn turn--door">
+          <div class="turn__rail" aria-hidden="true">01</div>
+          <div class="turn__body">
+            <p class="turn__who">
+              Door
+              <span class="chime" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+                  <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke-linejoin="round"/>
+                  <path d="M17.5 8.5a5 5 0 0 1 0 7"/><path d="M20.5 5.5a9 9 0 0 1 0 13"/>
+                </svg>
+              </span>
+              <i>spoken aloud through the chime</i>
+            </p>
+            <p class="say">&ldquo;Hello. The resident here is Deaf and cannot come to the door. I can help &mdash; are you delivering something?&rdquo;</p>
+          </div>
+        </li>
+
+        <li class="turn turn--visitor">
+          <div class="turn__rail" aria-hidden="true">02</div>
+          <div class="turn__body">
+            <div class="keycard__art" style="padding:0">
+              <svg class="glyph" viewBox="-16 -16 272 272" role="img" aria-label="Thumbs up gesture">
+                <use class="g-mass" href="#hand-thumbsup"/>
+                <use class="g-line" href="#hand-thumbsup"/>
+                <use class="g-dots" href="#jt-thumbsup"/>
+              </svg>
+            </div>
+            <div>
+              <p class="turn__who">Visitor <i>read from camera</i></p>
+              <p class="gname">Thumbs up</p>
+              <p class="say">&ldquo;Yes, go ahead&rdquo;</p>
+              <p class="gconf">
+                <span class="num">93%</span>
+                <span class="bar bar--dark" style="--pct:93%" role="img" aria-label="93 percent confidence"><i></i></span>
+              </p>
+            </div>
+          </div>
+        </li>
+
+        <li class="turn turn--door">
+          <div class="turn__rail" aria-hidden="true">03</div>
+          <div class="turn__body">
+            <p class="turn__who">
+              Door
+              <span class="chime" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+                  <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke-linejoin="round"/>
+                  <path d="M17.5 8.5a5 5 0 0 1 0 7"/><path d="M20.5 5.5a9 9 0 0 1 0 13"/>
+                </svg>
+              </span>
+              <i>spoken aloud through the chime</i>
+            </p>
+            <p class="say">&ldquo;Thank you. Please leave it inside the porch, out of the rain, and point down once it is placed.&rdquo;</p>
+          </div>
+        </li>
+
+        <li class="turn turn--visitor">
+          <div class="turn__rail" aria-hidden="true">04</div>
+          <div class="turn__body">
+            <div class="keycard__art" style="padding:0">
+              <svg class="glyph" viewBox="-16 -16 272 272" role="img" aria-label="Pointing down gesture">
+                <use class="g-mark" href="#mark-down"/>
+                <use class="g-mass" href="#hand-pointdown"/>
+                <use class="g-line" href="#hand-pointdown"/>
+                <use class="g-dots" href="#jt-pointdown"/>
+              </svg>
+            </div>
+            <div>
+              <p class="turn__who">Visitor <i>read from camera</i></p>
+              <p class="gname">Point down</p>
+              <p class="say">&ldquo;Leaving it here&rdquo;</p>
+              <p class="gconf">
+                <span class="num">87%</span>
+                <span class="bar bar--dark" style="--pct:87%" role="img" aria-label="87 percent confidence"><i></i></span>
+              </p>
+            </div>
+          </div>
+        </li>
+
+        <li class="turn turn--door">
+          <div class="turn__rail" aria-hidden="true">05</div>
+          <div class="turn__body">
+            <p class="turn__who">
+              Door
+              <span class="chime" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+                  <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke-linejoin="round"/>
+                  <path d="M17.5 8.5a5 5 0 0 1 0 7"/><path d="M20.5 5.5a9 9 0 0 1 0 13"/>
+                </svg>
+              </span>
+              <i>spoken aloud through the chime</i>
+            </p>
+            <p class="say">&ldquo;Got it, I have a photo. Have a good day.&rdquo;</p>
+          </div>
+        </li>
+
+      </ol>
+
+      <p class="transcript-note">
+        You were never asked to listen, speak, or hurry to the door. The exchange is
+        finished by the time you open this &mdash; the photo is attached, and nothing needs
+        a reply.
+      </p>
+    </section>
+  </div>
+
+  <!-- =========================== GESTURE KEY =========================== -->
+  <section class="key" aria-labelledby="key-title">
+    <div class="key__head">
+      <h2 class="key__title" id="key-title">The five<span>hand shapes</span></h2>
+      <p class="key__blurb">
+        A visitor has to guess the vocabulary in under a second, in the rain, holding a
+        box. So there are five shapes, they are large, and they are already what people
+        do at doors. Print this plate and pin it beside the bell.
+      </p>
+    </div>
+
+    <ol class="key__grid">
+
+      <li class="keycard">
+        <span class="keycard__no">01</span>
+        <div class="keycard__art">
+          <svg class="glyph" viewBox="-16 -16 272 272" role="img" aria-label="Line drawing of a thumbs up">
+            <use class="g-mass" href="#hand-thumbsup"/>
+            <use class="g-line" href="#hand-thumbsup"/>
+            <use class="g-dots" href="#jt-thumbsup"/>
+          </svg>
+        </div>
+        <h3 class="keycard__name">Thumbs up</h3>
+        <span class="keycard__mean">Yes</span>
+        <p class="keycard__note">Agrees with whatever the door just asked. The workhorse of the set.</p>
+      </li>
+
+      <li class="keycard">
+        <span class="keycard__no">02</span>
+        <div class="keycard__art">
+          <svg class="glyph" viewBox="-16 -16 272 272" role="img" aria-label="Line drawing of a flat open palm held up">
+            <use class="g-mass" href="#hand-palm"/>
+            <use class="g-line" href="#hand-palm"/>
+            <use class="g-dots" href="#jt-palm"/>
+          </svg>
+        </div>
+        <h3 class="keycard__name">Open palm</h3>
+        <span class="keycard__mean">Wait</span>
+        <p class="keycard__note">Holds the conversation open while the visitor finds a parcel or a name.</p>
+      </li>
+
+      <li class="keycard">
+        <span class="keycard__no">03</span>
+        <div class="keycard__art">
+          <svg class="glyph" viewBox="-16 -16 272 272" role="img" aria-label="Line drawing of a hand waving, with motion arcs">
+            <use class="g-mark" href="#mark-wave"/>
+            <use class="g-mass" href="#hand-wave"/>
+            <use class="g-line" href="#hand-wave"/>
+            <use class="g-dots" href="#jt-wave"/>
+          </svg>
+        </div>
+        <h3 class="keycard__name">Wave</h3>
+        <span class="keycard__mean">Hello, I am a person</span>
+        <p class="keycard__note">Opens the exchange and separates a caller from a passing cat.</p>
+      </li>
+
+      <li class="keycard">
+        <span class="keycard__no">04</span>
+        <div class="keycard__art">
+          <svg class="glyph" viewBox="-16 -16 272 272" role="img" aria-label="Line drawing of a hand pointing downwards">
+            <use class="g-mark" href="#mark-down"/>
+            <use class="g-mass" href="#hand-pointdown"/>
+            <use class="g-line" href="#hand-pointdown"/>
+            <use class="g-dots" href="#jt-pointdown"/>
+          </svg>
+        </div>
+        <h3 class="keycard__name">Point down</h3>
+        <span class="keycard__mean">Leaving it here</span>
+        <p class="keycard__note">Marks the spot. WAVE captures the frame as proof of placement.</p>
+      </li>
+
+      <li class="keycard">
+        <span class="keycard__no">05</span>
+        <div class="keycard__art">
+          <svg class="glyph" viewBox="-16 -16 272 272" role="img" aria-label="Line drawing of a closed fist">
+            <use class="g-mass" href="#hand-fist"/>
+            <use class="g-line" href="#hand-fist"/>
+            <use class="g-dots" href="#jt-fist"/>
+          </svg>
+        </div>
+        <h3 class="keycard__name">Closed fist</h3>
+        <span class="keycard__mean">No</span>
+        <p class="keycard__note">Declines. The door thanks them and the event closes without entry.</p>
+      </li>
+
+    </ol>
+
+    <div class="key__foot mono">
+      <span>WAVE gesture plate &mdash; rev 01</span>
+      <span class="rule"></span>
+      <span>Right or left hand &middot; either accepted</span>
+      <span>Hold for 400&nbsp;ms</span>
+    </div>
+  </section>
+
+  <!-- =========================== RECENT =========================== -->
+  <section class="recent" aria-labelledby="rec-title">
+    <div class="recent__head">
+      <h2 class="recent__title" id="rec-title">Recent at this door</h2>
+      <span class="mono dim">Last 48 hours</span>
+    </div>
+
+    <ol class="rlist">
+
+      <li class="rrow">
+        <div class="rrow__art rrow__none" aria-hidden="true"><span></span></div>
+        <div class="rrow__what">Parcel left in the porch
+          <small>No one present &mdash; motion only, no conversation</small>
+        </div>
+        <div class="rrow__meta mono dim">Today 07:42 &middot; Front Door</div>
+        <div class="rrow__tag"><span class="tagpill">Photo saved</span></div>
+      </li>
+
+      <li class="rrow">
+        <div class="rrow__art">
+          <svg class="glyph" viewBox="-16 -16 272 272" role="img" aria-label="Wave gesture">
+            <use class="g-mass" href="#hand-wave"/>
+            <use class="g-line" href="#hand-wave"/>
+            <use class="g-dots" href="#jt-wave"/>
+          </svg>
+        </div>
+        <div class="rrow__what">Neighbour from number 14
+          <small>Waved hello, 91% &mdash; left a note about the bins</small>
+        </div>
+        <div class="rrow__meta mono dim">Yesterday 18:15 &middot; Front Door</div>
+        <div class="rrow__tag"><span class="tagpill tagpill--ok">Note left</span></div>
+      </li>
+
+      <li class="rrow">
+        <div class="rrow__art">
+          <svg class="glyph" viewBox="-16 -16 272 272" role="img" aria-label="Closed fist gesture">
+            <use class="g-mass" href="#hand-fist"/>
+            <use class="g-line" href="#hand-fist"/>
+            <use class="g-dots" href="#jt-fist"/>
+          </svg>
+        </div>
+        <div class="rrow__what">Unknown visitor, no delivery
+          <small>Closed fist, 88% &mdash; declined and left after 40 seconds</small>
+        </div>
+        <div class="rrow__meta mono dim">Yesterday 09:03 &middot; Front Door</div>
+        <div class="rrow__tag"><span class="tagpill tagpill--no">No entry</span></div>
+      </li>
+
+    </ol>
+  </section>
+
+  <!-- =========================== FOOTER =========================== -->
+  <footer class="foot">
+    <p class="foot__mark" aria-hidden="true">WAVE</p>
+    <p class="foot__txt">
+      <b>Your door, answered without a word.</b><br>
+      Built on the Ring doorbell and the Alexa+ chime. The door does the talking;
+      the camera does the listening. Designed for people who are Deaf or hard of
+      hearing &mdash; and usable by everyone else without instruction.
+    </p>
+  </footer>
+
+</div>
+
+</body>
+</html>

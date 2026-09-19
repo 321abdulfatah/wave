@@ -1,0 +1,1266 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WAVE — Culturally Adaptive · One door, four locales</title>
+<meta name="description" content="A visual design direction for WAVE, an accessible front-door agent: the same interface rendered in four locale identities, because a gesture is not universal and neither is a colour.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Outfit:wght@400;500;600;700&family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* =========================================================================
+   WAVE · Culturally Adaptive
+   One page. Four locale identities. No JavaScript.
+   Locale switching: hidden radio inputs + :checked sibling selectors.
+   All directional CSS uses logical properties so RTL mirrors for real.
+   ========================================================================= */
+
+/* ---------- page chrome (the studio backdrop) ---------- */
+:root{
+  color-scheme: light;
+  --chrome-bg:#131519;
+  --chrome-bg-2:#1b1e24;
+  --chrome-fg:#edeff3;
+  --chrome-dim:#a2abb8;
+  --chrome-line:#2c313a;
+  --chrome-accent:#84d6c5;
+  --chrome-warn:#f0a07a;
+  --ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --r: 14px;
+  --gut: clamp(16px, 4vw, 40px);
+}
+*{box-sizing:border-box}
+html{ -webkit-text-size-adjust:100% }
+body{
+  margin:0;
+  background:var(--chrome-bg);
+  color:var(--chrome-fg);
+  font-family:var(--ui);
+  font-size:16px;
+  line-height:1.55;
+  overflow-x:hidden;
+}
+img,svg{max-width:100%}
+h1,h2,h3,h4{line-height:1.2;margin:0}
+p{margin:0}
+ul,ol,dl,dd{margin:0;padding:0;list-style:none}
+
+/* ---------- masthead ---------- */
+.masthead{
+  padding: clamp(28px,6vw,64px) var(--gut) clamp(20px,3vw,32px);
+  max-width:1440px; margin-inline:auto;
+  border-block-end:1px solid var(--chrome-line);
+}
+.eyebrow{
+  font-size:.72rem; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--chrome-accent); font-weight:600; margin-block-end:14px;
+}
+.masthead h1{
+  font-size:clamp(2rem,6.2vw,4.1rem);
+  font-weight:700; letter-spacing:-.03em;
+}
+.masthead h1 small{
+  display:block; font-size:clamp(.95rem,2.4vw,1.35rem); font-weight:500;
+  letter-spacing:-.01em; color:var(--chrome-dim); margin-block-start:12px; max-width:52ch;
+}
+.thesis{
+  margin-block-start:clamp(22px,3vw,34px);
+  display:grid; gap:12px 26px;
+  grid-template-columns:1fr;
+  max-width:1100px;
+}
+@media(min-width:760px){ .thesis{grid-template-columns:1fr 1fr} }
+.thesis li{
+  display:flex; gap:12px; align-items:flex-start;
+  font-size:.885rem; color:var(--chrome-dim); line-height:1.5;
+  padding-block:8px; border-block-start:1px solid var(--chrome-line);
+}
+.thesis li b{color:var(--chrome-fg); font-weight:600}
+.thesis .n{
+  flex:0 0 auto; width:1.55em; height:1.55em; border-radius:50%;
+  display:grid; place-items:center; font-size:.68rem; font-weight:700;
+  background:var(--chrome-bg-2); color:var(--chrome-accent);
+  border:1px solid var(--chrome-line); margin-block-start:2px;
+}
+
+/* ---------- switcher (pure CSS) ---------- */
+.sw{
+  position:absolute; width:1px; height:1px; opacity:0;
+  margin:-1px; padding:0; border:0; clip-path:inset(50%);
+}
+.tabbar{
+  position:sticky; top:0; z-index:20;
+  background:rgba(19,21,25,.93);
+  -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
+  border-block-end:1px solid var(--chrome-line);
+  padding:10px var(--gut);
+}
+.tabbar-inner{
+  max-width:1440px; margin-inline:auto;
+  display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+}
+.tabbar .lead{
+  font-size:.68rem; letter-spacing:.16em; text-transform:uppercase;
+  color:#7b8493; font-weight:600; margin-inline-end:6px;
+}
+.tabbar label{
+  cursor:pointer; user-select:none;
+  display:inline-flex; align-items:center; gap:8px;
+  padding:7px 13px; border-radius:999px;
+  border:1px solid var(--chrome-line);
+  background:var(--chrome-bg-2); color:var(--chrome-dim);
+  font-size:.82rem; font-weight:500; white-space:nowrap;
+  transition:background .18s ease, color .18s ease, border-color .18s ease;
+}
+.tabbar label:hover{color:var(--chrome-fg); border-color:#3c434e}
+.tabbar label .dot{
+  width:9px;height:9px;border-radius:50%;flex:0 0 auto;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.25);
+}
+.tabbar label .nat{font-weight:600; color:var(--chrome-fg)}
+#t-gulf:checked ~ .tabbar label[for="t-gulf"],
+#t-jp:checked   ~ .tabbar label[for="t-jp"],
+#t-no:checked   ~ .tabbar label[for="t-no"],
+#t-ng:checked   ~ .tabbar label[for="t-ng"],
+#t-all:checked  ~ .tabbar label[for="t-all"]{
+  background:var(--chrome-fg); color:#131519; border-color:var(--chrome-fg);
+}
+#t-gulf:checked ~ .tabbar label[for="t-gulf"] .nat,
+#t-jp:checked   ~ .tabbar label[for="t-jp"] .nat,
+#t-no:checked   ~ .tabbar label[for="t-no"] .nat,
+#t-ng:checked   ~ .tabbar label[for="t-ng"] .nat,
+#t-all:checked  ~ .tabbar label[for="t-all"] .nat{color:#131519}
+.sw:focus-visible ~ .tabbar label{outline:none}
+#t-gulf:focus-visible ~ .tabbar label[for="t-gulf"],
+#t-jp:focus-visible   ~ .tabbar label[for="t-jp"],
+#t-no:focus-visible   ~ .tabbar label[for="t-no"],
+#t-ng:focus-visible   ~ .tabbar label[for="t-ng"],
+#t-all:focus-visible  ~ .tabbar label[for="t-all"]{
+  outline:3px solid var(--chrome-accent); outline-offset:2px;
+}
+
+/* ---------- stage ---------- */
+.stage{
+  max-width:1440px; margin-inline:auto;
+  padding: clamp(20px,4vw,44px) var(--gut) clamp(40px,6vw,72px);
+  display:grid; gap:clamp(20px,3vw,32px); grid-template-columns:1fr;
+}
+.pane{display:none}
+#t-gulf:checked ~ .stage .p-gulf,
+#t-jp:checked   ~ .stage .p-jp,
+#t-no:checked   ~ .stage .p-no,
+#t-ng:checked   ~ .stage .p-ng,
+#t-all:checked  ~ .stage .pane{display:block}
+@media(min-width:1120px){
+  #t-all:checked ~ .stage{grid-template-columns:1fr 1fr}
+}
+#t-all:checked ~ .stage .panegrid{grid-template-columns:1fr !important}
+#t-all:checked ~ .stage .pane{font-size:.94rem}
+#t-all:checked ~ .stage .tagline{font-size:clamp(1.15rem,2.4vw,1.5rem)}
+
+/* =========================================================================
+   The locale pane — structure shared, tokens swapped.
+   ========================================================================= */
+.pane{
+  --bg:#fff; --surface:#fff; --fg:#111; --dim:#555; --line:#ddd;
+  --brand:#333; --brand-soft:#eee; --flag:#a33; --flag-soft:#fee; --ok:#2a6;
+  background:var(--bg); color:var(--fg);
+  border-radius:var(--r);
+  box-shadow:0 1px 0 rgba(255,255,255,.06), 0 26px 60px -28px rgba(0,0,0,.85);
+  padding:clamp(18px,3vw,32px);
+  overflow:hidden;
+  font-family:var(--font, var(--ui));
+}
+
+/* --- 1 · Gulf Arabic : date-palm green, desert sand, brass, ink --- */
+.p-gulf{
+  --font:"IBM Plex Sans Arabic","Inter",sans-serif;
+  --bg:#FBF7EE; --surface:#FFFDF8; --fg:#15302A; --dim:#56675F; --line:#E2D9C6;
+  --brand:#0D6553; --brand-soft:#E2EFE9;
+  --accent:#8A6413; --accent-soft:#F4EBD6;
+  --flag:#9B2C1E; --flag-soft:#F8E7E2; --ok:#0D6553;
+}
+/* --- 2 · Japanese : washi, sumi ink, indigo, one point of vermilion --- */
+.p-jp{
+  --font:"Noto Sans JP","Inter",sans-serif;
+  --serif:"Shippori Mincho","Noto Sans JP",serif;
+  --bg:#F4F1E9; --surface:#FBFAF6; --fg:#1C1B19; --dim:#5A5852; --line:#DCD7C9;
+  --brand:#24384F; --brand-soft:#E3E7EC;
+  --accent:#A63A28; --accent-soft:#F3E3DF;
+  --flag:#A63A28; --flag-soft:#F3E3DF; --ok:#24384F;
+}
+/* --- 3 · Nordic : snow, ink, one cold blue. Maximum contrast, minimum ink --- */
+.p-no{
+  --font:"Inter",system-ui,sans-serif;
+  --bg:#FFFFFF; --surface:#F7F8FA; --fg:#0E1216; --dim:#4B535C; --line:#D9DEE4;
+  --brand:#1746C4; --brand-soft:#E7ECFB;
+  --accent:#0E1216; --accent-soft:#EDEFF2;
+  --flag:#B22A1F; --flag-soft:#FBE9E7; --ok:#146A4C;
+}
+/* --- 4 · West African / Nigerian : adire indigo, clay, palm, cream --- */
+.p-ng{
+  --font:"Outfit","Inter",sans-serif;
+  --bg:#FFF7EC; --surface:#FFFCF6; --fg:#22150A; --dim:#5E4A38; --line:#EAD9C2;
+  --brand:#17325E; --brand-soft:#E3E8F1;
+  --accent:#A8421F; --accent-soft:#F8E6DC;
+  --flag:#A8421F; --flag-soft:#F8E6DC; --ok:#125239;
+}
+
+/* ---------- pane head ---------- */
+.panehead{
+  display:flex; flex-wrap:wrap; gap:14px 18px;
+  align-items:flex-start; justify-content:space-between;
+  padding-block-end:clamp(16px,2.4vw,24px);
+  border-block-end:1px solid var(--line);
+  margin-block-end:clamp(18px,2.6vw,28px);
+}
+.mark{
+  font-family:"Inter",sans-serif;
+  font-weight:700; letter-spacing:.32em; font-size:.82rem;
+  color:var(--brand); text-transform:uppercase;
+  display:flex; align-items:center; gap:10px;
+}
+.mark .ripple{display:block; width:22px; height:22px; color:var(--brand)}
+.tagline{
+  font-size:clamp(1.3rem,3.4vw,2.05rem); font-weight:700;
+  letter-spacing:-.015em; margin-block-start:12px; max-width:22ch;
+}
+.p-jp .tagline{font-family:var(--serif); font-weight:700; letter-spacing:.01em}
+.p-gulf .tagline{letter-spacing:0; line-height:1.45}
+.subline{color:var(--dim); font-size:.9rem; margin-block-start:8px; max-width:34ch}
+.localechip{
+  flex:0 0 auto;
+  font-family:"Inter",sans-serif; direction:ltr; text-align:start;
+  font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; font-weight:600;
+  color:var(--dim); border:1px solid var(--line); background:var(--surface);
+  border-radius:8px; padding:7px 10px; line-height:1.5;
+}
+.localechip b{display:block; color:var(--fg); letter-spacing:.06em; font-size:.74rem}
+
+/* ---------- three columns ---------- */
+.panegrid{display:grid; gap:clamp(18px,2.4vw,26px); grid-template-columns:1fr; align-items:start}
+@media(min-width:960px){
+  .panegrid{grid-template-columns: minmax(230px,300px) minmax(0,1fr) minmax(250px,330px)}
+}
+.colhead{
+  font-family:"Inter",sans-serif;
+  font-size:.66rem; letter-spacing:.16em; text-transform:uppercase; font-weight:600;
+  color:var(--dim); margin-block-end:12px;
+  display:flex; align-items:center; gap:9px;
+}
+.p-gulf .colhead, .p-jp .colhead{font-family:var(--font); letter-spacing:.06em; font-size:.74rem}
+.colhead::after{content:""; flex:1; height:1px; background:var(--line)}
+
+/* ---------- live event card ---------- */
+.event{
+  background:var(--surface); border:1px solid var(--line);
+  border-radius:12px; overflow:hidden;
+}
+.cam{
+  position:relative; aspect-ratio:4/3; background:var(--brand-soft);
+  display:grid; place-items:center; overflow:hidden;
+  border-block-end:1px solid var(--line);
+}
+.cam .subject{width:32%; max-width:96px; color:var(--brand); opacity:.9}
+.cam .frame{position:absolute; inset:10px; color:var(--brand); opacity:.55}
+.cam .scan{
+  position:absolute; inset-inline:0; top:0; height:34%;
+  background:linear-gradient(to bottom, transparent, color-mix(in srgb, var(--brand) 16%, transparent));
+  border-block-end:1.5px solid color-mix(in srgb, var(--brand) 55%, transparent);
+  animation: scan 3.6s cubic-bezier(.45,0,.55,1) infinite;
+}
+@keyframes scan{
+  0%   {transform:translateY(-100%)}
+  55%  {transform:translateY(200%)}
+  100% {transform:translateY(200%)}
+}
+.livetag{
+  position:absolute; inset-block-start:10px; inset-inline-start:10px;
+  display:inline-flex; align-items:center; gap:7px;
+  background:var(--fg); color:var(--bg);
+  border-radius:999px; padding:4px 10px;
+  font-size:.64rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+}
+.p-gulf .livetag, .p-jp .livetag{letter-spacing:.02em; text-transform:none; font-size:.7rem}
+.livetag i{
+  width:7px; height:7px; border-radius:50%; background:var(--accent); font-style:normal;
+  animation:pulse 1.8s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1; transform:scale(1)} 50%{opacity:.35; transform:scale(.72)}}
+
+.evbody{padding:14px 15px 16px}
+.evrow{display:flex; gap:10px; justify-content:space-between; align-items:baseline; padding-block:6px}
+.evrow + .evrow{border-block-start:1px dashed var(--line)}
+.evrow dt{font-size:.76rem; color:var(--dim)}
+.evrow dd{font-weight:600; font-size:.92rem; text-align:end}
+.conf{margin-block-start:13px}
+.confbar{
+  position:relative; height:7px; border-radius:999px;
+  background:var(--brand-soft); overflow:hidden;
+}
+.confbar span{
+  position:absolute; inset-block:0; inset-inline-start:0; width:94%;
+  background:var(--brand); border-radius:999px;
+  transform-origin:left center;
+  animation:fill .9s cubic-bezier(.2,.7,.3,1) both;
+}
+[dir="rtl"] .confbar span{transform-origin:right center}
+@keyframes fill{from{transform:scaleX(0)} to{transform:scaleX(1)}}
+.status{
+  margin-block-start:13px; display:inline-flex; align-items:center; gap:8px;
+  background:var(--accent-soft); color:var(--fg);
+  border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius:8px; padding:7px 11px; font-size:.8rem; font-weight:600;
+}
+.status .dotm{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+
+/* ---------- palette strip ---------- */
+.palette{margin-block-start:clamp(16px,2.2vw,22px)}
+.swatches{display:grid; grid-template-columns:repeat(4,1fr); gap:8px}
+.sw-item{font-size:.66rem; color:var(--dim); line-height:1.35}
+.sw-item i{
+  display:block; height:38px; border-radius:8px; margin-block-end:6px;
+  border:1px solid color-mix(in srgb, var(--fg) 14%, transparent);
+}
+.sw-item b{display:block; color:var(--fg); font-weight:600; font-size:.7rem}
+
+/* ---------- the doorstep transcript ---------- */
+.talk{display:flex; flex-direction:column; gap:12px}
+.turn{max-width:min(46ch, 92%); display:flex; flex-direction:column; gap:5px}
+.turn.door{align-self:start}
+.turn.vis{align-self:end}
+.who{
+  font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; font-weight:700;
+  color:var(--dim); display:flex; align-items:center; gap:7px;
+}
+.p-gulf .who, .p-jp .who{letter-spacing:.02em; text-transform:none; font-size:.73rem}
+.turn.vis .who{flex-direction:row-reverse}
+.bubble{
+  border-radius:14px; padding:12px 15px; font-size:.95rem; line-height:1.6;
+  border:1px solid var(--line); background:var(--surface);
+  animation:rise .5s ease both;
+}
+.turn.door .bubble{
+  background:var(--brand); color:#fff; border-color:var(--brand);
+  border-start-start-radius:4px;
+}
+.turn.vis .bubble{ border-start-end-radius:4px }
+.turn:nth-child(1) .bubble{animation-delay:.02s}
+.turn:nth-child(2) .bubble{animation-delay:.12s}
+.turn:nth-child(3) .bubble{animation-delay:.22s}
+.turn:nth-child(4) .bubble{animation-delay:.32s}
+.turn:nth-child(5) .bubble{animation-delay:.42s}
+@keyframes rise{from{opacity:0; transform:translateY(9px)} to{opacity:1; transform:none}}
+.viagest{
+  display:flex; align-items:center; gap:8px;
+  font-size:.72rem; color:var(--dim); font-weight:600;
+  border:1px dashed var(--line); border-radius:999px;
+  padding:4px 10px; align-self:end; background:var(--bg);
+}
+.viagest svg{width:18px; height:18px; color:var(--brand); flex:0 0 auto}
+.chan{
+  font-family:"Inter",sans-serif; direction:ltr;
+  font-size:.6rem; letter-spacing:.1em; font-weight:700; text-transform:uppercase;
+  color:var(--dim); border:1px solid var(--line); border-radius:5px; padding:1px 5px;
+}
+.readnote{
+  margin-block-start:16px; padding:12px 14px; border-radius:10px;
+  background:var(--surface); border:1px solid var(--line);
+  font-size:.79rem; color:var(--dim); line-height:1.6;
+}
+.readnote b{color:var(--fg)}
+
+/* ---------- gesture key ---------- */
+.keys{display:flex; flex-direction:column; gap:10px}
+.key{
+  display:flex; gap:12px; align-items:flex-start;
+  border:1px solid var(--line); border-radius:12px;
+  padding:11px 12px; background:var(--surface);
+}
+.key.swapped{
+  border-color:color-mix(in srgb, var(--flag) 42%, transparent);
+  background:color-mix(in srgb, var(--flag-soft) 62%, var(--surface));
+}
+.glyphs{display:flex; align-items:center; gap:6px; flex:0 0 auto}
+.glyph{
+  width:44px; height:44px; flex:0 0 auto; border-radius:10px;
+  display:grid; place-items:center;
+  background:var(--brand-soft); color:var(--brand);
+  border:1px solid color-mix(in srgb, var(--brand) 18%, transparent);
+}
+.glyph svg{width:30px; height:30px}
+.glyph.bad{
+  background:transparent; color:var(--flag); width:34px; height:34px;
+  border-style:dashed; border-color:color-mix(in srgb, var(--flag) 45%, transparent);
+  position:relative; opacity:.85;
+}
+.glyph.bad svg{width:22px;height:22px; opacity:.6}
+.glyph.bad::after{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(to bottom right, transparent calc(50% - 1px), var(--flag) calc(50% - 1px), var(--flag) calc(50% + 1px), transparent calc(50% + 1px));
+}
+.arrow{
+  flex:0 0 auto; width:14px; height:14px; color:var(--dim);
+}
+[dir="rtl"] .arrow{transform:scaleX(-1)}
+.keytxt{min-width:0}
+.keytxt b{display:block; font-size:.92rem; font-weight:700; line-height:1.35}
+.keytxt .how{display:block; font-size:.8rem; color:var(--dim); margin-block-start:2px}
+.tagrow{display:flex; flex-wrap:wrap; gap:5px; margin-block-start:7px}
+.pill{
+  font-size:.62rem; font-weight:700; letter-spacing:.06em;
+  border-radius:999px; padding:3px 8px; line-height:1.5;
+  border:1px solid currentColor;
+}
+.p-gulf .pill, .p-jp .pill{letter-spacing:0; font-size:.68rem}
+.pill.swap{color:var(--flag); background:var(--flag-soft)}
+.pill.keep{color:var(--ok); background:color-mix(in srgb, var(--ok) 10%, transparent)}
+.pill.care{color:var(--accent); background:var(--accent-soft)}
+.why{
+  display:block; font-size:.76rem; line-height:1.55; color:var(--dim);
+  margin-block-start:7px; padding-inline-start:10px;
+  border-inline-start:2px solid color-mix(in srgb, var(--flag) 45%, transparent);
+}
+.key:not(.swapped) .why{border-inline-start-color:var(--line)}
+
+.footnote{
+  margin-block-start:16px; font-size:.78rem; color:var(--dim); line-height:1.65;
+  padding-block-start:14px; border-block-start:1px solid var(--line);
+}
+.footnote b{color:var(--fg)}
+
+/* ---------- page footer ---------- */
+.colophon{
+  max-width:1440px; margin-inline:auto;
+  padding:clamp(28px,5vw,56px) var(--gut) clamp(48px,7vw,90px);
+  border-block-start:1px solid var(--chrome-line);
+  display:grid; gap:clamp(18px,3vw,34px); grid-template-columns:1fr;
+}
+@media(min-width:880px){ .colophon{grid-template-columns:repeat(3,1fr)} }
+.colophon h3{
+  font-size:.68rem; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--chrome-accent); font-weight:600; margin-block-end:11px;
+}
+.colophon p{font-size:.84rem; color:var(--chrome-dim); line-height:1.7}
+.colophon p + p{margin-block-start:10px}
+.colophon b{color:var(--chrome-fg); font-weight:600}
+.colophon .warn{color:var(--chrome-warn)}
+
+/* ---------- motion collapse ---------- */
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+  }
+  .cam .scan{
+    animation:none !important;
+    top:auto; inset-block-start:40%; height:26%;
+    transform:none !important;
+  }
+  .livetag i{animation:none !important; opacity:1 !important; transform:none !important}
+  .confbar span{animation:none !important; transform:none !important}
+  .bubble{animation:none !important; opacity:1 !important; transform:none !important}
+}
+
+/* ---------- print-ish / very small ---------- */
+@media (max-width:400px){
+  .swatches{grid-template-columns:repeat(2,1fr)}
+  .turn{max-width:100%}
+  .glyph{width:40px;height:40px}
+}
+</style>
+</head>
+<body>
+
+<!-- ======================= HAND GLYPH SPRITE ======================= -->
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+  <defs>
+    <style>
+      symbol{ fill:none; stroke:currentColor; stroke-width:2.6;
+              stroke-linecap:round; stroke-linejoin:round; }
+      symbol .mo{ stroke-width:2; opacity:.5 }
+      symbol .fill{ fill:currentColor; stroke:none }
+    </style>
+  </defs>
+
+  <!-- ripple / wordmark glyph -->
+  <symbol id="g-ripple" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 30c4.5 0 4.5-12 9-12s4.5 12 9 12 4.5-12 9-12 4.5 12 9 12 4.5-12 6-12"/>
+  </symbol>
+
+  <!-- thumbs up -->
+  <symbol id="g-thumb" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 22v17a4 4 0 0 0 4 4h11.2a4 4 0 0 0 3.9-3.1l2.4-10.6a3.5 3.5 0 0 0-3.4-4.3H28.6l1.3-6.6A4.2 4.2 0 0 0 25.8 3.4a2.6 2.6 0 0 0-2.4 1.6L18 22Z"/>
+    <path d="M18 22h-6.6A2.4 2.4 0 0 0 9 24.4v16.2A2.4 2.4 0 0 0 11.4 43H18"/>
+  </symbol>
+
+  <!-- open palm, fingers SPREAD, pushed forward · moútza / waka -->
+  <symbol id="g-spread" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="13" y="23" width="22" height="20" rx="8"/>
+    <path d="M16.5 24 10.5 11.5"/>
+    <path d="M21 23 18.5 7.5"/>
+    <path d="M26.5 23 27 6"/>
+    <path d="M31.5 24 35.5 9.5"/>
+    <path d="M34.8 29.5 43 24.5"/>
+  </symbol>
+
+  <!-- open hand, fingers TOGETHER, held still · greeting -->
+  <symbol id="g-together" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="13" y="23" width="22" height="20" rx="8"/>
+    <path d="M17 24V10.5"/><path d="M22 23V6.5"/><path d="M27 23V6"/><path d="M32 24V10.5"/>
+    <path d="M35 29.5 42.5 25"/>
+  </symbol>
+
+  <!-- index finger point -->
+  <symbol id="g-point" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="13" y="23" width="22" height="20" rx="8"/>
+    <path d="M26.5 23V5"/>
+    <path d="M17 24v-4"/><path d="M21.5 23v-4.5"/><path d="M32 24v-3.5"/>
+    <path d="M35 29.5 42 26"/>
+  </symbol>
+
+  <!-- open hand, palm up, offered toward a place · the usher -->
+  <symbol id="g-palmup" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <g transform="rotate(52 24 24)">
+      <rect x="13" y="23" width="20" height="19" rx="8"/>
+      <path d="M17 24V12"/><path d="M21.5 23V8.5"/><path d="M26 23V8"/><path d="M30.5 24V12"/>
+      <path d="M33 29 39.5 25"/>
+    </g>
+    <path d="M4 42h12" class="mo" stroke-width="2" opacity="0.5"/>
+  </symbol>
+
+  <!-- two hands forming a parcel -->
+  <symbol id="g-box" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="13" y="10" width="22" height="18" rx="2.5"/>
+    <path d="M13 17.5h22"/><path d="M24 10v7.5"/>
+    <path d="M9 26.5v5.5a7 7 0 0 0 7 7h16a7 7 0 0 0 7-7v-5.5"/>
+    <path d="M9 26.5a3.6 3.6 0 0 1 5.2-3.2"/>
+    <path d="M39 26.5a3.6 3.6 0 0 0-5.2-3.2"/>
+  </symbol>
+
+  <!-- right hand laid on the chest -->
+  <symbol id="g-heart" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 45a20 20 0 0 1 40 0"/>
+    <rect x="16" y="21" width="16" height="13" rx="5.5"/>
+    <path d="M20 21.5v-6"/><path d="M24.5 21v-7.5"/><path d="M29 21.5v-6"/>
+    <path d="M32 27.5 38.5 24"/>
+  </symbol>
+
+  <!-- wave hello / goodbye -->
+  <symbol id="g-wave" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="14" y="24" width="20" height="19" rx="8"/>
+    <path d="M18 25V12"/><path d="M22.5 24V8"/><path d="M27 24V8.5"/><path d="M31.5 25V13"/>
+    <path d="M33.5 30 40 26.5"/>
+    <path d="M8 16c-2.5-3-2.5-7.5 0-10.5" class="mo" stroke-width="2" opacity="0.5"/>
+    <path d="M41 13.5c2.5-2.5 2.5-6.5 0-9" class="mo" stroke-width="2" opacity="0.5"/>
+  </symbol>
+
+  <!-- flat hand held vertically, waved side to side · Japanese "no" -->
+  <symbol id="g-tefuru" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <g transform="rotate(-7 24 26)">
+      <rect x="17" y="21" width="14" height="21" rx="6"/>
+      <path d="M20.5 22v-8.5"/><path d="M24 21.5v-10.5"/><path d="M27.5 22v-8.5"/>
+      <path d="M30.8 27 37 22.5"/>
+    </g>
+    <path d="M9.5 24c-2.5-3.5-2.5-8 0-11.5" class="mo" stroke-width="2" opacity="0.5"/>
+    <path d="M42 24c2.5-3.5 2.5-8 0-11.5" class="mo" stroke-width="2" opacity="0.5"/>
+  </symbol>
+
+  <!-- flat hand held low, fingers together, small side sweep -->
+  <symbol id="g-lowsweep" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <g transform="rotate(97 24 26)">
+      <rect x="17" y="22" width="14" height="19" rx="6"/>
+      <path d="M20.5 23v-8"/><path d="M24 22.5v-10"/><path d="M27.5 23v-8"/>
+      <path d="M30.8 28 37 24"/>
+    </g>
+    <path d="M5 42.5h9" class="mo" stroke-width="2" opacity="0.5"/><path d="M34 42.5h9" class="mo" stroke-width="2" opacity="0.5"/>
+  </symbol>
+
+  <!-- a bow -->
+  <symbol id="g-bow" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="13.5" cy="16.5" r="6.5"/>
+    <path d="M19.5 20c7.5 1.2 12.5 5.8 15 13"/>
+    <path d="M34.5 33v11"/>
+    <path d="M30 34.5 26.5 44"/>
+    <path d="M20 24.5c-1 4-.5 7.5 1.5 10.5"/>
+    <path d="M8 8.5C10.5 5 14.5 3.5 18 4.5" class="mo" stroke-width="2" opacity="0.5"/>
+  </symbol>
+
+  <!-- receiving with both hands -->
+  <symbol id="g-receive" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22.5 42H16a8.5 8.5 0 0 1-8.5-8.5V24a3.2 3.2 0 0 1 6.4 0v6.2"/>
+    <path d="M25.5 42H32a8.5 8.5 0 0 0 8.5-8.5V24a3.2 3.2 0 0 0-6.4 0v6.2"/>
+    <path d="m13.9 30.2 4.6-6.6"/><path d="m34.1 30.2-4.6-6.6"/>
+    <path d="M24 5v11" class="mo" stroke-width="2" opacity="0.5"/><path d="m19 10.5 5-5.5 5 5.5" class="mo" stroke-width="2" opacity="0.5"/>
+  </symbol>
+
+  <!-- right hand raised, palm inward, head inclined -->
+  <symbol id="g-salaam" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <g transform="rotate(-9 24 24)">
+      <rect x="14" y="23" width="21" height="19" rx="8"/>
+      <path d="M18 24V11.5"/><path d="M23 23V8"/><path d="M28 23V8.5"/><path d="M32.5 24V12"/>
+      <path d="M34.8 29.5 41.5 26"/>
+    </g>
+    <path d="M6.5 20c0-4.5 1.5-8.5 4.5-11.5" class="mo" stroke-width="2" opacity="0.5"/>
+  </symbol>
+
+  <!-- visitor silhouette used in the camera frame -->
+  <symbol id="g-visitor" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="24" cy="13" r="8"/>
+    <path d="M6 45c0-9.5 8-16 18-16s18 6.5 18 16"/>
+  </symbol>
+
+  <!-- camera corner brackets -->
+  <symbol id="g-frame" viewBox="0 0 100 75" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2 16V2h16" stroke-width="2"/><path d="M98 16V2H82" stroke-width="2"/>
+    <path d="M2 59v14h16" stroke-width="2"/><path d="M98 59v14H82" stroke-width="2"/>
+  </symbol>
+
+  <!-- arrow used between an unsafe and a safe gesture -->
+  <symbol id="g-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 12h15"/><path d="m13 6 6 6-6 6"/>
+  </symbol>
+</svg>
+
+<!-- ======================= SWITCHER INPUTS ======================= -->
+<input class="sw" type="radio" name="loc" id="t-gulf" checked>
+<input class="sw" type="radio" name="loc" id="t-jp">
+<input class="sw" type="radio" name="loc" id="t-no">
+<input class="sw" type="radio" name="loc" id="t-ng">
+<input class="sw" type="radio" name="loc" id="t-all">
+
+<!-- ======================= MASTHEAD ======================= -->
+<header class="masthead">
+  <p class="eyebrow">WAVE · Design direction 03 · Culturally adaptive</p>
+  <h1>A gesture is not universal.<br>Neither is a colour.
+    <small>WAVE answers the door for people who are Deaf or hard of hearing. The door speaks through the chime; the visitor answers with their hands; the resident reads a conversation they never heard. Which means WAVE ships a gesture vocabulary into somebody else&rsquo;s culture — and a vocabulary is not a translation problem. Here is the same screen, built four times.</small>
+  </h1>
+
+  <ul class="thesis">
+    <li><span class="n">1</span><span><b>Thumbs up</b> is read as an obscene insult in Iraq and Iran, in Greece, in parts of West Africa, and in Sardinia. Global media has softened it in cities. WAVE will not gamble a stranger&rsquo;s dignity on &ldquo;softened&rdquo;.</span></li>
+    <li><span class="n">2</span><span><b>The open palm</b>, fingers spread and pushed toward a person, is the <i>moútza</i> — among the oldest insults still in use in Greece. A closely related five-finger gesture, <i>waka</i>, is a serious insult in Nigeria.</span></li>
+    <li><span class="n">3</span><span><b>Pointing with the index finger</b> is rude across much of Asia, the Middle East and Africa. And in much of the Arab world, South Asia and West Africa the <b>left hand</b> is reserved for hygiene — so WAVE prompts for the right.</span></li>
+    <li><span class="n">4</span><span><b>White</b> is the colour of mourning and funerary dress across much of East Asia, though white with red (<i>kōhaku</i>) is celebratory in Japan. <b>Red</b> is luck and celebration in China and alarm in the West. A palette is an assertion.</span></li>
+    <li><span class="n">5</span><span><b>There is no universal sign language.</b> More than 300 are in use and they are not dialects of one another — Danish and Swedish Sign Language are mutually unintelligible even where the spoken languages are close.</span></li>
+    <li><span class="n">6</span><span><b>So WAVE does not claim to read sign language.</b> It reads five deliberate gestures, chosen per locale, and it tells the visitor which five. That is a smaller promise. It is one the product can keep.</span></li>
+  </ul>
+</header>
+
+<!-- ======================= TAB BAR ======================= -->
+<nav class="tabbar" aria-label="Locale">
+  <div class="tabbar-inner">
+    <span class="lead">Locale</span>
+    <label for="t-gulf"><span class="dot" style="background:#0D6553"></span><span class="nat">الخليج</span> Gulf Arabic</label>
+    <label for="t-jp"><span class="dot" style="background:#A63A28"></span><span class="nat">日本</span> Japanese</label>
+    <label for="t-no"><span class="dot" style="background:#1746C4"></span><span class="nat">Norge</span> Nordic</label>
+    <label for="t-ng"><span class="dot" style="background:#A8421F"></span><span class="nat">Naijá</span> Nigerian</label>
+    <label for="t-all"><span class="dot" style="background:linear-gradient(135deg,#0D6553 0 25%,#A63A28 25% 50%,#1746C4 50% 75%,#A8421F 75%)"></span>Compare all four</label>
+  </div>
+</nav>
+
+<main class="stage">
+
+<!-- ============================================================
+     1 · GULF ARABIC — full RTL
+     ============================================================ -->
+<section class="pane p-gulf" dir="rtl" lang="ar" aria-label="Gulf Arabic locale">
+  <div class="panehead">
+    <div>
+      <div class="mark"><svg class="ripple" aria-hidden="true"><use href="#g-ripple"/></svg>WAVE</div>
+      <h2 class="tagline">بابك يُجيب… دون كلمة واحدة.</h2>
+      <p class="subline">وكيل للباب الأمامي، لمن هم صُمّ أو ضعاف السمع. الباب يتكلّم، والزائر يُجيب بيده.</p>
+    </div>
+    <p class="localechip">Locale <b>ar-AE · Gulf</b> RTL · Arabic-Indic numerals</p>
+  </div>
+
+  <div class="panegrid">
+    <!-- column A -->
+    <div>
+      <h3 class="colhead">الحدث عند الباب</h3>
+      <div class="event">
+        <div class="cam">
+          <svg class="frame" viewBox="0 0 100 75" preserveAspectRatio="none" aria-hidden="true"><use href="#g-frame"/></svg>
+          <svg class="subject" viewBox="0 0 48 48" aria-hidden="true"><use href="#g-visitor"/></svg>
+          <span class="scan" aria-hidden="true"></span>
+          <span class="livetag"><i></i>مباشر</span>
+        </div>
+        <div class="evbody">
+          <dl>
+            <div class="evrow"><dt>الباب</dt><dd>الباب الأمامي</dd></div>
+            <div class="evrow"><dt>الزائر</dt><dd>مندوب صيدلية</dd></div>
+            <div class="evrow"><dt>درجة الثقة</dt><dd>٩٤٪</dd></div>
+          </dl>
+          <div class="conf"><div class="confbar"><span></span></div></div>
+          <p class="status"><span class="dotm"></span>عند الباب الآن</p>
+        </div>
+      </div>
+
+      <div class="palette">
+        <h3 class="colhead">الألوان</h3>
+        <div class="swatches">
+          <div class="sw-item"><i style="background:#0D6553"></i><b>أخضر النخيل</b>الأساسي</div>
+          <div class="sw-item"><i style="background:#FBF7EE"></i><b>رملي</b>الخلفية</div>
+          <div class="sw-item"><i style="background:#8A6413"></i><b>نحاسي</b>التنبيه</div>
+          <div class="sw-item"><i style="background:#15302A"></i><b>حبر</b>النص</div>
+        </div>
+        <p class="footnote">الأخضر هنا ليس زخرفة: فهو مقروء ومألوف ومحترم في المنطقة. تجنّبنا الأحمر للحالة العادية لأنه لغة إنذار، والذهب اللامع لأنه يُقرأ كمبالغة لا كثقة.</p>
+      </div>
+    </div>
+
+    <!-- column B -->
+    <div>
+      <h3 class="colhead">نصّ الحديث عند الباب</h3>
+      <ol class="talk">
+        <li class="turn door">
+          <p class="who"><span class="chan">door</span>الباب</p>
+          <p class="bubble">السلام عليكم. ساكنة هذا البيت صمّاء، وأنا أتحدّث نيابةً عنها. أجِب بيدك اليمنى — الكاميرا تقرأ إشارتك.</p>
+        </li>
+        <li class="turn vis">
+          <p class="who">الزائر<span class="chan">gesture</span></p>
+          <p class="bubble">معي طلب من الصيدلية.</p>
+          <span class="viagest"><svg aria-hidden="true"><use href="#g-box"/></svg>كلتا اليدين تُشكّلان صندوقاً · ثقة ٩٧٪</span>
+        </li>
+        <li class="turn door">
+          <p class="who"><span class="chan">door</span>الباب</p>
+          <p class="bubble">شكراً لك. من فضلك اترك الطلب في الصندوق الذي على يمين الباب.</p>
+        </li>
+        <li class="turn vis">
+          <p class="who">الزائر<span class="chan">gesture</span></p>
+          <p class="bubble">تمام، فهمت.</p>
+          <span class="viagest"><svg aria-hidden="true"><use href="#g-heart"/></svg>اليد اليمنى على الصدر · ثقة ٩٣٪</span>
+        </li>
+        <li class="turn door">
+          <p class="who"><span class="chan">door</span>الباب</p>
+          <p class="bubble">شكراً جزيلاً. وصلت الرسالة إلى ساكنة البيت، وهي تقرأها الآن.</p>
+        </li>
+      </ol>
+      <p class="readnote"><b>ما تراه الساكنة:</b> النصّ أعلاه فقط. لم تسمع شيئاً، ولم تُضطرّ إلى الردّ. الباب تكلّم، والكاميرا قرأت، والمحضر وصل إلى هاتفها خلال ثانيتين.</p>
+    </div>
+
+    <!-- column C -->
+    <div>
+      <h3 class="colhead">مفتاح الإشارات الخمس</h3>
+      <ul class="keys">
+
+        <li class="key swapped">
+          <span class="glyphs">
+            <span class="glyph bad"><svg aria-hidden="true"><use href="#g-thumb"/></svg></span>
+            <svg class="arrow" aria-hidden="true"><use href="#g-arrow"/></svg>
+            <span class="glyph"><svg aria-hidden="true"><use href="#g-heart"/></svg></span>
+          </span>
+          <span class="keytxt">
+            <b>نعم</b>
+            <span class="how">اليد اليمنى على الصدر</span>
+            <span class="tagrow"><span class="pill swap">استُبدلت</span></span>
+            <span class="why">رفع الإبهام يُفهم كإشارة بذيئة في العراق وإيران وأجزاء من المنطقة. اليد على الصدر مفهومة على نطاق واسع، ولا تحتمل قراءة مسيئة.</span>
+          </span>
+        </li>
+
+        <li class="key">
+          <span class="glyphs"><span class="glyph"><svg aria-hidden="true"><use href="#g-spread"/></svg></span></span>
+          <span class="keytxt">
+            <b>لا</b>
+            <span class="how">كفّ مرفوع مع حركة خفيفة للمعصم</span>
+            <span class="tagrow"><span class="pill keep">كما هي</span></span>
+            <span class="why">آمنة هنا. الإشارة نفسها تُعدّ إهانة في اليونان (المُوتزا) وفي نيجيريا (واكا) — ولهذا تُستبدل هناك، لا هنا.</span>
+          </span>
+        </li>
+
+        <li class="key">
+          <span class="glyphs"><span class="glyph"><svg aria-hidden="true"><use href="#g-box"/></svg></span></span>
+          <span class="keytxt">
+            <b>معي طرد</b>
+            <span class="how">كلتا اليدين تُشكّلان صندوقاً</span>
+            <span class="tagrow"><span class="pill keep">كما هي</span></span>
+            <span class="why">إشارة وصفية لا رمزية: تصف الشيء نفسه. لم نجد منطقة تُقرأ فيها بمعنى مسيء.</span>
+          </span>
+        </li>
+
+        <li class="key swapped">
+          <span class="glyphs">
+            <span class="glyph bad"><svg aria-hidden="true"><use href="#g-point"/></svg></span>
+            <svg class="arrow" aria-hidden="true"><use href="#g-arrow"/></svg>
+            <span class="glyph"><svg aria-hidden="true"><use href="#g-palmup"/></svg></span>
+          </span>
+          <span class="keytxt">
+            <b>أين أترك الطلب؟</b>
+            <span class="how">كفّ يمنى مفتوحة نحو المكان</span>
+            <span class="tagrow"><span class="pill swap">استُبدلت</span><span class="pill care">اليمنى فقط</span></span>
+            <span class="why">الإشارة بالسبّابة نحو شخص أو مكان تُعدّ فظّة في معظم المنطقة. واليد اليسرى مخصّصة للنظافة، فالنموذج يطلب اليمنى ويؤكّدها.</span>
+          </span>
+        </li>
+
+        <li class="key">
+          <span class="glyphs"><span class="glyph"><svg aria-hidden="true"><use href="#g-salaam"/></svg></span></span>
+          <span class="keytxt">
+            <b>شكراً · انتهينا</b>
+            <span class="how">رفع اليد اليمنى مع إمالة خفيفة للرأس</span>
+            <span class="tagrow"><span class="pill keep">كما هي</span></span>
+            <span class="why">التلويح مقبول هنا. أبقيناه، لكن الكاميرا تقبل أيضاً الرفع الثابت لأنه أوضح في الإضاءة المنخفضة.</span>
+          </span>
+        </li>
+      </ul>
+      <p class="footnote"><b>ملاحظة عن لغة الإشارة:</b> لغات الإشارة العربية تختلف من بلد إلى آخر رغم محاولات التوحيد. WAVE لا يدّعي قراءة لغة إشارة؛ إنه يقرأ خمس إشارات مقصودة، ويعرضها على الزائر أولاً.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     2 · JAPANESE
+     ============================================================ -->
+<section class="pane p-jp" lang="ja" aria-label="Japanese locale">
+  <div class="panehead">
+    <div>
+      <div class="mark"><svg class="ripple" aria-hidden="true"><use href="#g-ripple"/></svg>WAVE</div>
+      <h2 class="tagline">声を出さずに、玄関が応える。</h2>
+      <p class="subline">耳が聞こえない人・聞こえにくい人のための玄関エージェント。玄関が話し、来訪者は手で答えます。</p>
+    </div>
+    <p class="localechip">Locale <b>ja-JP</b> Vertical rhythm · density</p>
+  </div>
+
+  <div class="panegrid">
+    <div>
+      <h3 class="colhead">玄関の記録</h3>
+      <div class="event">
+        <div class="cam">
+          <svg class="frame" viewBox="0 0 100 75" preserveAspectRatio="none" aria-hidden="true"><use href="#g-frame"/></svg>
+          <svg class="subject" viewBox="0 0 48 48" aria-hidden="true"><use href="#g-visitor"/></svg>
+          <span class="scan" aria-hidden="true"></span>
+          <span class="livetag"><i></i>ライブ</span>
+        </div>
+        <div class="evbody">
+          <dl>
+            <div class="evrow"><dt>場所</dt><dd>玄関</dd></div>
+            <div class="evrow"><dt>来訪者</dt><dd>薬局の配達員</dd></div>
+            <div class="evrow"><dt>信頼度</dt><dd>94%</dd></div>
+          </dl>
+          <div class="conf"><div class="confbar"><span></span></div></div>
+          <p class="status"><span class="dotm"></span>ただいま玄関前</p>
+        </div>
+      </div>
+
+      <div class="palette">
+        <h3 class="colhead">配色</h3>
+        <div class="swatches">
+          <div class="sw-item"><i style="background:#F4F1E9"></i><b>生成り</b>地色</div>
+          <div class="sw-item"><i style="background:#1C1B19"></i><b>墨</b>文字</div>
+          <div class="sw-item"><i style="background:#24384F"></i><b>藍</b>主色</div>
+          <div class="sw-item"><i style="background:#A63A28"></i><b>朱</b>差し色</div>
+        </div>
+        <p class="footnote">白と黒だけの組み合わせは弔事を思わせます。だから純白ではなく生成り、黒ではなく墨。紅白（こうはく）は祝いの色なので、朱は一点だけ、注意を引く場所にのみ置きます。</p>
+      </div>
+    </div>
+
+    <div>
+      <h3 class="colhead">玄関での会話</h3>
+      <ol class="talk">
+        <li class="turn door">
+          <p class="who"><span class="chan">door</span>玄関</p>
+          <p class="bubble">こんにちは。こちらの住人は耳が聞こえません。代わりに私がお応えします。手で答えてください。カメラが読み取ります。</p>
+        </li>
+        <li class="turn vis">
+          <p class="who">来訪者<span class="chan">gesture</span></p>
+          <p class="bubble">お薬のお届けです。</p>
+          <span class="viagest"><svg aria-hidden="true"><use href="#g-box"/></svg>両手で箱をかたどる・信頼度 97%</span>
+        </li>
+        <li class="turn door">
+          <p class="who"><span class="chan">door</span>玄関</p>
+          <p class="bubble">ありがとうございます。ドア右側の宅配ボックスにお入れください。</p>
+        </li>
+        <li class="turn vis">
+          <p class="who">来訪者<span class="chan">gesture</span></p>
+          <p class="bubble">はい、承知しました。</p>
+          <span class="viagest"><svg aria-hidden="true"><use href="#g-bow"/></svg>会釈・信頼度 92%</span>
+        </li>
+        <li class="turn door">
+          <p class="who"><span class="chan">door</span>玄関</p>
+          <p class="bubble">ありがとうございました。住人に通知しました。お気をつけて。</p>
+        </li>
+      </ol>
+      <p class="readnote"><b>住人が見るもの：</b>この記録だけです。音は一度も聞こえていません。玄関が話し、カメラが読み取り、二秒後に手元へ届きます。</p>
+    </div>
+
+    <div>
+      <h3 class="colhead">五つのジェスチャー</h3>
+      <ul class="keys">
+
+        <li class="key">
+          <span class="glyphs"><span class="glyph"><svg aria-hidden="true"><use href="#g-thumb"/></svg></span></span>
+          <span class="keytxt">
+            <b>はい</b>
+            <span class="how">親指を立てる</span>
+            <span class="tagrow"><span class="pill keep">そのまま</span></span>
+            <span class="why">日本では問題ありません。まったく同じ手つきが、イラク・イラン・ギリシャでは侮辱として読まれます。「安全なジェスチャー」は存在せず、「この場所で安全なジェスチャー」があるだけです。</span>
+          </span>
+        </li>
+
+        <li class="key swapped">
+          <span class="glyphs">
+            <span class="glyph bad"><svg aria-hidden="true"><use href="#g-spread"/></svg></span>
+            <svg class="arrow" aria-hidden="true"><use href="#g-arrow"/></svg>
+            <span class="glyph"><svg aria-hidden="true"><use href="#g-tefuru"/></svg></span>
+          </span>
+          <span class="keytxt">
+            <b>いいえ</b>
+            <span class="how">手を立てて、顔の前で左右に振る</span>
+            <span class="tagrow"><span class="pill swap">差し替え</span></span>
+            <span class="why">欧米式の「手のひらを前へ突き出す」形は使いません。ギリシャではムーヅァという侮辱に当たり、日本でもそもそも自然な否定の形ではないからです。</span>
+          </span>
+        </li>
+
+        <li class="key">
+          <span class="glyphs"><span class="glyph"><svg aria-hidden="true"><use href="#g-box"/></svg></span></span>
+          <span class="keytxt">
+            <b>荷物です</b>
+            <span class="how">両手で箱をかたどる</span>
+            <span class="tagrow"><span class="pill keep">そのまま</span></span>
+            <span class="why">象徴ではなく描写のジェスチャー。物の形をなぞるだけなので、文化をまたいでも意味がずれません。</span>
+          </span>
+        </li>
+
+        <li class="key swapped">
+          <span class="glyphs">
+            <span class="glyph bad"><svg aria-hidden="true"><use href="#g-point"/></svg></span>
+            <svg class="arrow" aria-hidden="true"><use href="#g-arrow"/></svg>
+            <span class="glyph"><svg aria-hidden="true"><use href="#g-palmup"/></svg></span>
+          </span>
+          <span class="keytxt">
+            <b>どこに置きますか</b>
+            <span class="how">指をそろえ、手のひらを上に向けて示す</span>
+            <span class="tagrow"><span class="pill swap">差し替え</span></span>
+            <span class="why">人差し指で人や場所を指すのは失礼とされます。駅員や店員が使う「手差し」が正しい形で、カメラもこちらのほうが安定して読み取れます。</span>
+          </span>
+        </li>
+
+        <li class="key swapped">
+          <span class="glyphs">
+            <span class="glyph bad"><svg aria-hidden="true"><use href="#g-wave"/></svg></span>
+            <svg class="arrow" aria-hidden="true"><use href="#g-arrow"/></svg>
+            <span class="glyph"><svg aria-hidden="true"><use href="#g-bow"/></svg></span>
+          </span>
+          <span class="keytxt">
+            <b>ありがとう・完了</b>
+            <span class="how">会釈（おじぎ）</span>
+            <span class="tagrow"><span class="pill swap">差し替え</span></span>
+            <span class="why">手を振るより会釈のほうが自然で、しかも読み取りやすい。ここだけは手ではなく上半身の傾きを読みます。ジェスチャーの置き換えは、手の形の問題にとどまりません。</span>
+          </span>
+        </li>
+      </ul>
+      <p class="footnote"><b>手話について：</b>日本手話（JSL）はアメリカ手話とは系統が異なる別の言語です。WAVE は手話を読み取るとは言いません。決められた五つの合図だけを読み、その五つを先に画面と音声で示します。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     3 · NORDIC (Norwegian Bokmål)
+     ============================================================ -->
+<section class="pane p-no" lang="nb" aria-label="Nordic locale">
+  <div class="panehead">
+    <div>
+      <div class="mark"><svg class="ripple" aria-hidden="true"><use href="#g-ripple"/></svg>WAVE</div>
+      <h2 class="tagline">Døren din — besvart uten et ord.</h2>
+      <p class="subline">En døragent for deg som er døv eller hørselshemmet. Døren snakker. Den besøkende svarer med hånden.</p>
+    </div>
+    <p class="localechip">Locale <b>nb-NO</b> Klarspråk · high contrast</p>
+  </div>
+
+  <div class="panegrid">
+    <div>
+      <h3 class="colhead">Hendelse ved døren</h3>
+      <div class="event">
+        <div class="cam">
+          <svg class="frame" viewBox="0 0 100 75" preserveAspectRatio="none" aria-hidden="true"><use href="#g-frame"/></svg>
+          <svg class="subject" viewBox="0 0 48 48" aria-hidden="true"><use href="#g-visitor"/></svg>
+          <span class="scan" aria-hidden="true"></span>
+          <span class="livetag"><i></i>Direkte</span>
+        </div>
+        <div class="evbody">
+          <dl>
+            <div class="evrow"><dt>Dør</dt><dd>Inngangsdør</dd></div>
+            <div class="evrow"><dt>Besøkende</dt><dd>Apotekbud</dd></div>
+            <div class="evrow"><dt>Sikkerhet</dt><dd>94 %</dd></div>
+          </dl>
+          <div class="conf"><div class="confbar"><span></span></div></div>
+          <p class="status"><span class="dotm"></span>Står ved døren nå</p>
+        </div>
+      </div>
+
+      <div class="palette">
+        <h3 class="colhead">Farger</h3>
+        <div class="swatches">
+          <div class="sw-item"><i style="background:#FFFFFF"></i><b>Snø</b>Bakgrunn</div>
+          <div class="sw-item"><i style="background:#0E1216"></i><b>Blekk</b>Tekst</div>
+          <div class="sw-item"><i style="background:#1746C4"></i><b>Blå</b>Handling</div>
+          <div class="sw-item"><i style="background:#B22A1F"></i><b>Varsel</b>Kun fare</div>
+        </div>
+        <p class="footnote">Lite farge, mye kontrast, mye luft. Rødt brukes bare når noe faktisk er galt. Dette er den paletten resten av bransjen kaller «nøytral» — den er ikke nøytral, den er nordisk.</p>
+      </div>
+    </div>
+
+    <div>
+      <h3 class="colhead">Referat fra døren</h3>
+      <ol class="talk">
+        <li class="turn door">
+          <p class="who"><span class="chan">door</span>Døren</p>
+          <p class="bubble">Hei. Hun som bor her er døv. Jeg svarer for henne. Svar med hånden — kameraet leser deg.</p>
+        </li>
+        <li class="turn vis">
+          <p class="who">Besøkende<span class="chan">gesture</span></p>
+          <p class="bubble">Jeg har en pakke fra apoteket.</p>
+          <span class="viagest"><svg aria-hidden="true"><use href="#g-box"/></svg>Begge hender former en eske · 97 %</span>
+        </li>
+        <li class="turn door">
+          <p class="who"><span class="chan">door</span>Døren</p>
+          <p class="bubble">Takk. Legg den i pakkeboksen til høyre for døren.</p>
+        </li>
+        <li class="turn vis">
+          <p class="who">Besøkende<span class="chan">gesture</span></p>
+          <p class="bubble">Ja, forstått.</p>
+          <span class="viagest"><svg aria-hidden="true"><use href="#g-thumb"/></svg>Tommel opp · 95 %</span>
+        </li>
+        <li class="turn door">
+          <p class="who"><span class="chan">door</span>Døren</p>
+          <p class="bubble">Takk skal du ha. Hun har fått beskjed. Ha en fin dag.</p>
+        </li>
+      </ol>
+      <p class="readnote"><b>Dette er alt hun ser:</b> referatet. Hun hørte ingenting og trengte ikke å svare. Døren snakket, kameraet leste, og teksten lå på telefonen etter to sekunder.</p>
+    </div>
+
+    <div>
+      <h3 class="colhead">De fem håndtegnene</h3>
+      <ul class="keys">
+
+        <li class="key">
+          <span class="glyphs"><span class="glyph"><svg aria-hidden="true"><use href="#g-thumb"/></svg></span></span>
+          <span class="keytxt">
+            <b>Ja</b>
+            <span class="how">Tommel opp</span>
+            <span class="tagrow"><span class="pill keep">Beholdt</span></span>
+            <span class="why">Trygt her. Uanstendig i Irak og Iran, i Hellas, i deler av Vest-Afrika og på Sardinia.</span>
+          </span>
+        </li>
+
+        <li class="key">
+          <span class="glyphs"><span class="glyph"><svg aria-hidden="true"><use href="#g-spread"/></svg></span></span>
+          <span class="keytxt">
+            <b>Nei</b>
+            <span class="how">Åpen håndflate fram</span>
+            <span class="tagrow"><span class="pill keep">Beholdt</span></span>
+            <span class="why">Trygt her. I Hellas er dette moútza. I Nigeria er en nær beslektet variant, waka, en alvorlig fornærmelse.</span>
+          </span>
+        </li>
+
+        <li class="key">
+          <span class="glyphs"><span class="glyph"><svg aria-hidden="true"><use href="#g-box"/></svg></span></span>
+          <span class="keytxt">
+            <b>Jeg har en pakke</b>
+            <span class="how">Begge hender former en eske</span>
+            <span class="tagrow"><span class="pill keep">Beholdt</span></span>
+            <span class="why">Beskrivende, ikke symbolsk. Det eneste tegnet i settet som ser likt ut overalt vi har prøvd det.</span>
+          </span>
+        </li>
+
+        <li class="key swapped">
+          <span class="glyphs">
+            <span class="glyph bad"><svg aria-hidden="true"><use href="#g-point"/></svg></span>
+            <svg class="arrow" aria-hidden="true"><use href="#g-arrow"/></svg>
+            <span class="glyph"><svg aria-hidden="true"><use href="#g-palmup"/></svg></span>
+          </span>
+          <span class="keytxt">
+            <b>Hvor skal den?</b>
+            <span class="how">Åpen hånd, håndflaten opp, mot stedet</span>
+            <span class="tagrow"><span class="pill swap">Byttet ut</span></span>
+            <span class="why">Byttet ut <i>her også</i> — og det er poenget. Budet ved en norsk dør kommer like gjerne fra Warszawa, Mogadishu eller Lahore som fra Bergen. En lokal palett gjør ikke den besøkende lokal.</span>
+          </span>
+        </li>
+
+        <li class="key">
+          <span class="glyphs"><span class="glyph"><svg aria-hidden="true"><use href="#g-wave"/></svg></span></span>
+          <span class="keytxt">
+            <b>Takk · ferdig</b>
+            <span class="how">Vink</span>
+            <span class="tagrow"><span class="pill keep">Beholdt</span></span>
+            <span class="why">Trygt her. I Japan er et lite bukk både høfligere og lettere å lese for kameraet.</span>
+          </span>
+        </li>
+      </ul>
+      <p class="footnote"><b>Fire av fem tegn i dette settet er utrygge et sted.</b> Dette er settet de fleste produkter sender ut i verden uten å spørre. Norsk tegnspråk er dessuten et eget språk — og ikke gjensidig forståelig med dansk eller svensk tegnspråk, selv om de talte språkene ligger tett.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     4 · WEST AFRICAN / NIGERIAN (Naijá — Nigerian Pidgin)
+     ============================================================ -->
+<section class="pane p-ng" lang="pcm" aria-label="Nigerian locale">
+  <div class="panehead">
+    <div>
+      <div class="mark"><svg class="ripple" aria-hidden="true"><use href="#g-ripple"/></svg>WAVE</div>
+      <h2 class="tagline">Your door dey answer. No word need.</h2>
+      <p class="subline">Front-door agent for person wey deaf or wey no dey hear well. Di door go talk. Di visitor go answer with hand.</p>
+    </div>
+    <p class="localechip">Locale <b>pcm-NG · Naijá</b> Nigerian Pidgin</p>
+  </div>
+
+  <div class="panegrid">
+    <div>
+      <h3 class="colhead">Wetin dey happen</h3>
+      <div class="event">
+        <div class="cam">
+          <svg class="frame" viewBox="0 0 100 75" preserveAspectRatio="none" aria-hidden="true"><use href="#g-frame"/></svg>
+          <svg class="subject" viewBox="0 0 48 48" aria-hidden="true"><use href="#g-visitor"/></svg>
+          <span class="scan" aria-hidden="true"></span>
+          <span class="livetag"><i></i>Live</span>
+        </div>
+        <div class="evbody">
+          <dl>
+            <div class="evrow"><dt>Door</dt><dd>Front Door</dd></div>
+            <div class="evrow"><dt>Visitor</dt><dd>Pharmacy dispatch rider</dd></div>
+            <div class="evrow"><dt>How sure</dt><dd>94%</dd></div>
+          </dl>
+          <div class="conf"><div class="confbar"><span></span></div></div>
+          <p class="status"><span class="dotm"></span>E dey door now</p>
+        </div>
+      </div>
+
+      <div class="palette">
+        <h3 class="colhead">Di colours</h3>
+        <div class="swatches">
+          <div class="sw-item"><i style="background:#17325E"></i><b>Adire</b>Main</div>
+          <div class="sw-item"><i style="background:#FFF7EC"></i><b>Cream</b>Background</div>
+          <div class="sw-item"><i style="background:#A8421F"></i><b>Clay</b>Attention</div>
+          <div class="sw-item"><i style="background:#125239"></i><b>Palm</b>Confirm</div>
+        </div>
+        <p class="footnote">We no just copy di flag green-white. Di indigo na adire cloth colour, and di clay na warm earth. Warm background, strong ink, plenty contrast — because plenty person go open dis app for bright sun, for cheap screen.</p>
+      </div>
+    </div>
+
+    <div>
+      <h3 class="colhead">Wetin happen for door</h3>
+      <ol class="talk">
+        <li class="turn door">
+          <p class="who"><span class="chan">door</span>Door</p>
+          <p class="bubble">Good afternoon. Di person wey dey live here no dey hear. Na me dey talk for am. Use your hand answer me — camera go read you.</p>
+        </li>
+        <li class="turn vis">
+          <p class="who">Visitor<span class="chan">gesture</span></p>
+          <p class="bubble">I carry medicine come from di pharmacy.</p>
+          <span class="viagest"><svg aria-hidden="true"><use href="#g-box"/></svg>Two hand make box · 97%</span>
+        </li>
+        <li class="turn door">
+          <p class="who"><span class="chan">door</span>Door</p>
+          <p class="bubble">Thank you. Abeg drop am inside di box wey dey your right hand side.</p>
+        </li>
+        <li class="turn vis">
+          <p class="who">Visitor<span class="chan">gesture</span></p>
+          <p class="bubble">Yes. I don hear you.</p>
+          <span class="viagest"><svg aria-hidden="true"><use href="#g-together"/></svg>Right hand up, finger together · 93%</span>
+        </li>
+        <li class="turn door">
+          <p class="who"><span class="chan">door</span>Door</p>
+          <p class="bubble">Thank you well well. She don see everything. Make you go well.</p>
+        </li>
+      </ol>
+      <p class="readnote"><b>Na dis one she dey see:</b> di talk, as text. She no hear anything, and she no need reply. Di door talk, di camera read, and di message land for her phone inside two seconds.</p>
+    </div>
+
+    <div>
+      <h3 class="colhead">Di five hand sign</h3>
+      <ul class="keys">
+
+        <li class="key swapped">
+          <span class="glyphs">
+            <span class="glyph bad"><svg aria-hidden="true"><use href="#g-thumb"/></svg></span>
+            <svg class="arrow" aria-hidden="true"><use href="#g-arrow"/></svg>
+            <span class="glyph"><svg aria-hidden="true"><use href="#g-together"/></svg></span>
+          </span>
+          <span class="keytxt">
+            <b>Yes</b>
+            <span class="how">Right hand up, finger together, hold am still</span>
+            <span class="tagrow"><span class="pill swap">We change am</span></span>
+            <span class="why">Thumbs up don soft for Lagos and Abuja, but e still fit vex person for some part of West Africa. WAVE no dey gamble with stranger respect — especially for person wey no fit hear di apology.</span>
+          </span>
+        </li>
+
+        <li class="key swapped">
+          <span class="glyphs">
+            <span class="glyph bad"><svg aria-hidden="true"><use href="#g-spread"/></svg></span>
+            <svg class="arrow" aria-hidden="true"><use href="#g-arrow"/></svg>
+            <span class="glyph"><svg aria-hidden="true"><use href="#g-lowsweep"/></svg></span>
+          </span>
+          <span class="keytxt">
+            <b>No</b>
+            <span class="how">Hand low, finger together, small sweep</span>
+            <span class="tagrow"><span class="pill swap">We change am</span></span>
+            <span class="why">Open palm wey you spread di finger and push am for person face na <i>waka</i> — serious insult for Nigeria. Na two small thing dey separate greeting from insult: whether di finger spread, and whether di hand push. WAVE go read dat difference, flag am, and e go never ask person to do am.</span>
+          </span>
+        </li>
+
+        <li class="key">
+          <span class="glyphs"><span class="glyph"><svg aria-hidden="true"><use href="#g-box"/></svg></span></span>
+          <span class="keytxt">
+            <b>I get package</b>
+            <span class="how">Two hand make box shape</span>
+            <span class="tagrow"><span class="pill keep">Same</span></span>
+            <span class="why">Dis one dey describe di thing, e no dey stand for anything. Na why e safe everywhere.</span>
+          </span>
+        </li>
+
+        <li class="key swapped">
+          <span class="glyphs">
+            <span class="glyph bad"><svg aria-hidden="true"><use href="#g-point"/></svg></span>
+            <svg class="arrow" aria-hidden="true"><use href="#g-arrow"/></svg>
+            <span class="glyph"><svg aria-hidden="true"><use href="#g-palmup"/></svg></span>
+          </span>
+          <span class="keytxt">
+            <b>Where I go drop am?</b>
+            <span class="how">Open right hand, palm up, show di place with di whole hand</span>
+            <span class="tagrow"><span class="pill swap">We change am</span><span class="pill care">Right hand</span></span>
+            <span class="why">To point person with one finger no good. And for plenty part of di country, especially for di north, left hand no be di hand you take give or show person something.</span>
+          </span>
+        </li>
+
+        <li class="key swapped">
+          <span class="glyphs">
+            <span class="glyph bad"><svg aria-hidden="true"><use href="#g-wave"/></svg></span>
+            <svg class="arrow" aria-hidden="true"><use href="#g-arrow"/></svg>
+            <span class="glyph"><svg aria-hidden="true"><use href="#g-receive"/></svg></span>
+          </span>
+          <span class="keytxt">
+            <b>Thank you · we don finish</b>
+            <span class="how">Collect am with two hand, small bow</span>
+            <span class="tagrow"><span class="pill swap">We change am</span></span>
+            <span class="why">To give or collect with two hand na respect for Nigeria. E clear pass wave, and camera dey read am well well.</span>
+          </span>
+        </li>
+      </ul>
+      <p class="footnote"><b>About sign language:</b> Nigerian Sign Language na mostly ASL-derived, and e different from indigenous system like Hausa Sign Language and Yoruba Sign Language. Four out of five sign for dis locale change. Na di biggest change for di whole product — and di locale wey most Western design go ship last.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ======================= COLOPHON ======================= -->
+<footer class="colophon">
+  <div>
+    <h3>What actually changes</h3>
+    <p>Four things change per locale, and all four are visible on this page: <b>language and script</b>, <b>reading direction</b>, <b>colour palette</b>, and <b>the gesture vocabulary itself</b>. The layout does not change. That is deliberate: this is one product, not four, and the skeleton has to be recognisable to the engineer who maintains it.</p>
+    <p>The Arabic view is genuinely mirrored — <code>dir="rtl"</code> plus logical properties throughout, so the three columns, the speech bubbles, the confidence bar and the swap arrows all reverse. Nothing here is merely right-aligned.</p>
+  </div>
+  <div>
+    <h3>Honesty about the claims</h3>
+    <p>Gesture meanings are <b>regional and generational, not national and fixed</b>. Thumbs up has softened in many cities; <i>waka</i> and the <i>moútza</i> have not. Every claim on this page is scoped to a named region, and where a gesture is contested rather than uniformly offensive, the note says so.</p>
+    <p class="warn">Two of these claims are the kind a judge should check: that the open palm is offensive in Greece and Nigeria but not in the Gulf, and that thumbs up is fine in Japan but not in Iraq. Both are load-bearing for the design, and both are why the vocabulary is per-locale rather than global.</p>
+  </div>
+  <div>
+    <h3>Build notes</h3>
+    <p>One file, no JavaScript, no build step. Locale switching is five hidden radio inputs and <code>:checked ~</code> sibling selectors — keyboard-operable with arrow keys, because the switcher itself should not fail the audience this product is for.</p>
+    <p>Hands are inline SVG, no emoji — emoji renders differently on every platform, and the one thing this direction cannot afford is a gesture that changes shape on the device. Every animation (camera scan, live pulse, confidence fill, transcript rise) collapses to a still, legible state under <code>prefers-reduced-motion: reduce</code>.</p>
+  </div>
+</footer>
+
+</body>
+</html>

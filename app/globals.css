@@ -3,39 +3,86 @@
 @tailwind utilities;
 
 /*
- * WAVE design system.
+ * WAVE design system — "Warm Domestic".
  *
- * The product is for people who cannot hear the doorbell, so every signal the
- * interface sends has to land in the eye. Sound is replaced by motion: the
- * screen itself rings. Colour is used sparingly so that when amber appears, it
- * means one thing only — someone is at the door right now.
+ * A front door is not a perimeter. It is where a household meets the world, and
+ * most of what arrives there is ordinary and kind. Every product in this
+ * category renders that as a black security console; this one renders it as
+ * paper and ink, because the person reading it is at home.
+ *
+ * The accessibility constraint drives the rest: the resident cannot hear, so
+ * every signal has to land in the eye. Sound is replaced by motion, and the
+ * numbers for that motion come from docs/motion.md — grounded in WCAG 2.3.1 and
+ * the 2025 photosensitive-epilepsy guidance, not chosen by feel.
+ *
+ * Colour follows ISO 3864-4 rather than folk symbolism, per the locale
+ * research: red = prohibition, yellow = warning, green = safe. And per WCAG
+ * 1.4.1, colour never carries a state on its own — every state also has a shape
+ * and a label.
  */
 
 :root {
-  --ink: #07080b;
-  --ink-raised: #0d0f14;
-  --ink-card: #12141b;
-  --line: #1e212b;
-  --line-bright: #2b2f3d;
+  color-scheme: light;
 
-  --text: #f2f4f8;
-  --text-dim: #9aa1b3;
-  --text-faint: #636b7e;
+  /* paper */
+  --paper: #faf4ea;
+  --paper-2: #f4eadb;
+  --paper-3: #eee0cb;
+  --card: #fffcf6;
 
-  --signal: #ffb020; /* someone is at the door */
-  --signal-soft: rgba(255, 176, 32, 0.12);
-  --calm: #2dd4bf; /* system is healthy, conversation resolved */
-  --calm-soft: rgba(45, 212, 191, 0.12);
-  --alert: #fb7185; /* needs the resident */
-  --alert-soft: rgba(251, 113, 133, 0.12);
+  /* ink — contrast ratios measured on --paper, not estimated */
+  --ink: #2a2420; /* 13.9:1 */
+  --ink-2: #574c42; /* 7.4:1 */
+  --ink-3: #6e6154; /* 5.4:1 */
 
-  --radius: 14px;
-}
+  /* clay — the voice of the door */
+  --clay: #a3432a; /* 6.0:1 */
+  --clay-2: #c2603d;
+  --clay-wash: #f6e1d5;
+  --clay-line: #e6c4b2;
 
-/* The page is intentionally dark in both schemes: it is a wall display that
-   sits in a hallway, and a white flash at 3am helps nobody. */
-:root:not([data-theme='light']) {
-  color-scheme: dark;
+  /* ochre — attention, and the light under a door */
+  --ochre: #c58a2b;
+  --ochre-ink: #815510; /* 5.9:1 */
+  --ochre-wash: #f9ebd1;
+  --ochre-line: #ebd3a6;
+
+  /* sage — quiet confirmation */
+  --sage: #44614a; /* 7.0:1 */
+  --sage-wash: #e7eee4;
+  --sage-line: #cbdac6;
+
+  --line: #e6d9c5;
+  --line-2: #d8c6ab;
+
+  --shadow-1: 0 1px 1px rgba(78, 52, 24, 0.05), 0 6px 18px -12px rgba(94, 64, 30, 0.3);
+  --shadow-2: 0 1px 2px rgba(78, 52, 24, 0.06), 0 18px 44px -26px rgba(94, 64, 30, 0.45);
+
+  --r-sm: 12px;
+  --r-md: 18px;
+  --r-lg: 26px;
+
+  /* Motion tokens. The loop periods are the safety-critical ones. */
+  --loop-ring: 1200ms; /* 0.83 Hz — 3.6x under the WCAG three-per-second limit */
+  --loop-offline: 2400ms;
+  --ease-swell: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-breath: cubic-bezier(0.37, 0, 0.63, 1);
+
+  /* Aliases so components written against the earlier dark system keep working
+     while the merge finishes, rather than half the app going unstyled. */
+  --ink-raised: var(--paper-2);
+  --ink-card: var(--card);
+  --line-bright: var(--line-2);
+  --text: var(--ink);
+  --text-dim: var(--ink-2);
+  --text-faint: var(--ink-3);
+  --signal: var(--ochre-ink);
+  --signal-soft: var(--ochre-wash);
+  --calm: var(--sage);
+  --calm-soft: var(--sage-wash);
+  --alert: var(--clay);
+  --alert-soft: var(--clay-wash);
+  --radius: var(--r-md);
 }
 
 * {
@@ -43,47 +90,57 @@
 }
 
 body {
-  background: var(--ink);
-  color: var(--text);
-  font-feature-settings: 'cv11', 'ss01';
+  background: var(--paper);
+  color: var(--ink);
   -webkit-font-smoothing: antialiased;
 }
 
-/* A soft vignette keeps attention in the middle of a large wall-mounted screen. */
+/* A fine grain, so the surface reads as stock rather than as a flat fill. */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(120% 90% at 50% 0%, rgba(255, 176, 32, 0.05), transparent 60%);
   z-index: 0;
+  opacity: 0.4;
+  background-image: radial-gradient(circle at 1px 1px, rgba(120, 90, 50, 0.055) 1px, transparent 0);
+  background-size: 4px 4px;
 }
 
 @layer components {
   .card {
-    background: var(--ink-card);
+    background: var(--card);
     border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-1);
   }
 
   .eyebrow {
     font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--text-faint);
+    color: var(--ink-3);
   }
 
   .pill {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 3px 9px;
+    padding: 3px 10px;
     border-radius: 999px;
     font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.02em;
-    border: 1px solid var(--line-bright);
+    border: 1px solid var(--line-2);
+    background: var(--paper-2);
+  }
+
+  /* Headlines carry the warmth. Fraunces at reading size is the single biggest
+     reason this reads as a home and not a console. */
+  .display {
+    font-family: 'Fraunces', Georgia, serif;
+    font-optical-sizing: auto;
+    letter-spacing: -0.015em;
   }
 }
 
@@ -92,40 +149,43 @@ body::before {
 /* ------------------------------------------------------------------ */
 
 /*
- * When the doorbell is pressed, a ring expands out of the door card. This is
- * the whole accessibility thesis in one animation: the notification is spatial
- * and impossible to miss from across a room, and it needs no sound at all.
+ * "The Ring." Someone is at the door and the resident cannot hear it.
+ *
+ * Noticeability is bought with looming expansion and area rather than flicker,
+ * because the frequency band peripheral vision is best at — 15–20 Hz — is
+ * exactly the band that provokes photosensitive seizures. So this is slow and
+ * large instead of fast and small: 0.83 Hz, well under the 3 Hz clinical floor.
  */
 @keyframes ring-out {
   0% {
-    transform: scale(0.85);
-    opacity: 0.55;
+    transform: scale(0.9);
+    opacity: 0.5;
   }
   100% {
-    transform: scale(1.9);
+    transform: scale(1.75);
     opacity: 0;
   }
 }
 
-.ring-pulse::after,
-.ring-pulse::before {
+.ring-pulse::before,
+.ring-pulse::after {
   content: '';
   position: absolute;
   inset: -1px;
-  border-radius: var(--radius);
-  border: 2px solid var(--signal);
-  animation: ring-out 2.4s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+  border-radius: var(--r-md);
+  border: 2px solid var(--ochre);
+  animation: ring-out var(--loop-ring) var(--ease-swell) infinite;
   pointer-events: none;
 }
 
 .ring-pulse::after {
-  animation-delay: 1.2s;
+  animation-delay: calc(var(--loop-ring) / 2);
 }
 
 @keyframes breathe {
   0%,
   100% {
-    opacity: 0.45;
+    opacity: 0.4;
   }
   50% {
     opacity: 1;
@@ -133,13 +193,13 @@ body::before {
 }
 
 .breathe {
-  animation: breathe 2s ease-in-out infinite;
+  animation: breathe 2s var(--ease-breath) infinite;
 }
 
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(5px);
   }
   to {
     opacity: 1;
@@ -148,11 +208,11 @@ body::before {
 }
 
 .rise {
-  animation: rise 0.34s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation: rise 0.34s var(--ease-swell) both;
 }
 
-/* Waveform bars that play while the Chime is speaking. Because the resident
-   cannot hear the Chime, this is the only way they know the door spoke. */
+/* Bars that play while the Chime is speaking. Because the resident cannot hear
+   the Chime, this is the only evidence the door said anything at all. */
 @keyframes bar {
   0%,
   100% {
@@ -164,12 +224,15 @@ body::before {
 }
 
 .bar {
-  animation: bar 0.9s ease-in-out infinite;
+  animation: bar 0.9s var(--ease-breath) infinite;
   transform-origin: center;
 }
 
-/* Everything above is decoration carrying meaning, so it degrades to a static
-   state rather than disappearing when the viewer has asked for less motion. */
+/*
+ * Every animation above carries information, so none of them may simply vanish.
+ * Under reduced motion the alert is re-encoded, not deleted: the ring settles
+ * into a static ochre border that is still unmissable.
+ */
 @media (prefers-reduced-motion: reduce) {
   .ring-pulse::before,
   .ring-pulse::after,
@@ -179,7 +242,11 @@ body::before {
     animation: none !important;
   }
   .ring-pulse::before {
-    opacity: 0.6;
+    opacity: 1;
+    border-width: 3px;
+  }
+  .ring-pulse::after {
+    display: none;
   }
 }
 
@@ -188,7 +255,7 @@ body::before {
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--line-bright);
+  background: var(--line-2);
   border-radius: 999px;
-  border: 3px solid var(--ink);
+  border: 3px solid var(--paper);
 }

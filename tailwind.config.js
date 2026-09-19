@@ -5,8 +5,12 @@ module.exports = {
     extend: {
       colors: {
         ink: 'var(--ink)',
-        raised: 'var(--ink-raised)',
-        card: 'var(--ink-card)',
+        paper: 'var(--paper)',
+        raised: 'var(--paper-2)',
+        card: 'var(--card)',
+        clay: 'var(--clay)',
+        ochre: 'var(--ochre-ink)',
+        sage: 'var(--sage)',
         line: 'var(--line)',
         bright: 'var(--line-bright)',
         body: 'var(--text)',
@@ -18,6 +22,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ['Inter', 'Segoe UI Variable', 'Segoe UI', 'system-ui', 'sans-serif'],
+        display: ['Fraunces', 'Georgia', 'serif'],
         mono: ['ui-monospace', 'Cascadia Code', 'Consolas', 'monospace'],
       },
       maxWidth: { shell: '1280px' },

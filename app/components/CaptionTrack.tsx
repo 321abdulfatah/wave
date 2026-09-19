@@ -176,7 +176,7 @@ export default function CaptionTrack({
         )}
       </div>
 
-      {status && (
+      {status?.available && (
         <p className="mt-2 text-[11px] leading-relaxed text-faint">{status.explanation}</p>
       )}
     </section>

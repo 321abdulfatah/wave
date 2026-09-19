@@ -158,8 +158,9 @@ export default function Dashboard({ mock }: { mock: boolean }) {
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <div className="eyebrow">{selected.deviceName}</div>
-                    <h2 className="mt-1 text-[26px] font-semibold leading-tight tracking-tight">
+                    <h2 className="display mt-1 text-[28px] font-semibold leading-[1.15]">
                       {selected.visitorLabel ?? visitorTitle(selected.visitor)}
+                      <span className="text-ink-3"> is at the {selected.deviceName}.</span>
                     </h2>
                     <p className="mt-1 text-xs text-faint">
                       {timeAgo(selected.startedAt)} · triggered by{' '}
@@ -348,7 +349,7 @@ function Header({
       <div>
         <div className="flex items-center gap-2.5">
           <WaveMark />
-          <span className="text-[22px] font-bold tracking-[-0.02em]">WAVE</span>
+          <span className="display text-[24px] font-bold tracking-[-0.02em]">WAVE</span>
         </div>
         <p className="mt-1.5 text-[13px] text-dim">
           Your door, answered without a word.

@@ -1153,8 +1153,11 @@ footer.foot p{max-width:80ch}
   }
   requestAnimationFrame(frame);
 
-  function isRM(stage){
-    return stage.classList.contains('rm') || root.getAttribute('data-rm') === '1';
+  /* A node is in reduced mode if it sits in the reduced pane, or if reduced
+     motion is forced globally. (Scenes are nested inside the stage, so this
+     walks up to the pane rather than testing the nearest .stage.) */
+  function isRM(node){
+    return !!node.closest('.stagewrap.rmw') || root.getAttribute('data-rm') === '1';
   }
   function restart(el){
     el.classList.remove('run');
@@ -1210,7 +1213,6 @@ footer.foot p{max-width:80ch}
     var t = local('speak') % SPEAK_CYCLE;
     var beat = Math.floor(t / BEAT);
     $$('.sc-speak').forEach(function(scene){
-      var stage = scene.closest('.stage');
       var spans = $$('.caption span', scene);
       var shown = 0;
       for(var i=0;i<WORDS.length;i++){
@@ -1218,7 +1220,7 @@ footer.foot p{max-width:80ch}
         if(on) shown++;
         spans[i].classList.toggle('on', on);
       }
-      if(isRM(stage)){
+      if(isRM(scene)){
         var blocks = $$('.steps i', scene);
         var lit = Math.round(shown / WORDS.length * blocks.length);
         blocks.forEach(function(b,i){ b.classList.toggle('on', i < lit); });
@@ -1248,8 +1250,9 @@ footer.foot p{max-width:80ch}
     var sampled = Math.floor(t / 100) * 100;                   /* 10 Hz sample-and-hold */
     var c = confidenceAt(sampled);
     $$('.sc-gest').forEach(function(scene){
-      var stage = scene.closest('.stage');
-      var v = isRM(stage) ? Math.round(c*10)/10 : c;
+      /* Quantise down, never up: the step display may understate confidence
+         but must never claim more than the recogniser actually has. */
+      var v = isRM(scene) ? Math.floor(c*10)/10 : c;
       var ring = $('.gring', scene);
       $('.arc', scene).style.strokeDashoffset = (C * (1 - v)).toFixed(2);
       ring.classList.toggle('locked', v >= 0.85);

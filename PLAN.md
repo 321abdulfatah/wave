@@ -41,14 +41,31 @@ But a gesture is not a universal token, and this is where the product gets its e
 > **👍 means "good" in Seattle and something obscene in Baghdad, Athens and Lagos.**
 > **There is no universal sign language. There are more than 300.**
 
-Four of WAVE's five starting gestures are offensive or ambiguous somewhere:
+Research settled it, and the answer was worse than the guess. Full findings in
+[docs/gesture-research-eastasia.md](docs/gesture-research-eastasia.md) and
+[docs/gesture-research-greece-africa.md](docs/gesture-research-greece-africa.md).
 
-| Gesture | Where it fails |
-|---|---|
-| 👍 thumbs up | Iraq, Iran, Greece, West Africa, Sardinia — obscene |
-| ✋ open palm | Greece — the *moútza*, one of the oldest insults in Europe |
-| ☝ pointing | rude across much of Asia, the Middle East and Africa |
-| 👋 wave | palm-forward reads as moútza in Greece and Nigeria |
+Against Matsumoto & Hwang (2013), a peer-reviewed emblem catalogue with measured recognition
+rates, **four of our five gesture-to-meaning mappings are contradicted**:
+
+| Gesture | Finding | Action |
+|---|---|---|
+| `fist` = no | pan-cultural **"Threat" at 98.15%**; in Japan it is triumph; in China it is the numeral 10 | **cut globally** |
+| `open_palm` = wait | **is the moútza** in Greece — and the "fingers together" fix is a *named milder insult* | locale-gated, needs thrust detection |
+| `wave` = hello | a **US** emblem; in Japan it means *"no, that's wrong"* | locale-gated |
+| `point` = leaving it | MediaPipe has no `Pointing_Down`; collides with southern-Chinese "7" | custom classifier |
+| `thumbs_up` = yes | means **"good"**, not yes — 74.85% East Asia vs 100% US | relabel |
+
+Two claims this plan previously asserted **did not survive verification** and have been
+withdrawn: that thumbs-up is obscene in West Africa (traces to a 1991 travel book, and
+Wikipedia's own thumb-signal article does not mention West Africa at all), and that the wave
+reads as moútza in Nigeria (the Nigerian "waka" claim carries **no citation anywhere** we could
+find, including in the Wikipedia sentence that states it).
+
+**The architecture consequence is the real finding.** The pan-cultural emblems are heads, not
+hands — nod for yes at **98.18%**, shake for no at **99.10%**. A hand-only pipeline cannot
+express the culturally correct hello, yes and no in East Asia, which are a bow, a nod and a
+shake. MediaPipe ships Face and Pose Landmarker alongside Hands.
 
 A door agent that misreads a gesture is not merely unhelpful — it insults a stranger on
 someone's doorstep, in their name. So the gesture vocabulary is **per-locale**, not a

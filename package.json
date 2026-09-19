@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start -p 3000",
     "typecheck": "tsc --noEmit",
+    "test": "npm --prefix packages/gesture-locale test",
     "validate:ring": "node scripts/validate-ring.mjs"
   },
   "dependencies": {

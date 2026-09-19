@@ -3,6 +3,7 @@ import { transcriberStatus, TRANSCRIBE_SAMPLE_RATE } from '@/lib/captions/transc
 import type { CaptionChunk } from '@/lib/captions/transcriber'
 import { speechStatus, transcribeOpenAICompatible, pcmToWav } from '@/lib/ai/provider'
 import { check, record } from '@/lib/ai/budget'
+import { env } from '@/lib/env'
 
 export const dynamic = 'force-dynamic'
 
@@ -67,11 +68,11 @@ async function transcribe(pcm: Int16Array, seconds: number): Promise<CaptionChun
     '@aws-sdk/client-transcribe-streaming'
   )
 
-  const client = new TranscribeStreamingClient({ region: process.env.AWS_REGION })
+  const client = new TranscribeStreamingClient({ region: env('AWS_REGION') })
 
   const response = await client.send(
     new StartStreamTranscriptionCommand({
-      LanguageCode: (process.env.TRANSCRIBE_LANGUAGE ?? 'en-US') as never,
+      LanguageCode: (env('TRANSCRIBE_LANGUAGE') ?? 'en-US') as never,
       MediaSampleRateHertz: TRANSCRIBE_SAMPLE_RATE,
       MediaEncoding: 'pcm',
       AudioStream: (async function* () {

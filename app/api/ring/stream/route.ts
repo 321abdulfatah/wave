@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { isMockMode, startWhepSession, RingError } from '@/lib/ring/client'
+import { env } from '@/lib/env'
 
 export const dynamic = 'force-dynamic'
 
@@ -51,11 +52,11 @@ export async function DELETE(req: Request) {
 
   const url = session.startsWith('http')
     ? session
-    : `${process.env.RING_API_BASE ?? 'https://api.amazonvision.com'}${session}`
+    : `${env('RING_API_BASE') ?? 'https://api.amazonvision.com'}${session}`
 
   const res = await fetch(url, {
     method: 'DELETE',
-    headers: { Authorization: `Bearer ${process.env.RING_ACCESS_TOKEN}` },
+    headers: { Authorization: `Bearer ${env('RING_ACCESS_TOKEN')}` },
   })
   return NextResponse.json({ ok: res.ok, status: res.status })
 }

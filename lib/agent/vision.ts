@@ -1,5 +1,6 @@
 import type { VisitorKind } from '@/lib/ring/types'
 import { visionStatus, visionOpenAICompatible } from '@/lib/ai/provider'
+import { env } from '@/lib/env'
 
 /**
  * Who is at the door.
@@ -80,7 +81,7 @@ export async function classifyVisitor(jpeg: Uint8Array): Promise<VisionResult> {
 
 async function viaBedrock(jpeg: Uint8Array): Promise<string> {
   const { BedrockRuntimeClient, InvokeModelCommand } = await import('@aws-sdk/client-bedrock-runtime')
-  const client = new BedrockRuntimeClient({ region: process.env.AWS_REGION })
+  const client = new BedrockRuntimeClient({ region: env('AWS_REGION') })
 
   const body = {
     anthropic_version: 'bedrock-2023-05-31',
@@ -102,7 +103,7 @@ async function viaBedrock(jpeg: Uint8Array): Promise<string> {
 
   const res = await client.send(
     new InvokeModelCommand({
-      modelId: process.env.BEDROCK_MODEL_ID ?? 'us.anthropic.claude-sonnet-5',
+      modelId: env('BEDROCK_MODEL_ID') ?? 'us.anthropic.claude-sonnet-5',
       contentType: 'application/json',
       body: JSON.stringify(body),
     }),

@@ -19,6 +19,8 @@
  * them. A fallback is a fallback.
  */
 
+import { env } from '@/lib/env'
+
 export type VisionProvider = 'bedrock' | 'openai-compatible' | 'none'
 export type SpeechProvider = 'aws-transcribe' | 'openai-compatible' | 'none'
 
@@ -30,7 +32,7 @@ export interface ProviderStatus<T> {
 }
 
 function hasAws() {
-  return Boolean(process.env.AWS_REGION && process.env.AWS_ACCESS_KEY_ID)
+  return Boolean(env('AWS_REGION') && env('AWS_ACCESS_KEY_ID'))
 }
 
 /**
@@ -38,11 +40,11 @@ function hasAws() {
  * Together, a local llama.cpp server. One base URL and one key.
  */
 function hasOpenAICompatible() {
-  return Boolean(process.env.AI_API_KEY && process.env.AI_BASE_URL)
+  return Boolean(env('AI_API_KEY') && env('AI_BASE_URL'))
 }
 
 function hasSpeechEndpoint() {
-  return Boolean(process.env.SPEECH_API_KEY && process.env.SPEECH_BASE_URL)
+  return Boolean(env('SPEECH_API_KEY') && env('SPEECH_BASE_URL'))
 }
 
 export function visionStatus(): ProviderStatus<VisionProvider> {
@@ -53,7 +55,7 @@ export function visionStatus(): ProviderStatus<VisionProvider> {
     return {
       provider: 'openai-compatible',
       available: true,
-      label: `${hostOf(process.env.AI_BASE_URL)} · ${process.env.AI_MODEL ?? 'default model'}`,
+      label: `${hostOf(env('AI_BASE_URL'))} · ${env('AI_MODEL') ?? 'default model'}`,
     }
   }
   return { provider: 'none', available: false, label: 'No vision model configured' }
@@ -67,7 +69,7 @@ export function speechStatus(): ProviderStatus<SpeechProvider> {
     return {
       provider: 'openai-compatible',
       available: true,
-      label: `${hostOf(process.env.SPEECH_BASE_URL)} · ${process.env.SPEECH_MODEL ?? 'whisper'}`,
+      label: `${hostOf(env('SPEECH_BASE_URL'))} · ${env('SPEECH_MODEL') ?? 'whisper'}`,
     }
   }
   return { provider: 'none', available: false, label: 'No transcription model configured' }
@@ -92,17 +94,17 @@ export async function visionOpenAICompatible(
   system: string,
   question: string,
 ): Promise<string> {
-  const res = await fetch(`${process.env.AI_BASE_URL}/chat/completions`, {
+  const res = await fetch(`${env('AI_BASE_URL')}/chat/completions`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${process.env.AI_API_KEY}`,
+      Authorization: `Bearer ${env('AI_API_KEY')}`,
       'Content-Type': 'application/json',
       // OpenRouter asks for these and ignores them elsewhere.
-      'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL ?? 'https://wave-tan-nine.vercel.app',
+      'HTTP-Referer': env('NEXT_PUBLIC_SITE_URL') ?? 'https://wave-tan-nine.vercel.app',
       'X-Title': 'WAVE',
     },
     body: JSON.stringify({
-      model: process.env.AI_MODEL ?? 'anthropic/claude-sonnet-4.5',
+      model: env('AI_MODEL') ?? 'anthropic/claude-sonnet-4.5',
       max_tokens: 200,
       messages: [
         { role: 'system', content: system },
@@ -138,12 +140,13 @@ export async function visionOpenAICompatible(
 export async function transcribeOpenAICompatible(wav: Uint8Array): Promise<string> {
   const form = new FormData()
   form.append('file', new Blob([wav as unknown as BlobPart], { type: 'audio/wav' }), 'chunk.wav')
-  form.append('model', process.env.SPEECH_MODEL ?? 'whisper-large-v3')
-  if (process.env.SPEECH_LANGUAGE) form.append('language', process.env.SPEECH_LANGUAGE)
+  form.append('model', env('SPEECH_MODEL') ?? 'whisper-large-v3')
+  const language = env('SPEECH_LANGUAGE')
+  if (language) form.append('language', language)
 
-  const res = await fetch(`${process.env.SPEECH_BASE_URL}/audio/transcriptions`, {
+  const res = await fetch(`${env('SPEECH_BASE_URL')}/audio/transcriptions`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${process.env.SPEECH_API_KEY}` },
+    headers: { Authorization: `Bearer ${env('SPEECH_API_KEY')}` },
     body: form,
   })
 

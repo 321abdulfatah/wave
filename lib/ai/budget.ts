@@ -12,6 +12,8 @@
  * can count exactly.
  */
 
+import { env } from '@/lib/env'
+
 /** Rough per-call costs, used only to translate the cap into a number a human can judge. */
 const ESTIMATED_USD = {
   vision: 0.006, // ~1,800 input tokens for a doorstep frame, ~60 out, Sonnet-class pricing
@@ -46,8 +48,8 @@ function ledger(): Ledger {
  */
 function limits() {
   return {
-    vision: Number(process.env.MAX_VISION_CALLS_PER_DAY ?? 300),
-    speech: Number(process.env.MAX_SPEECH_CALLS_PER_DAY ?? 4000),
+    vision: Number(env('MAX_VISION_CALLS_PER_DAY') ?? 300),
+    speech: Number(env('MAX_SPEECH_CALLS_PER_DAY') ?? 4000),
   }
 }
 

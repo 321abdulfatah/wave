@@ -1,7 +1,8 @@
 import crypto from 'crypto'
 import type { RingDevice, RingWebhookEvent } from './types'
+import { env } from '@/lib/env'
 
-const BASE = process.env.RING_API_BASE ?? 'https://api.amazonvision.com'
+const BASE = env('RING_API_BASE') ?? 'https://api.amazonvision.com'
 
 export class RingError extends Error {
   constructor(public status: number, message: string) {
@@ -12,7 +13,7 @@ export class RingError extends Error {
 
 /** True when no Playground token is configured, so WAVE should serve mock data. */
 export function isMockMode() {
-  return !process.env.RING_ACCESS_TOKEN
+  return !env('RING_ACCESS_TOKEN')
 }
 
 /**
@@ -21,7 +22,7 @@ export function isMockMode() {
  * handlers, never from a component.
  */
 async function ring<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const token = process.env.RING_ACCESS_TOKEN
+  const token = env('RING_ACCESS_TOKEN')
   if (!token) throw new RingError(401, 'RING_ACCESS_TOKEN is not set')
 
   const res = await fetch(`${BASE}${path}`, {
@@ -164,7 +165,7 @@ export async function downloadSnapshot(
     method: 'POST',
     redirect: 'manual',
     headers: {
-      Authorization: `Bearer ${process.env.RING_ACCESS_TOKEN}`,
+      Authorization: `Bearer ${env('RING_ACCESS_TOKEN')}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
@@ -209,7 +210,7 @@ export async function startWhepSession(deviceId: string, sdpOffer: string) {
   const res = await fetch(`${BASE}/v1/devices/${deviceId}/media/streaming/whep/sessions`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${process.env.RING_ACCESS_TOKEN}`,
+      Authorization: `Bearer ${env('RING_ACCESS_TOKEN')}`,
       'Content-Type': 'application/sdp',
     },
     body: sdpOffer,
@@ -225,7 +226,7 @@ export async function startWhepSession(deviceId: string, sdpOffer: string) {
  * here would let anyone forge door events.
  */
 export function verifyWebhookSignature(rawBody: string, signature: string | null): boolean {
-  const secret = process.env.RING_WEBHOOK_SECRET
+  const secret = env('RING_WEBHOOK_SECRET')
   if (!secret || !signature) return false
 
   const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex')

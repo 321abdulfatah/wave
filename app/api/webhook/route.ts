@@ -3,6 +3,7 @@ import { parseWebhook, verifyWebhookSignature } from '@/lib/ring/client'
 import { decide } from '@/lib/agent/policy'
 import { listMemory, upsertEvent } from '@/lib/store'
 import type { DoorEvent, VisitorKind } from '@/lib/ring/types'
+import { env } from '@/lib/env'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,7 +16,7 @@ export async function POST(req: Request) {
 
   // Signature checking is skipped only when no secret is configured, which is
   // the local Playground case. Anywhere a secret exists, a bad one is rejected.
-  if (process.env.RING_WEBHOOK_SECRET && process.env.RING_WEBHOOK_SECRET !== 'dev-secret-change-me') {
+  if (env('RING_WEBHOOK_SECRET') && env('RING_WEBHOOK_SECRET') !== 'dev-secret-change-me') {
     if (!verifyWebhookSignature(raw, signature)) {
       return NextResponse.json({ error: 'bad signature' }, { status: 401 })
     }

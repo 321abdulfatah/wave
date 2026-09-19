@@ -131,6 +131,22 @@ export const GESTURES: GestureSpec[] = [
       'If ever animated as a prompt, animate it SLOWLY: fast with hard eye contact it is a threat.',
   },
   {
+    id: 'wave',
+    label: 'Wave',
+    meaning: 'Hello — I am a person, not a delivery',
+    threshold: 0.75,
+    stableFrames: 10,
+    source: 'hands',
+    // Withheld in ja-JP (it is ちがう、ちがう, "that is wrong"), tr-TR (it is
+    // "no, thanks" — a refusal) and el-GR (repeated moútza exposure). It is a
+    // US emblem at 98.20% and travels far less well than it appears to.
+    detection:
+      'Fingers SPREAD plus at least two reversals of wrist-x within 1.2s. Spread separates it ' +
+      'from "present" in a single frame, and the motion confirms — never rely on motion alone, ' +
+      'which a hesitant visitor or a short frame buffer destroys. Keep the motion clearly ' +
+      'LATERAL: a forward thrust toward the camera is the moútza.',
+  },
+  {
     id: 'index_up',
     label: 'Raised index',
     meaning: 'One moment',

@@ -11,6 +11,7 @@
     "validate:ring": "node scripts/validate-ring.mjs"
   },
   "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.1136.0",
     "@aws-sdk/client-transcribe-streaming": "^3.1136.0",
     "@mediapipe/camera_utils": "^0.3.1675466862",
     "@mediapipe/drawing_utils": "^0.3.1675466124",

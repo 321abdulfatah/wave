@@ -193,3 +193,52 @@ Submissions with friction logs can earn up to a 10% judging bonus.
   3. Either implement the event-history query parameters or reject unknown ones. Silently
      ignoring `?event_type=` reads as "this device has only on_demand events" rather than
      "this filter does nothing", which is a slow and avoidable misunderstanding.
+
+---
+
+## FL-009 — The API reference says "video only — no audio". Ring sends Opus.
+- **Date:** 2026-09-19
+- **Tool:** Ring Partner API — WHEP live streaming
+- **Severity:** **Critical**
+- **Task:** Confirm the documented audio capability of the live view before designing around it.
+- **Steps:** Sent a WHEP SDP offer containing both a `recvonly` video m-line and a `recvonly`
+  audio m-line (Opus 48000/2) to
+  `POST /v1/devices/{id}/media/streaming/whep/sessions`.
+- **Expected:** Per the Ring Developer landing page and the Partner API reference, live video is
+  **"Video only — no audio"**. A conformant answer would therefore either omit the audio m-line
+  or reject it with port 0.
+- **Actual:** **201, and the answer accepts audio:**
+
+  ```
+  m=video 9 UDP/TLS/RTP/SAVPF 96
+  a=sendonly
+  m=audio 9 UDP/TLS/RTP/SAVPF 111
+  a=sendonly
+  a=rtpmap:111 OPUS/48000/2
+  ```
+
+  Ring negotiates an Opus audio track and marks it `sendonly` — it streams the visitor's audio
+  to the client. The documentation is factually wrong.
+- **Why this is Critical rather than Important.** This is not a cosmetic doc error. The single
+  most valuable accessibility feature available on this platform is **captioning the visitor's
+  speech for a Deaf or hard-of-hearing resident** — something no shipping doorbell does anywhere
+  (Google Nest states outright that "only non-verbal audio specified in the list is supported";
+  Ring's own AI Video Descriptions are visual-only; Alexa+ Greetings hands the resident an audio
+  recording). A developer who reads the documentation concludes that feature is impossible on
+  Ring and does not build it. **The docs are actively suppressing the platform's best
+  accessibility capability.**
+
+  We had designed an entire product architecture around the documented limitation before testing
+  it. That is two days of design predicated on a sentence that is not true.
+- **Workaround:** None needed — the capability works. But it is only discoverable by ignoring
+  the documentation and probing the endpoint, which is not a reasonable expectation.
+- **Suggestion:**
+  1. **Correct the "Video only — no audio" statement** on the Ring Developer landing page and in
+     the Partner API reference. It appears in both.
+  2. Document the audio track properly: codec, sample rate, channel count, whether it is
+     available on all device classes or only some, and whether a subscription gates it.
+  3. Consider stating the accessibility implication explicitly in the docs. Amazon already ships
+     Call Captioning and Real Time Text on Echo Show, scoped to Alexa calls and Drop Ins. The
+     same primitive pointed at a doorbell would be the most significant accessibility feature in
+     the category, and right now the documentation tells developers the raw material does not
+     exist.

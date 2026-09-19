@@ -10,6 +10,16 @@
  * The cap is enforced in *calls*, not in dollars, because a running total in
  * dollars requires trusting a price table that changes. Calls are something we
  * can count exactly.
+ *
+ * Two limits worth stating plainly rather than discovering later:
+ *
+ *  - The ledger lives in memory. On Vercel each serverless instance keeps its
+ *    own copy and instances recycle, so this is a cap per instance per day, not
+ *    a global one. It reliably stops a runaway loop inside one hot instance —
+ *    which is the failure mode it was written for — and it does not add up to a
+ *    guarantee across the fleet.
+ *  - Therefore the only real ceiling is the credit limit set on the provider
+ *    key itself. This file is the seatbelt; that is the brake.
  */
 
 import { env } from '@/lib/env'
@@ -17,7 +27,10 @@ import { env } from '@/lib/env'
 /** Rough per-call costs, used only to translate the cap into a number a human can judge. */
 const ESTIMATED_USD = {
   vision: 0.006, // ~1,800 input tokens for a doorstep frame, ~60 out, Sonnet-class pricing
-  speech: 0.0005, // one second of audio, Whisper-class pricing
+  // Whisper-class pricing for one second of audio. On Groq's free tier this is
+  // actually zero — requests are rate-limited rather than billed — so the
+  // speech figure is an upper bound for a paid endpoint, not a prediction.
+  speech: 0.0005,
 }
 
 interface Ledger {
@@ -42,13 +55,14 @@ function ledger(): Ledger {
 /**
  * Daily call ceilings.
  *
- * Defaults are sized so a full day of heavy demoing lands near one US dollar:
- * 300 classifications is far more doorstep events than any demo produces, and
- * 4,000 speech chunks is about 66 minutes of continuous captioning.
+ * Sized against a fixed project budget rather than against what the providers
+ * would allow: 150 classifications is far more doorstep events than a demo
+ * produces, and 4,000 speech chunks is about 66 minutes of continuous
+ * captioning on an endpoint that currently bills nothing for it.
  */
 function limits() {
   return {
-    vision: Number(env('MAX_VISION_CALLS_PER_DAY') ?? 300),
+    vision: Number(env('MAX_VISION_CALLS_PER_DAY') ?? 150),
     speech: Number(env('MAX_SPEECH_CALLS_PER_DAY') ?? 4000),
   }
 }

@@ -38,8 +38,9 @@ intent comes **in** through the camera as gesture.
 
 But a gesture is not a universal token, and this is where the product gets its edge:
 
-> **👍 means "good" in Seattle and something obscene in Baghdad, Athens and Lagos.**
-> **There is no universal sign language. There are more than 300.**
+> **Our "wait" gesture is the Greek moútza. Our "wait" gesture with the thumb folded is the
+> Rabia sign, which has cost Egyptian athletes their careers. Our "no" reads as a threat to
+> 98% of the world. There is no universal sign language — there are more than 300.**
 
 Research settled it, and the answer was worse than the guess. Full findings in
 [docs/gesture-research-eastasia.md](docs/gesture-research-eastasia.md) and
@@ -54,7 +55,13 @@ rates, **four of our five gesture-to-meaning mappings are contradicted**:
 | `open_palm` = wait | **is the moútza** in Greece — and the "fingers together" fix is a *named milder insult* | locale-gated, needs thrust detection |
 | `wave` = hello | a **US** emblem; in Japan it means *"no, that's wrong"* | locale-gated |
 | `point` = leaving it | MediaPipe has no `Pointing_Down`; collides with southern-Chinese "7" | custom classifier |
-| `thumbs_up` = yes | means **"good"**, not yes — 74.85% East Asia vs 100% US | relabel |
+| `thumbs_up` = yes | means **"good"**, not yes — 74.85% East Asia vs 100% US. Gulf evidence genuinely split | relabel; accept as input, never prompt for it |
+
+And one the research found that we had not even considered: **`open_palm` with the thumb folded
+is the Rabia sign.** Egypt designated the Muslim Brotherhood a terrorist organisation in 2013;
+a footballer was suspended and a kung fu champion banned for a year for displaying it. In Turkey
+the same sign is Erdoğan's party emblem. A thumb-tolerant classifier emits it by accident, so
+`ar-EG` must **hard reject** that configuration rather than absorb it.
 
 Two claims this plan previously asserted **did not survive verification** and have been
 withdrawn: that thumbs-up is obscene in West Africa (traces to a 1991 travel book, and
@@ -69,9 +76,16 @@ shake. MediaPipe ships Face and Pose Landmarker alongside Hands.
 
 A door agent that misreads a gesture is not merely unhelpful — it insults a stranger on
 someone's doorstep, in their name. So the gesture vocabulary is **per-locale**, not a
-translation layer bolted on at the end. Same for colour (white is mourning in much of East
-Asia; red is luck in China and danger in the West), for reading direction, and for how
-directly a stranger may be addressed.
+translation layer bolted on at the end. Same for reading direction, and for how directly a
+stranger may be addressed — Egyptians "typically avoid saying no directly", so a door agent
+that forces a binary yes/no is demanding a culturally dispreferred speech act.
+
+Colour turned out to be the *easy* axis, and not for the reason expected. Folk colour symbolism
+is unreliable and often wrong in circulation; the defensible ground is **ISO 3864-4**, which is
+explicitly graphical "to overcome language barriers", plus **WCAG 1.4.1**, which forbids colour
+as the sole carrier of meaning anyway. That demotes locale colour from a correctness problem to
+a tuning one. The one hard finding worth keeping: in Arabic, **yellow reads as envy and sickness,
+not caution**, and white carries the shroud — so neither is a neutral UI default there.
 
 This is the strongest differentiator the project has. Ring ships globally; nobody else in
 this hackathon will have thought about it.

@@ -2,6 +2,7 @@
 
 import type { DoorEvent, Turn } from '@/lib/ring/types'
 import { gestureSpec } from '@/lib/gestures/vocabulary'
+import { useT } from '@/lib/i18n/context'
 
 /**
  * The doorstep transcript.
@@ -11,6 +12,7 @@ import { gestureSpec } from '@/lib/gestures/vocabulary'
  * The resident reads both halves, having heard neither.
  */
 export default function Conversation({ event }: { event: DoorEvent }) {
+  const t = useT()
   return (
     <ol className="space-y-3">
       {event.turns.map((turn, i) => (
@@ -22,7 +24,7 @@ export default function Conversation({ event }: { event: DoorEvent }) {
       {event.resolution === 'in_progress' && (
         <li className="flex items-center gap-3 ps-1 pt-1">
           <Waveform />
-          <span className="text-xs text-faint">listening for a gesture…</span>
+          <span className="text-xs text-faint">{t.listeningForGesture}</span>
         </li>
       )}
     </ol>
@@ -30,6 +32,7 @@ export default function Conversation({ event }: { event: DoorEvent }) {
 }
 
 function TurnRow({ turn }: { turn: Turn }) {
+  const t = useT()
   const isDoor = turn.from === 'door'
   const spec = turn.gesture ? gestureSpec(turn.gesture) : undefined
 
@@ -48,7 +51,7 @@ function TurnRow({ turn }: { turn: Turn }) {
 
       <div className={`max-w-[78%] ${isDoor ? '' : 'text-end'}`}>
         <div className="eyebrow mb-1">
-          {isDoor ? 'The door said' : 'Visitor gestured'}
+          {isDoor ? t.theDoorSaid : t.visitorGestured}
           {typeof turn.confidence === 'number' && (
             <span className="ms-2 font-mono text-[10px] text-faint">
               {Math.round(turn.confidence * 100)}%

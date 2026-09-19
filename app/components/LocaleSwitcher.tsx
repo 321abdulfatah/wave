@@ -4,13 +4,14 @@ import { useEffect, useMemo, useState } from 'react'
 import { LOCALES } from '@/lib/gestures/locales'
 import { LOCALE_GROUPS, resolve, seedResidentLocale, DEFAULT_RESIDENT } from '@/lib/locale/resolve'
 import { gestureSpec } from '@/lib/gestures/vocabulary'
+import { stringsFor } from '@/lib/i18n/strings'
 
 /**
  * Two questions, deliberately separated, because conflating them is the mistake
  * this whole feature exists to avoid:
  *
  *   "What language do YOU read?"        → the resident's interface
- *   "Who arrives at your door?"         → the gesture vocabulary and speech
+ *   "Who arrives at your door?"        → the gesture vocabulary and speech
  *
  * The second cannot be detected. Not by IP, which locates the door rather than
  * the person at it, and not by device locale, which is the same thing. It is
@@ -32,6 +33,7 @@ export default function LocaleSwitcher({
   }, [])
 
   const res = useMemo(() => resolve(resident, visitors), [resident, visitors])
+  const t = stringsFor(resident)
 
   useEffect(() => {
     document.documentElement.lang = res.resident.code
@@ -62,10 +64,10 @@ export default function LocaleSwitcher({
         aria-expanded={open}
       >
         <div>
-          <h3 className="text-[13px] font-semibold tracking-tight">Language &amp; culture</h3>
+          <h3 className="text-[13px] font-semibold tracking-tight">{t.languageAndCulture}</h3>
           <p className="mt-1 text-[11.5px] leading-relaxed text-faint">
-            {res.resident.nativeName} · {res.safeGestures.length} gestures safe
-            {res.excluded.length > 0 && ` · ${res.excluded.length} withheld`}
+            {res.resident.nativeName} · {t.gesturesSafe(res.safeGestures.length)}
+            {res.excluded.length > 0 && ` · ${t.withheld(res.excluded.length)}`}
           </p>
         </div>
         <span
@@ -90,7 +92,7 @@ export default function LocaleSwitcher({
         <div className="overflow-hidden">
           <div className="pt-4">
             {/* ---- the resident ---- */}
-            <p className="eyebrow mb-2">What you read</p>
+            <p className="eyebrow mb-2">{t.whatYouRead}</p>
             <div className="flex flex-wrap gap-1.5">
               {Object.values(LOCALES).map((l) => {
                 const on = l.code === resident
@@ -115,11 +117,9 @@ export default function LocaleSwitcher({
             </div>
 
             {/* ---- the visitors ---- */}
-            <p className="eyebrow mb-2 mt-5">Who arrives at your door</p>
+            <p className="eyebrow mb-2 mt-5">{t.whoArrives}</p>
             <p className="mb-3 text-[11.5px] leading-relaxed text-faint">
-              This cannot be detected. Your address says where the door is, not where the person
-              standing at it is from — so the door asks you, and uses only the gestures that are
-              safe for everyone you pick.
+              {t.whoArrivesHint}
             </p>
 
             <div className="space-y-3">

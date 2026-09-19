@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { downsample, floatToPcm16, TRANSCRIBE_SAMPLE_RATE } from '@/lib/captions/transcriber'
 import type { CaptionChunk, TranscriberStatus } from '@/lib/captions/transcriber'
+import { useT } from '@/lib/i18n/context'
 
 /**
  * Live captions for the visitor's speech.
@@ -26,6 +27,7 @@ export default function CaptionTrack({
   const [partial, setPartial] = useState('')
   const [status, setStatus] = useState<TranscriberStatus | null>(null)
   const [listening, setListening] = useState(false)
+  const t = useT()
   const scrollRef = useRef<HTMLDivElement>(null)
   const startedAt = useRef(0)
 
@@ -127,14 +129,14 @@ export default function CaptionTrack({
     <section className="card p-4">
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-[13px] font-semibold tracking-tight">What the visitor said</h3>
+          <h3 className="text-[13px] font-semibold tracking-tight">{t.whatVisitorSaid}</h3>
           <p className="mt-1 text-[11.5px] leading-relaxed text-faint">
-            Ring&rsquo;s own docs say the live view carries no audio. It carries Opus.
+            {t.captionSubtitle}
           </p>
         </div>
         {listening && (
           <span className="pill shrink-0" style={{ color: 'var(--calm)', background: 'var(--calm-soft)' }}>
-            <span className="breathe">●</span> captioning
+            <span className="breathe">●</span> {t.captioning}
           </span>
         )}
       </div>
@@ -151,12 +153,12 @@ export default function CaptionTrack({
         {chunks.length === 0 && !partial && (
           <p className="text-faint">
             {!status
-              ? 'Checking the transcription backend…'
+              ? t.checkingBackend
               : !status.available
                 ? status.explanation
                 : !hasAudio
                   ? 'No audio track on this stream yet.'
-                  : 'Nothing said yet.'}
+                  : t.nothingSaidYet}
           </p>
         )}
 

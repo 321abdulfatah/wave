@@ -6,14 +6,18 @@ import GestureKey from './GestureKey'
 import GestureReader from './GestureReader'
 import CaptionTrack from './CaptionTrack'
 import LocaleSwitcher from './LocaleSwitcher'
+import { I18nProvider, useT } from '@/lib/i18n/context'
+import { stringsFor } from '@/lib/i18n/strings'
 import type { DoorEvent, Gesture, RingDevice, Resolution, VisitorMemory } from '@/lib/ring/types'
 
-const RESOLUTION_LABEL: Record<Resolution, string> = {
-  in_progress: 'At the door now',
-  left_at_door: 'Left at the door',
-  message_taken: 'Message taken',
-  resident_notified: 'You were notified',
-  declined: 'Turned away',
+function resolutionLabel(r: Resolution, t: ReturnType<typeof stringsFor>): string {
+  return {
+    in_progress: t.atDoorNow,
+    left_at_door: t.leftAtDoor,
+    message_taken: t.messageTaken,
+    resident_notified: t.residentNotified,
+    declined: t.declined,
+  }[r]
 }
 
 const RESOLUTION_TONE: Record<Resolution, 'signal' | 'calm' | 'alert'> = {
@@ -36,6 +40,8 @@ export default function Dashboard({ mock }: { mock: boolean }) {
   const [useRing, setUseRing] = useState(false)
   const [liveStream, setLiveStream] = useState<MediaStream | null>(null)
   const [dir, setDir] = useState<'ltr' | 'rtl'>('ltr')
+  const [locale, setLocale] = useState('en-US')
+  const t = stringsFor(locale)
   const [polling, setPolling] = useState<{ started: boolean; reason?: string } | null>(null)
   const liveRegion = useRef<HTMLElement | null>(null)
   /** Event ids already seen, so a reconnect's snapshot does not re-announce. */
@@ -131,12 +137,15 @@ export default function Dashboard({ mock }: { mock: boolean }) {
       setEvents((prev) => prev.map((p) => (p.id === event.id ? event : p)))
       setExpecting(decision.expecting)
       setRationale(decision.rationale)
-      announce(decision.speak || RESOLUTION_LABEL[event.resolution as Resolution])
+      announce(decision.speak || resolutionLabel(event.resolution as Resolution, t))
     },
     [selected],
   )
 
-  const onLocale = useCallback((_code: string, d: 'ltr' | 'rtl') => setDir(d), [])
+  const onLocale = useCallback((code: string, d: 'ltr' | 'rtl') => {
+    setDir(d)
+    setLocale(code)
+  }, [])
 
   const simulate = useCallback(async (visitor: string) => {
     const res = await fetch('/api/simulate', {
@@ -150,7 +159,8 @@ export default function Dashboard({ mock }: { mock: boolean }) {
   }, [])
 
   return (
-    <main className="mx-auto max-w-shell px-5 py-7 md:px-8" dir={dir}>
+    <I18nProvider locale={locale}>
+    <main className="mx-auto max-w-shell px-5 py-7 md:px-8" dir={dir} data-locale={locale}>
       <Header mock={mock} connected={connected} devices={devices} polling={polling} />
 
       <div className="mt-7 grid gap-5 lg:grid-cols-[1.55fr_1fr]">
@@ -167,14 +177,14 @@ export default function Dashboard({ mock }: { mock: boolean }) {
                       <span className="text-ink-3"> is at the {selected.deviceName}.</span>
                     </h2>
                     <p className="mt-1 text-xs text-faint">
-                      {timeAgo(selected.startedAt)} · triggered by{' '}
+                      {timeAgo(selected.startedAt)} · {t.triggeredBy}{' '}
                       <span className="font-mono">{selected.trigger}</span> ·{' '}
-                      {Math.round(selected.confidence * 100)}% confidence
+                      {Math.round(selected.confidence * 100)}% {t.confidence}
                     </p>
                   </div>
                   <Badge tone={RESOLUTION_TONE[selected.resolution]}>
                     {active && <span className="breathe">●</span>}
-                    {RESOLUTION_LABEL[selected.resolution]}
+                    {resolutionLabel(selected.resolution, t)}
                   </Badge>
                 </div>
 
@@ -193,7 +203,7 @@ export default function Dashboard({ mock }: { mock: boolean }) {
               style={{ borderColor: 'rgba(45,212,191,.28)', background: 'var(--calm-soft)' }}
             >
               <div className="eyebrow mb-1.5" style={{ color: 'var(--calm)' }}>
-                Why WAVE did that
+                {t.whyWaveDidThat}
               </div>
               <p style={{ color: 'var(--text)' }}>{rationale}</p>
             </div>
@@ -211,9 +221,9 @@ export default function Dashboard({ mock }: { mock: boolean }) {
           <section className="card p-4">
             <div className="mb-3 flex items-start justify-between gap-3">
               <div>
-                <h3 className="text-[13px] font-semibold tracking-tight">Camera</h3>
+                <h3 className="text-[13px] font-semibold tracking-tight">{t.camera}</h3>
                 <p className="mt-1 text-[11.5px] leading-relaxed text-faint">
-                  {useRing ? 'Ring live view over WHEP.' : 'Local webcam, same pipeline.'}
+                  {useRing ? t.ringLive : t.webcam}
                 </p>
               </div>
               <button
@@ -224,7 +234,7 @@ export default function Dashboard({ mock }: { mock: boolean }) {
                   background: cameraOn ? 'var(--signal-soft)' : 'transparent',
                 }}
               >
-                {cameraOn ? 'Stop' : 'Start'}
+                {cameraOn ? t.stop : t.start}
               </button>
             </div>
 
@@ -233,8 +243,8 @@ export default function Dashboard({ mock }: { mock: boolean }) {
             <div className="mb-3 grid grid-cols-2 gap-1 rounded-lg border p-1" style={{ background: 'var(--ink-raised)' }}>
               {(
                 [
-                  [false, 'Webcam'],
-                  [true, 'Ring live'],
+                  [false, t.webcam],
+                  [true, t.ringLive],
                 ] as const
               ).map(([val, label]) => (
                 <button
@@ -263,8 +273,8 @@ export default function Dashboard({ mock }: { mock: boolean }) {
           </section>
 
           <Panel
-            title="Gesture vocabulary"
-            hint="Ring streams carry no audio, so the visitor answers with their hands."
+            title="{t.gestureVocabulary}"
+            hint="{t.gestureSubtitle}"
           >
             <GestureKey expecting={expecting} disabled={!active} onSend={sendGesture} />
             {!active && (
@@ -274,7 +284,7 @@ export default function Dashboard({ mock }: { mock: boolean }) {
             )}
           </Panel>
 
-          <Panel title="Ring the doorbell" hint="Stands in for a Playground event.">
+          <Panel title="{t.ringTheDoorbell}" hint="{t.gestureSubtitle}">
             <div className="grid grid-cols-2 gap-2">
               {(
                 [
@@ -296,7 +306,7 @@ export default function Dashboard({ mock }: { mock: boolean }) {
             </div>
           </Panel>
 
-          <Panel title="Who WAVE remembers" hint="State carried across sessions.">
+          <Panel title="{t.whoWaveRemembers}" hint="{t.whoWaveRemembers}">
             <ul className="space-y-2.5">
               {memory.map((m) => (
                 <li key={m.label} className="rounded-lg border p-3" style={{ background: 'var(--ink-raised)' }}>
@@ -334,6 +344,7 @@ export default function Dashboard({ mock }: { mock: boolean }) {
         </aside>
       </div>
     </main>
+    </I18nProvider>
   )
 }
 
@@ -350,6 +361,7 @@ function Header({
   devices: RingDevice[]
   polling: { started: boolean; reason?: string } | null
 }) {
+  const t = useT()
   return (
     <header className="flex flex-wrap items-end justify-between gap-4 border-b pb-5">
       <div>
@@ -358,7 +370,7 @@ function Header({
           <span className="display text-[24px] font-bold tracking-[-0.02em]">WAVE</span>
         </div>
         <p className="mt-1.5 text-[13px] text-dim">
-          Your door, answered without a word.
+          {t.tagline}
         </p>
       </div>
 
@@ -371,7 +383,7 @@ function Header({
           }}
         >
           <span className={connected ? 'breathe' : ''}>●</span>
-          {connected ? 'Live' : 'Reconnecting'}
+          {connected ? t.live : t.reconnecting}
         </span>
         <span
           className="pill"
@@ -381,10 +393,10 @@ function Header({
           }}
           title={polling?.reason}
         >
-          {mock ? 'Mock data' : polling?.started ? 'Watching Ring' : 'Ring Playground'}
+          {mock ? t.mockData : polling?.started ? t.watchingRing : 'Ring Playground'}
         </span>
         <span className="pill" style={{ color: 'var(--text-dim)' }}>
-          {devices.length} devices
+          {t.devices(devices.length)}
         </span>
       </div>
     </header>
@@ -443,9 +455,10 @@ function History({
   selectedId?: string
   onSelect: (id: string) => void
 }) {
+  const t = useT()
   return (
     <section className="card p-4">
-      <h3 className="mb-3 text-[13px] font-semibold tracking-tight">Recent</h3>
+      <h3 className="mb-3 text-[13px] font-semibold tracking-tight">{t.recent}</h3>
       <ul className="space-y-1.5">
         {events.map((e) => {
           const on = e.id === selectedId
@@ -487,13 +500,14 @@ function History({
 }
 
 function Empty() {
+  const t = useT()
   return (
     <div className="py-14 text-center">
       <div className="mx-auto mb-3 w-fit opacity-40">
         <WaveMark />
       </div>
-      <p className="text-sm text-dim">Nothing at the door.</p>
-      <p className="mt-1 text-xs text-faint">Ring the doorbell from the panel on the right.</p>
+      <p className="text-sm text-dim">{t.nothingAtDoor}</p>
+      <p className="mt-1 text-xs text-faint">{t.ringTheDoorbell} from the panel on the right.</p>
     </div>
   )
 }

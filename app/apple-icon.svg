@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <!-- No rounded corners: iOS masks these itself, and pre-rounding shows as a
+       dark halo inside the mask. -->
+  <rect width="180" height="180" fill="#FAF4EA"/>
+  <circle cx="90" cy="90" r="20" fill="#B8801F"/>
+  <circle cx="90" cy="90" r="42" fill="none" stroke="#B8801F" stroke-opacity=".62" stroke-width="10"/>
+  <circle cx="90" cy="90" r="66" fill="none" stroke="#B8801F" stroke-opacity=".26" stroke-width="10"/>
+</svg>

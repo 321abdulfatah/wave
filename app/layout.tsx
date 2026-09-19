@@ -2,9 +2,35 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'WAVE — your door, answered without a word',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://wave-tan-nine.vercel.app'),
+  title: {
+    default: 'WAVE — your door, answered without a word',
+    template: '%s · WAVE',
+  },
   description:
-    'An accessible front-door agent built on the Ring Partner API. The chime speaks for you; the camera reads gestures back.',
+    'An accessible front-door agent for Deaf and hard-of-hearing residents. It captions the ' +
+    'visitor, reads their gestures, and keeps a written record of a conversation you never heard.',
+  applicationName: 'WAVE',
+  authors: [{ name: 'Abd Ulfatah Esper' }],
+  keywords: [
+    'accessibility',
+    'Deaf',
+    'hard of hearing',
+    'doorbell',
+    'Ring',
+    'Alexa+',
+    'captions',
+    'gesture recognition',
+  ],
+  openGraph: {
+    type: 'website',
+    siteName: 'WAVE',
+    title: 'WAVE — your door, answered without a word',
+    description:
+      'Every doorbell is built for someone who can hear. The AI ones now answer the door for you ' +
+      'and hand you a sound file. WAVE gives you the conversation in writing, both directions.',
+  },
+  twitter: { card: 'summary_large_image' },
 }
 
 export const viewport: Viewport = {

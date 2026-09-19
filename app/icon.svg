@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- The doorbell as a Deaf resident experiences it: not a bell, a ring of
+       light travelling outward. Same mark as the header, so the tab, the
+       installed app and the product are recognisably one thing. -->
+  <rect width="32" height="32" rx="7" fill="#FAF4EA"/>
+  <circle cx="16" cy="16" r="3.6" fill="#B8801F"/>
+  <circle cx="16" cy="16" r="7.6" fill="none" stroke="#B8801F" stroke-opacity=".62" stroke-width="2"/>
+  <circle cx="16" cy="16" r="11.8" fill="none" stroke="#B8801F" stroke-opacity=".26" stroke-width="2"/>
+</svg>

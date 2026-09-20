@@ -50,6 +50,26 @@ export default function Dashboard({ mock }: { mock: boolean }) {
     liveRegion.current = document.getElementById('wave-live')
   }, [])
 
+  /* ---- the locale theme, on the document rather than on <main> --------- */
+  useEffect(() => {
+    /*
+     * theme.css keys every locale theme off [data-locale], and that attribute
+     * used to live only on <main>. Which meant the themed paper resolved
+     * correctly and then painted nothing: the page background is drawn by
+     * <body>, outside that element, so the single largest surface on screen
+     * kept the base cream in every locale. The Japanese theme's cooler
+     * #f2f1ee was being computed and thrown away.
+     *
+     * lang goes up with it. A screen reader picks its voice from lang, and a
+     * product that announces events through an assertive live region should
+     * not be announcing Arabic in an English voice.
+     */
+    const root = document.documentElement
+    root.setAttribute('data-locale', locale)
+    root.setAttribute('dir', dir)
+    root.setAttribute('lang', locale)
+  }, [locale, dir])
+
   /* ---- live event feed ------------------------------------------------ */
   useEffect(() => {
     const es = new EventSource(`/api/ring/events?locale=${locale}`)

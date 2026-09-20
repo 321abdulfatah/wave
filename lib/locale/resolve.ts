@@ -118,6 +118,26 @@ export function resolve(residentCode: string, visitorCodes: string[]): LocaleRes
 }
 
 /** Locales grouped for the switcher, so the list is scannable rather than alphabetical. */
+/**
+ * The label to show for a locale inside a given list.
+ *
+ * The endonym alone is the right thing to show most of the time — a resident
+ * looking for their language scans for the word they would write themselves,
+ * not for "Arabic (Egypt)". But endonyms are not unique. Listed flat, en-US and
+ * en-NG are both "English" and ar-SA and ar-EG are both "العربية", and the
+ * picker asks the resident to choose between two identical rows.
+ *
+ * So the region is appended only where the list actually needs it. Inside the
+ * visitor groups it usually does not, because those are already split by
+ * continent; in the flat resident list it always does.
+ */
+export function localeLabel(code: string, within: readonly string[]): string {
+  const l = LOCALES[code]
+  if (!l) return code
+  const ambiguous = within.some((other) => other !== code && LOCALES[other]?.nativeName === l.nativeName)
+  return ambiguous ? `${l.nativeName} · ${l.nativeRegion}` : l.nativeName
+}
+
 export const LOCALE_GROUPS: { label: string; codes: string[] }[] = [
   { label: 'Europe', codes: ['en-GB', 'fr-FR', 'el-GR', 'tr-TR'] },
   { label: 'Americas', codes: ['en-US', 'es-MX', 'pt-BR'] },

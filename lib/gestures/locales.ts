@@ -35,6 +35,16 @@ export interface LocaleSpec {
   code: string
   name: string
   nativeName: string
+  /**
+   * The place, written the way the place writes it.
+   *
+   * Two locales can share an endonym — en-US and en-NG are both "English",
+   * ar-SA and ar-EG are both "العربية" — and a picker that lists the endonym
+   * alone shows the resident two identical rows and asks them to choose. The
+   * region is what tells them apart, and it belongs in the same script as the
+   * name beside it rather than in English underneath.
+   */
+  nativeRegion: string
   dir: 'ltr' | 'rtl'
   /** Named correctly and never merged. "Arabic Sign Language" is not one language. */
   signLanguage: { name: string; nativeName?: string; iso: string; note?: string }
@@ -99,6 +109,7 @@ export const LOCALES: Record<string, LocaleSpec> = {
     code: 'en-US',
     name: 'English (US)',
     nativeName: 'English',
+    nativeRegion: 'United States',
     dir: 'ltr',
     signLanguage: {
       name: 'American Sign Language',
@@ -115,6 +126,7 @@ export const LOCALES: Record<string, LocaleSpec> = {
     code: 'el-GR',
     name: 'Greek',
     nativeName: 'Ελληνικά',
+    nativeRegion: 'Ελλάδα',
     dir: 'ltr',
     signLanguage: {
       name: 'Greek Sign Language',
@@ -156,6 +168,7 @@ export const LOCALES: Record<string, LocaleSpec> = {
     code: 'ar-SA',
     name: 'Arabic (Gulf)',
     nativeName: 'العربية',
+    nativeRegion: 'الخليج',
     dir: 'rtl',
     signLanguage: {
       name: 'Saudi Sign Language',
@@ -206,6 +219,7 @@ export const LOCALES: Record<string, LocaleSpec> = {
     code: 'ar-EG',
     name: 'Arabic (Egypt)',
     nativeName: 'العربية',
+    nativeRegion: 'مصر',
     dir: 'rtl',
     signLanguage: {
       name: 'Egyptian Sign Language',
@@ -242,6 +256,7 @@ export const LOCALES: Record<string, LocaleSpec> = {
     code: 'tr-TR',
     name: 'Turkish',
     nativeName: 'Türkçe',
+    nativeRegion: 'Türkiye',
     dir: 'ltr',
     signLanguage: {
       name: 'Turkish Sign Language',
@@ -285,6 +300,7 @@ export const LOCALES: Record<string, LocaleSpec> = {
     code: 'ja-JP',
     name: 'Japanese',
     nativeName: '日本語',
+    nativeRegion: '日本',
     dir: 'ltr',
     signLanguage: {
       name: 'Japanese Sign Language',
@@ -321,6 +337,7 @@ export const LOCALES: Record<string, LocaleSpec> = {
     code: 'zh-CN',
     name: 'Chinese (Simplified, Mainland)',
     nativeName: '简体中文',
+    nativeRegion: '中国大陆',
     dir: 'ltr',
     signLanguage: {
       name: 'Chinese Sign Language',
@@ -361,6 +378,7 @@ export const LOCALES: Record<string, LocaleSpec> = {
     code: 'ko-KR',
     name: 'Korean',
     nativeName: '한국어',
+    nativeRegion: '대한민국',
     dir: 'ltr',
     signLanguage: {
       name: 'Korean Sign Language',
@@ -388,6 +406,7 @@ export const LOCALES: Record<string, LocaleSpec> = {
     code: 'hi-IN',
     name: 'Hindi',
     nativeName: 'हिन्दी',
+    nativeRegion: 'भारत',
     dir: 'ltr',
     signLanguage: {
       name: 'Indian Sign Language',
@@ -441,6 +460,7 @@ export const LOCALES: Record<string, LocaleSpec> = {
     code: 'sw-KE',
     name: 'Swahili (Kenya)',
     nativeName: 'Kiswahili',
+    nativeRegion: 'Kenya',
     dir: 'ltr',
     signLanguage: {
       name: 'Kenyan Sign Language',
@@ -487,6 +507,7 @@ export const LOCALES: Record<string, LocaleSpec> = {
     code: 'en-NG',
     name: 'English (Nigeria)',
     nativeName: 'English',
+    nativeRegion: 'Nigeria',
     dir: 'ltr',
     signLanguage: {
       name: 'Nigerian Sign Language',
@@ -525,6 +546,7 @@ export const LOCALES: Record<string, LocaleSpec> = {
     code: 'fr-FR',
     name: 'French',
     nativeName: 'Français',
+    nativeRegion: 'France',
     dir: 'ltr',
     signLanguage: {
       name: 'Langue des signes française',
@@ -553,6 +575,7 @@ export const LOCALES: Record<string, LocaleSpec> = {
     code: 'es-MX',
     name: 'Spanish (Mexico)',
     nativeName: 'Español',
+    nativeRegion: 'México',
     dir: 'ltr',
     signLanguage: {
       name: 'Lengua de Señas Mexicana',
@@ -588,6 +611,7 @@ export const LOCALES: Record<string, LocaleSpec> = {
     code: 'pt-BR',
     name: 'Portuguese (Brazil)',
     nativeName: 'Português',
+    nativeRegion: 'Brasil',
     dir: 'ltr',
     signLanguage: {
       name: 'Língua Brasileira de Sinais',

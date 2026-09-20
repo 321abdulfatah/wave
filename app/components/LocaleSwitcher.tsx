@@ -2,7 +2,13 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { LOCALES } from '@/lib/gestures/locales'
-import { LOCALE_GROUPS, resolve, seedResidentLocale, DEFAULT_RESIDENT } from '@/lib/locale/resolve'
+import {
+  LOCALE_GROUPS,
+  localeLabel,
+  resolve,
+  seedResidentLocale,
+  DEFAULT_RESIDENT,
+} from '@/lib/locale/resolve'
 import { gestureSpec } from '@/lib/gestures/vocabulary'
 import { stringsFor } from '@/lib/i18n/strings'
 
@@ -17,6 +23,8 @@ import { stringsFor } from '@/lib/i18n/strings'
  * the person at it, and not by device locale, which is the same thing. It is
  * asked, and the answer narrows the safe set.
  */
+const ALL_CODES = Object.keys(LOCALES)
+
 export default function LocaleSwitcher({
   onResidentChange,
 }: {
@@ -66,7 +74,7 @@ export default function LocaleSwitcher({
         <div>
           <h3 className="text-[13px] font-semibold tracking-tight">{t.languageAndCulture}</h3>
           <p className="mt-1 text-[11.5px] leading-relaxed text-faint">
-            {res.resident.nativeName} · {t.gesturesSafe(res.safeGestures.length)}
+            {localeLabel(res.resident.code, ALL_CODES)} · {t.gesturesSafe(res.safeGestures.length)}
             {res.excluded.length > 0 && ` · ${t.withheld(res.excluded.length)}`}
           </p>
         </div>
@@ -110,7 +118,7 @@ export default function LocaleSwitcher({
                       fontWeight: on ? 600 : 400,
                     }}
                   >
-                    {l.nativeName}
+                    {localeLabel(l.code, ALL_CODES)}
                   </button>
                 )
               })}
@@ -130,7 +138,6 @@ export default function LocaleSwitcher({
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {group.codes.map((code) => {
-                      const l = LOCALES[code]
                       const on = visitors.includes(code)
                       return (
                         <button
@@ -147,7 +154,7 @@ export default function LocaleSwitcher({
                             fontWeight: on ? 600 : 400,
                           }}
                         >
-                          {l.nativeName}
+                          {localeLabel(code, group.codes)}
                         </button>
                       )
                     })}

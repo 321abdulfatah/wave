@@ -112,6 +112,7 @@
 /* fr-FR — French (Français). Palette departs from base.
    Worst measured body-text ratio in this theme: 4.91:1 (AA needs 4.5).
    The caution tier moves from yellow-gold to orange. docs/locale-research-fr-us-ke.md: a saturated yellow panel in France reads as gilets jaunes (Nov 2018 – Jun 2020, ~3m participants, peak 287,710 per the Ministry of the Interior) before it reads as caution — and the doc names orange as the substitute, which is ANSI-correct anyway. */
+:root[data-locale='fr-FR'],
 [data-locale='fr-FR'] {
   --ochre: #c4600f;
   --ochre-ink: #9a4508;
@@ -122,6 +123,7 @@
 /* el-GR — Greek (Ελληνικά). Palette identical to base; typography only.
    Worst measured body-text ratio in this theme: 4.91:1 (AA needs 4.5).
    Palette unchanged. lib/gestures/locales.ts is explicit: "Ground in ISO 3864-4; no reliable Greek-specific UI colour semantics found." A Greek palette invented to look Greek would be a costume. */
+:root[data-locale='el-GR'],
 [data-locale='el-GR'] {
   --font-display: 'Noto Serif', 'Fraunces', Georgia, serif;
   --eyebrow-transform: none;
@@ -134,6 +136,7 @@
 /* ar-SA — Arabic (Gulf) (العربية). Palette departs from base.
    Worst measured body-text ratio in this theme: 5.28:1 (AA needs 4.5).
    The caution tier loses its yellow. Hasan, Al-Sammerai & Abdul Kadir (2011), English Language Teaching 4(3):206–213, read in full: yellow reads as envy, sickness, cruelty and dishonesty — "yellow smile = mean". It is not caution here. The warning tier becomes copper, which keeps an amber position in the ISO 3864-4 ordering without the yellow reading. */
+:root[data-locale='ar-SA'],
 [data-locale='ar-SA'] {
   --paper: #f6f0e3;
   --paper-2: #efe7d6;
@@ -162,6 +165,7 @@
 /* ar-EG — Arabic (Egypt) (العربية). Palette departs from base.
    Worst measured body-text ratio in this theme: 5.28:1 (AA needs 4.5).
    Identical palette to ar-SA. The Hasan et al. (2011) colour findings are pan-Arabic rather than country-specific, and inventing an Egyptian variant on top of a pan-Arabic source would be decoration. */
+:root[data-locale='ar-EG'],
 [data-locale='ar-EG'] {
   --paper: #f6f0e3;
   --paper-2: #efe7d6;
@@ -190,6 +194,7 @@
 /* ja-JP — Japanese (日本語). Palette departs from base.
    Worst measured body-text ratio in this theme: 5.33:1 (AA needs 4.5).
    The paper turns from cream to a low-chroma washi grey, and the alert wash turns fully neutral. This is the 紅白 finding in docs/locale-colour-typography.md: red-and-white together is the visual grammar of CELEBRATION in Japan — 紅白幕, 紅白餅, 紅白饅頭, all 縁起物 — traceable to the Genpei War banners. A red alert on a cream-white card is the most natural thing a Western designer reaches for, and in Japan it reads as bunting. */
+:root[data-locale='ja-JP'],
 [data-locale='ja-JP'] {
   --paper: #f2f1ee;
   --paper-2: #eae9e5;
@@ -220,6 +225,7 @@
 /* zh-CN — Chinese (Simplified, Mainland) (简体中文). Palette departs from base.
    Worst measured body-text ratio in this theme: 5.48:1 (AA needs 4.5).
    The red is pushed from the base's muted terracotta toward a true safety red. Red-as-alert is the legally standardised meaning in the Chinese national safety-colour standard — 红 = 禁止、停止、紧急告警 — which maps cleanly onto ISO 3864-4, so it is reinforced by the built environment the user walks through every day. */
+:root[data-locale='zh-CN'],
 [data-locale='zh-CN'] {
   --clay: #b0140f;
   --clay-2: #cc2a1c;
@@ -236,6 +242,7 @@
 /* ko-KR — Korean (한국어). Palette identical to base; typography only.
    Worst measured body-text ratio in this theme: 4.91:1 (AA needs 4.5).
    Palette unchanged, and that is the finding rather than the absence of one. The obvious move — recolour the Korean theme away from white because "white means death in Korea" — is NOT verified and the evidence cuts the other way: 백의민족, the white-clad people, is a well-cited description of white as ordinary everyday Korean dress for centuries, attested in the Records of Wei, Choe Nam-seon, Oppert and Yanagi. The English Korean funeral article contains no colour claims at all. */
+:root[data-locale='ko-KR'],
 [data-locale='ko-KR'] {
   --font-display: 'Noto Serif KR', 'Fraunces', Georgia, serif;
   --font-sans: 'Noto Sans KR', 'Inter', system-ui, sans-serif;
@@ -246,6 +253,7 @@
 /* hi-IN — Hindi (हिन्दी). Palette departs from base.
    Worst measured body-text ratio in this theme: 5.48:1 (AA needs 4.5).
    Every orange is gone. lib/gestures/locales.ts: avoid saffron/orange ENTIRELY — simultaneously sacred (Hindu, Buddhist, Sikh), the Hindutva/BJP movement colour, and the top band of the flag. "No reading of a saffron warning badge is inert." That removes both the base --ochre (a golden orange) and --clay-2 (a clear orange), which is why this is the largest palette departure in the set. */
+:root[data-locale='hi-IN'],
 [data-locale='hi-IN'] {
   --card: #fdf8ec;
   --clay: #9e2138;
@@ -270,6 +278,7 @@
 /* sw-KE — Swahili (Kenya) (Kiswahili). Palette departs from base.
    Worst measured body-text ratio in this theme: 5.48:1 (AA needs 4.5).
    Orange is removed, and this one costs something. Orange is ODM's election symbol and party colour, and orange is also the natural warning tier between yellow and red in every design system — docs/locale-research-fr-us-ke.md flags it as "an easy trap" for exactly that reason. */
+:root[data-locale='sw-KE'],
 [data-locale='sw-KE'] {
   --clay: #93231f;
   --clay-2: #ad3128;
@@ -287,6 +296,7 @@
 /* es-MX — Spanish (Mexico) (Español). Palette departs from base.
    Worst measured body-text ratio in this theme: 5.29:1 (AA needs 4.5).
    The flag triad is broken on two axes at once. The base theme puts sage green, a near-white card and clay red in the same component — green, white and red, which lib/gestures/locales.ts says to avoid together. The green is rotated to a deep pine-teal and every surface is warmed to sand, so neither the hue nor the white survives to assemble the flag. */
+:root[data-locale='es-MX'],
 [data-locale='es-MX'] {
   --paper: #f7f0e2;
   --paper-2: #f0e7d4;
@@ -310,6 +320,7 @@
 /* pt-BR — Portuguese (Brazil) (Português). Palette departs from base.
    Worst measured body-text ratio in this theme: 5.48:1 (AA needs 4.5).
    This is the theme where the default UI is the problem. Red is the historic colour of the Workers' Party and green+yellow is Bolsonaro's adopted pair, so a stock green-OK / red-alert interface puts the two most partisan colours in Brazilian politics side by side on a device mounted on someone's front door. */
+:root[data-locale='pt-BR'],
 [data-locale='pt-BR'] {
   --clay: #8e2a24;
   --clay-2: #a4392f;
@@ -339,6 +350,7 @@
 /* ar-SA, ar-EG — RTL is a document property; the theme only guarantees it is
    never fought by a physical margin. Components must use logical properties. */
 [data-locale='ar-SA'],
+:root[data-locale='ar-EG'],
 [data-locale='ar-EG'] {
   direction: rtl;
 }
@@ -359,3 +371,20 @@
   text-transform: none;
 }
 
+
+
+/* --------------------------------------------------------------------------
+ * The document surface.
+ *
+ * These themes used to be scoped to <main>, where they set every card but not
+ * the page behind them — the largest surface on screen kept the base cream in
+ * every locale. With [data-locale] on <html> the variables are in scope for
+ * <body>, and these two rules are what actually spend them: the first because
+ * body's background is painted from --paper, the second because body carries
+ * Tailwind's .font-sans, which hardcodes Inter and outranks inheritance.
+ * ----------------------------------------------------------------------- */
+:root[data-locale] body {
+  background: var(--paper);
+  font-family: var(--font-sans);
+  line-height: var(--leading);
+}

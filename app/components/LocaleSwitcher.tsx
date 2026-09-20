@@ -10,7 +10,7 @@ import {
   DEFAULT_RESIDENT,
 } from '@/lib/locale/resolve'
 import { gestureSpec } from '@/lib/gestures/vocabulary'
-import { stringsFor } from '@/lib/i18n/strings'
+import { stringsFor, isTranslated } from '@/lib/i18n/strings'
 
 /**
  * Two questions, deliberately separated, because conflating them is the mistake
@@ -119,10 +119,19 @@ export default function LocaleSwitcher({
                     }}
                   >
                     {localeLabel(l.code, ALL_CODES)}
+                    {!isTranslated(l.code) && (
+                      <span className="ms-1.5 opacity-55" title={t.inEnglish} aria-label={t.inEnglish}>
+                        EN
+                      </span>
+                    )}
                   </button>
                 )
               })}
             </div>
+
+            <p className="mt-2.5 text-[11px] leading-relaxed text-faint">
+              {t.interfaceLanguages}
+            </p>
 
             {/* ---- the visitors ---- */}
             <p className="eyebrow mb-2 mt-5">{t.whoArrives}</p>

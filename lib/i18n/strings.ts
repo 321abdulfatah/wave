@@ -96,6 +96,11 @@ export interface Strings {
   noVideoLeaves: string
   simSubtitle: string
 
+  /** Shown under the reading-language list, where only some are written. */
+  interfaceLanguages: string
+  /** Marks one option in that list. */
+  inEnglish: string
+
   /** Why a gesture is withheld in some locale. */
   severity: Record<'offensive' | 'impolite' | 'ambiguous' | 'political', string>
   /** What is offered in its place. */
@@ -228,6 +233,10 @@ const en: Strings = {
   noVideoLeaves: 'Frames are read in the browser. Only the gesture label is sent — no video leaves this page.',
   simSubtitle: 'Stands in for a Playground event.',
 
+  interfaceLanguages:
+    'The interface and the door’s own words are written in English and Arabic. Choosing another sets your gesture vocabulary and leaves the words in English — a door that speaks to a stranger should not be machine-translated.',
+  inEnglish: 'interface in English',
+
   severity: {
     offensive: 'offensive',
     impolite: 'impolite',
@@ -359,6 +368,10 @@ const ar: Strings = {
   noVideoLeaves: 'تُقرأ الإطارات في المتصفح. تُرسَل تسمية الإشارة فقط — لا يغادر أي فيديو هذه الصفحة.',
   simSubtitle: 'يقوم مقام حدث من الـ Playground.',
 
+  interfaceLanguages:
+    'الواجهة وكلام الباب مكتوبان بالعربية والإنجليزية. اختيار لغة أخرى يضبط مفردات الإشارات ويُبقي النص بالإنجليزية — فما يقوله الباب لغريب لا يصحّ أن يُترجَم آلياً.',
+  inEnglish: 'الواجهة بالإنجليزية',
+
   severity: {
     offensive: 'مسيئة',
     impolite: 'غير لائقة',
@@ -416,6 +429,24 @@ export const STRINGS: Record<Lang, Strings> = { en, ar }
 /** Any locale code maps to the language catalogue it belongs to. */
 export function stringsFor(localeCode: string): Strings {
   return localeCode.startsWith('ar') ? STRINGS.ar : STRINGS.en
+}
+
+/**
+ * Locales whose interface and door speech are actually written here.
+ *
+ * Fourteen locales are offered because the gesture vocabulary and the safety
+ * rules genuinely differ across all fourteen. The prose does not: it is
+ * hand-written in English and Arabic, and machine-translating the lines a door
+ * says to a stranger is exactly the kind of shortcut the research in
+ * docs/gesture-research-mena.md argues against.
+ *
+ * Exported so the picker can say which is which, rather than letting a
+ * resident choose Ελληνικά and quietly receive English.
+ */
+export const TRANSLATED: readonly string[] = ['en-US', 'en-GB', 'en-NG', 'ar-SA', 'ar-EG']
+
+export function isTranslated(localeCode: string) {
+  return TRANSLATED.includes(localeCode)
 }
 
 export function langFor(localeCode: string): Lang {

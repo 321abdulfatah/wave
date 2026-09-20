@@ -45,6 +45,15 @@ exists because the documentation was wrong, and that is written up as **FL-009**
 
 ![WAVE architecture](docs/architecture.svg)
 
+| | |
+|---|---|
+| ![The dashboard](docs/screenshots/01-dashboard.png) | ![A courier at the door](docs/screenshots/02-courier-at-the-door.png) |
+| The resident's screen. | A courier arrives; WAVE opens with the household's standing instruction and says why. |
+| ![Language and culture](docs/screenshots/03-language-and-culture.png) | ![Gestures withheld for Greece](docs/screenshots/04-gestures-withheld-for-greece.png) |
+| Two separate questions: what you read, and who arrives at your door. | Expecting Greek visitors withdraws the open palm and offers a raised index instead. |
+| ![Arabic, right to left](docs/screenshots/05-arabic-rtl.png) | ![Japanese](docs/screenshots/06-japanese.png) |
+| A full RTL pass — the transcript re-renders, because turns are stored as keys. | Paper, typeface and line height follow the locale: #f2f1ee and Noto Sans JP here. |
+
 ---
 
 ## Running it

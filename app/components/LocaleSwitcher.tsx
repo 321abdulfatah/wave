@@ -174,13 +174,18 @@ export default function LocaleSwitcher({
 
               {res.excluded.length > 0 && (
                 <ul className="mt-2.5 space-y-1">
-                  {res.excluded.map((e) => (
-                    <li key={e.gesture} className="text-[11.5px] leading-relaxed text-faint">
-                      <span className="line-through">{t.gestures[e.gesture]?.label ?? gestureSpec(e.gesture)?.label ?? e.gesture}</span>
-                      {' — '}
-                      {e.because}
-                    </li>
-                  ))}
+                  {res.excluded.map((e) => {
+                    const name = (id: string) =>
+                      t.gestures[id]?.label ?? gestureSpec(id as never)?.label ?? id
+                    return (
+                      <li key={e.gesture} className="text-[11.5px] leading-relaxed text-faint">
+                        <span className="line-through">{name(e.gesture)}</span>
+                        {' — '}
+                        {localeLabel(e.from, ALL_CODES)}: {t.severity[e.severity]}
+                        {e.substitute ? ` — ${t.offersInstead(name(e.substitute))}` : ''}
+                      </li>
+                    )
+                  })}
                 </ul>
               )}
             </div>

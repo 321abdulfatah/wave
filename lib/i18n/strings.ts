@@ -96,6 +96,11 @@ export interface Strings {
   noVideoLeaves: string
   simSubtitle: string
 
+  /** Why a gesture is withheld in some locale. */
+  severity: Record<'offensive' | 'impolite' | 'ambiguous' | 'political', string>
+  /** What is offered in its place. */
+  offersInstead: (label: string) => string
+
   /** Relative time. Arabic has its own dual and plural forms for these. */
   time: {
     now: string
@@ -223,6 +228,14 @@ const en: Strings = {
   noVideoLeaves: 'Frames are read in the browser. Only the gesture label is sent — no video leaves this page.',
   simSubtitle: 'Stands in for a Playground event.',
 
+  severity: {
+    offensive: 'offensive',
+    impolite: 'impolite',
+    ambiguous: 'ambiguous',
+    political: 'politically charged',
+  },
+  offersInstead: (label) => `offers ${label} instead`,
+
   time: {
     now: 'now',
     minutes: (n) => `${n}m ago`,
@@ -345,6 +358,14 @@ const ar: Strings = {
   enabledWhileOpen: 'يعمل أثناء المحادثة. ابدأوا واحدة من الأسفل للتجربة.',
   noVideoLeaves: 'تُقرأ الإطارات في المتصفح. تُرسَل تسمية الإشارة فقط — لا يغادر أي فيديو هذه الصفحة.',
   simSubtitle: 'يقوم مقام حدث من الـ Playground.',
+
+  severity: {
+    offensive: 'مسيئة',
+    impolite: 'غير لائقة',
+    ambiguous: 'ملتبسة',
+    political: 'محمّلة سياسياً',
+  },
+  offersInstead: (label) => `يُقترح ${label} بدلاً منها`,
 
   time: {
     now: 'الآن',

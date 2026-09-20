@@ -36,8 +36,20 @@ export interface LocaleResolution {
   visitorLocales: LocaleSpec[]
   /** Gestures safe across every one of them. */
   safeGestures: GestureId[]
-  /** Gestures dropped by the intersection, and which locale dropped each. */
-  excluded: { gesture: GestureId; because: string }[]
+  /**
+   * Gestures dropped by the intersection, and which locale dropped each.
+   *
+   * Structured rather than a sentence: the resident reads this, and the
+   * locale's name, the severity word and the substitute all have to appear in
+   * the language they are reading, not in the language the data was authored in.
+   */
+  excluded: {
+    gesture: GestureId
+    /** The visitor locale that withholds it. */
+    from: string
+    severity: 'offensive' | 'impolite' | 'ambiguous' | 'political'
+    substitute?: GestureId
+  }[]
   /** Shown to the resident so the shrinking set is never mysterious. */
   explanation: string
 }
@@ -93,14 +105,16 @@ export function resolve(residentCode: string, visitorCodes: string[]): LocaleRes
     perLocale.every((set) => set.has(g)),
   )
 
-  const excluded: { gesture: GestureId; because: string }[] = []
+  const excluded: LocaleResolution['excluded'] = []
   for (const l of visitorLocales) {
     for (const [gesture, rule] of Object.entries(l.blocked)) {
       if (safeGestures.includes(gesture as GestureId)) continue
       if (excluded.some((e) => e.gesture === gesture)) continue
       excluded.push({
         gesture: gesture as GestureId,
-        because: `${l.name}: ${rule.severity}${rule.substitute ? ` — offers ${rule.substitute} instead` : ''}`,
+        from: l.code,
+        severity: rule.severity,
+        substitute: rule.substitute,
       })
     }
   }

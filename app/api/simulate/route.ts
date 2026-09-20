@@ -52,10 +52,11 @@ export async function POST(req: Request) {
     locale,
   })
 
-  if (decision.speak) {
-    event.turns.push({ at: new Date().toISOString(), from: 'door', text: decision.speak })
+  if (decision.speakKey) {
+    event.turns.push({ at: new Date().toISOString(), from: 'door', key: decision.speakKey })
   }
   event.resolution = decision.resolution
+  event.why = decision.why
   upsertEvent(event)
 
   return NextResponse.json({ event, decision })

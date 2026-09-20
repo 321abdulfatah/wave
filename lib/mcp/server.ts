@@ -2,6 +2,7 @@ import { listEvents, listMemory, getEvent, upsertEvent } from '@/lib/store'
 import { LOCALES, availableGestures } from '@/lib/gestures/locales'
 import { gestureSpec } from '@/lib/gestures/vocabulary'
 import type { DoorEvent } from '@/lib/ring/types'
+import { stringsFor } from '@/lib/i18n/strings'
 
 /**
  * WAVE's MCP server.

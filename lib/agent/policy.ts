@@ -1,4 +1,13 @@
-import type { DoorEvent, Gesture, Resolution, Turn, VisitorKind, VisitorMemory } from '@/lib/ring/types'
+import type {
+  DoorEvent,
+  DoorLine,
+  Gesture,
+  Resolution,
+  Turn,
+  VisitorKind,
+  VisitorMemory,
+  Why,
+} from '@/lib/ring/types'
 import { stringsFor } from '@/lib/i18n/strings'
 
 /**
@@ -27,26 +36,28 @@ export interface AgentContext {
 }
 
 export interface AgentDecision {
-  /** What the Chime should say next. Empty when the conversation is over. */
+  /** What the Chime should say next, rendered in the caller's locale. Empty
+   *  when the conversation is over. */
   speak: string
+  /** The same line as a key, so a transcript can be re-rendered later in a
+   *  language the resident had not chosen yet when it was spoken. */
+  speakKey?: DoorLine
   /** Gestures that are meaningful as a reply to `speak`. */
   expecting: Gesture[]
   /** Set once the conversation has reached an outcome. */
   resolution: Resolution
   /** Whether to push a card to the resident right now. */
   notifyResident: boolean
-  /** One line the resident sees explaining why WAVE did this. */
-  rationale: string
+  /** Why WAVE did this, as a key and its parameters. Rendered by the reader. */
+  why: Why
 }
 
-function openers(t: ReturnType<typeof stringsFor>): Record<VisitorKind, string> {
-  return {
-    courier: t.door.greetCourier,
-    known: t.door.greetKnown,
-    stranger: t.door.greetStranger,
-    vehicle: '',
-    unknown: t.door.greetUnknown,
-  }
+const OPENER: Record<VisitorKind, DoorLine | undefined> = {
+  courier: 'greetCourier',
+  known: 'greetKnown',
+  stranger: 'greetStranger',
+  vehicle: undefined,
+  unknown: 'greetUnknown',
 }
 
 /**
@@ -68,20 +79,22 @@ export function decide(ctx: AgentContext): AgentDecision {
       expecting: [],
       resolution: 'resident_notified',
       notifyResident: false,
-      rationale: 'Vehicle only, no person approached the door. Logged without escalating.',
+      why: { key: 'vehicleOnly' },
     }
   }
 
   // Opening move: nothing has been said yet.
   if (ctx.turns.length === 0) {
+    const key = OPENER[ctx.visitor]
     return {
-      speak: openers(t)[ctx.visitor],
+      speak: key ? t.door[key] : '',
+      speakKey: key,
       expecting: ['nod', 'thumbs_up', 'shake'],
       resolution: 'in_progress',
       notifyResident: ctx.visitor === 'known',
-      rationale: known?.policy
-        ? `Recognised ${known.label}. Standing instruction: ${known.policy}`
-        : `Opened with the ${ctx.visitor} greeting at ${Math.round(ctx.confidence * 100)}% confidence.`,
+      why: known?.policy
+        ? { key: 'recognised', label: known.label, policy: known.policy }
+        : { key: 'opened', visitor: ctx.visitor, confidence: ctx.confidence },
     }
   }
 
@@ -92,47 +105,52 @@ export function decide(ctx: AgentContext): AgentDecision {
     case 'thumbs_up':
       return {
         speak: t.door.directToDropPoint,
+        speakKey: 'directToDropPoint',
         expecting: ['present', 'open_palm'],
         resolution: 'in_progress',
         notifyResident: false,
-        rationale: 'Visitor confirmed a delivery. Directed them to the sheltered drop point.',
+        why: { key: 'confirmedDelivery' },
       }
 
     case 'present':
       return {
         speak: t.door.confirmed,
+        speakKey: 'confirmed',
         expecting: [],
         resolution: 'left_at_door',
         notifyResident: true,
-        rationale: 'Delivery placed and photographed. Resident notified with the snapshot.',
+        why: { key: 'placed' },
       }
 
     case 'wave':
       return {
         speak: t.door.messageSaved,
+        speakKey: 'messageSaved',
         expecting: [],
         resolution: 'message_taken',
         notifyResident: true,
-        rationale: 'A person, not a delivery. Clip saved and escalated to the resident.',
+        why: { key: 'personNotDelivery' },
       }
 
     case 'open_palm':
       return {
         speak: t.door.holdOn,
+        speakKey: 'holdOn',
         expecting: ['nod', 'present', 'shake'],
         resolution: 'in_progress',
         notifyResident: false,
-        rationale: 'Visitor asked for a moment. Holding the conversation open.',
+        why: { key: 'askedForMoment' },
       }
 
     case 'shake':
     case 'thumbs_down':
       return {
         speak: t.door.closeDeclined,
+        speakKey: 'closeDeclined',
         expecting: [],
         resolution: 'declined',
         notifyResident: false,
-        rationale: 'Visitor cancelled. Closed without disturbing the resident.',
+        why: { key: 'cancelled' },
       }
 
     default:
@@ -140,10 +158,11 @@ export function decide(ctx: AgentContext): AgentDecision {
       if (ctx.turns.filter((t) => t.from === 'door').length >= 2) {
         return {
           speak: t.door.givingUp,
+        speakKey: 'givingUp',
           expecting: [],
           resolution: 'message_taken',
           notifyResident: true,
-          rationale: 'No gesture read after two prompts. Escalated instead of looping.',
+          why: { key: 'escalated' },
         }
       }
       return {
@@ -151,10 +170,11 @@ export function decide(ctx: AgentContext): AgentDecision {
         // highest-recognition emblems measured anywhere, and they work for
         // someone holding a parcel in both hands.
         speak: t.door.notUnderstood,
+        speakKey: 'notUnderstood',
         expecting: ['nod', 'shake', 'wave'],
         resolution: 'in_progress',
         notifyResident: false,
-        rationale: 'Gesture below confidence threshold. Re-prompted with a clearer instruction.',
+        why: { key: 'belowThreshold' },
       }
   }
 }
@@ -162,8 +182,11 @@ export function decide(ctx: AgentContext): AgentDecision {
 /** Fold a decision into the running event record. */
 export function applyDecision(event: DoorEvent, decision: AgentDecision): DoorEvent {
   const turns = decision.speak
-    ? [...event.turns, { at: new Date().toISOString(), from: 'door' as const, text: decision.speak }]
+    ? [
+        ...event.turns,
+        { at: new Date().toISOString(), from: 'door' as const, key: decision.speakKey },
+      ]
     : event.turns
 
-  return { ...event, turns, resolution: decision.resolution }
+  return { ...event, turns, resolution: decision.resolution, why: decision.why }
 }

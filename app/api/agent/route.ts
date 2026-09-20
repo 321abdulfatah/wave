@@ -57,7 +57,8 @@ export async function POST(req: Request) {
           {
             at: new Date().toISOString(),
             from: 'visitor' as const,
-            text: `${spec!.label} — ${spec!.meaning}`,
+            // No text: the gesture names the line, and the reader renders it
+            // in whatever language the resident is using now.
             gesture,
             confidence,
           },

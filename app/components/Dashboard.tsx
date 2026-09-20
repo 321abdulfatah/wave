@@ -8,7 +8,7 @@ import CaptionTrack from './CaptionTrack'
 import LocaleSwitcher from './LocaleSwitcher'
 import { I18nProvider, useT } from '@/lib/i18n/context'
 import { stringsFor } from '@/lib/i18n/strings'
-import type { DoorEvent, Gesture, RingDevice, Resolution, VisitorMemory } from '@/lib/ring/types'
+import type { DoorEvent, Gesture, RingDevice, Resolution, VisitorMemory, Why } from '@/lib/ring/types'
 
 function resolutionLabel(r: Resolution, t: ReturnType<typeof stringsFor>): string {
   return {
@@ -34,7 +34,6 @@ export default function Dashboard({ mock }: { mock: boolean }) {
   const [memory, setMemory] = useState<VisitorMemory[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [expecting, setExpecting] = useState<Gesture[]>([])
-  const [rationale, setRationale] = useState<string>('')
   const [connected, setConnected] = useState(false)
   const [cameraOn, setCameraOn] = useState(false)
   const [useRing, setUseRing] = useState(false)
@@ -136,7 +135,6 @@ export default function Dashboard({ mock }: { mock: boolean }) {
       const { event, decision } = await res.json()
       setEvents((prev) => prev.map((p) => (p.id === event.id ? event : p)))
       setExpecting(decision.expecting)
-      setRationale(decision.rationale)
       announce(decision.speak || resolutionLabel(event.resolution as Resolution, t))
     },
     [selected, locale],
@@ -155,7 +153,6 @@ export default function Dashboard({ mock }: { mock: boolean }) {
     })
     const { decision } = await res.json()
     setExpecting(decision.expecting)
-    setRationale(decision.rationale)
   }, [locale])
 
   return (
@@ -179,7 +176,7 @@ export default function Dashboard({ mock }: { mock: boolean }) {
                       )}
                     </h2>
                     <p className="mt-1 text-xs text-faint">
-                      {timeAgo(selected.startedAt)} · {t.triggeredBy}{' '}
+                      {timeAgo(selected.startedAt, t)} · {t.triggeredBy}{' '}
                       <span className="font-mono">{selected.trigger}</span> ·{' '}
                       {Math.round(selected.confidence * 100)}% {t.confidence}
                     </p>
@@ -199,7 +196,7 @@ export default function Dashboard({ mock }: { mock: boolean }) {
             )}
           </div>
 
-          {rationale && (
+          {selected?.why && (
             <div
               className="card rise p-4 text-[13px] leading-relaxed"
               style={{ borderColor: 'rgba(45,212,191,.28)', background: 'var(--calm-soft)' }}
@@ -207,7 +204,7 @@ export default function Dashboard({ mock }: { mock: boolean }) {
               <div className="eyebrow mb-1.5" style={{ color: 'var(--calm)' }}>
                 {t.whyWaveDidThat}
               </div>
-              <p style={{ color: 'var(--text)' }}>{rationale}</p>
+              <p style={{ color: 'var(--text)' }}>{renderWhy(selected.why, t)}</p>
             </div>
           )}
 
@@ -490,7 +487,7 @@ function History({
                   <span className="ms-2 text-faint">{e.deviceName}</span>
                 </span>
                 <span className="shrink-0 font-mono text-[10.5px] text-faint">
-                  {timeAgo(e.startedAt)}
+                  {timeAgo(e.startedAt, t)}
                 </span>
               </button>
             </li>
@@ -518,11 +515,29 @@ function visitorTitle(kind: string, t: ReturnType<typeof stringsFor>) {
   return t.visitor[kind as keyof typeof t.visitor] ?? t.visitor.unknown
 }
 
-function timeAgo(iso: string) {
+/**
+ * Turn a reason into a sentence, in the language on screen.
+ *
+ * The event carries the key and its parameters rather than a finished string,
+ * so this runs again — and produces different words — when the resident
+ * switches language, including for a visit that happened hours ago.
+ */
+function renderWhy(why: Why, t: ReturnType<typeof stringsFor>): string {
+  switch (why.key) {
+    case 'recognised':
+      return t.why.recognised(why.label ?? '', why.policy ?? '')
+    case 'opened':
+      return t.why.opened(visitorTitle(why.visitor ?? 'unknown', t), why.confidence ?? 0)
+    default:
+      return t.why[why.key]
+  }
+}
+
+function timeAgo(iso: string, t: ReturnType<typeof stringsFor>) {
   const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000)
-  if (mins < 1) return 'now'
-  if (mins < 60) return `${mins}m ago`
+  if (mins < 1) return t.time.now
+  if (mins < 60) return t.time.minutes(mins)
   const hrs = Math.round(mins / 60)
-  if (hrs < 24) return `${hrs}h ago`
-  return `${Math.round(hrs / 24)}d ago`
+  if (hrs < 24) return t.time.hours(hrs)
+  return t.time.days(Math.round(hrs / 24))
 }

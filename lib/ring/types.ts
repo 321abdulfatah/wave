@@ -57,12 +57,65 @@ export type Resolution =
   | 'in_progress'
 
 /** One turn in the doorstep conversation. */
+/** A line the door can speak. Indexes the `door` catalogue in lib/i18n/strings.ts. */
+export type DoorLine =
+  | 'greetCourier'
+  | 'greetKnown'
+  | 'greetStranger'
+  | 'greetUnknown'
+  | 'directToDropPoint'
+  | 'confirmed'
+  | 'messageSaved'
+  | 'holdOn'
+  | 'closeDeclined'
+  | 'notUnderstood'
+  | 'givingUp'
+
+/** Why WAVE acted. Indexes the `why` catalogue. */
+export type WhyKey =
+  | 'vehicleOnly'
+  | 'recognised'
+  | 'opened'
+  | 'confirmedDelivery'
+  | 'placed'
+  | 'personNotDelivery'
+  | 'askedForMoment'
+  | 'cancelled'
+  | 'escalated'
+  | 'belowThreshold'
+
+export interface Why {
+  key: WhyKey
+  label?: string
+  policy?: string
+  visitor?: VisitorKind
+  confidence?: number
+}
+
 export interface Turn {
   at: string
   /** 'door' = WAVE spoke through the Chime. 'visitor' = a gesture was read. */
   from: 'door' | 'visitor'
-  /** Spoken text, or the human-readable reading of a gesture. */
-  text: string
+  /**
+   * What was said, as a key rather than as a sentence.
+   *
+   * The resident can change language at any point, including hours after a
+   * visit. A turn stored as rendered text is frozen in whichever language
+   * happened to be on screen when it was written, so an Arabic interface ends
+   * up displaying an English transcript of a conversation that never took
+   * place in English. Storing the key and rendering at display time is what
+   * makes the history switch language with the rest of the page.
+   *
+   * Visitor turns need no key: the gesture identifies the line.
+   */
+  key?: DoorLine
+  /**
+   * Literal text, for lines that genuinely have no key — a live caption of
+   * what a visitor actually said, or a model-drafted phrase. Rendered as-is,
+   * and left in the language it was produced in, because it is a record of
+   * speech rather than an interface string.
+   */
+  text?: string
   gesture?: Gesture
   confidence?: number
 }
@@ -81,6 +134,12 @@ export interface DoorEvent {
   snapshotUrl?: string
   turns: Turn[]
   resolution: Resolution
+  /**
+   * Why WAVE did what it did, carried with the event rather than held in
+   * component state, so it survives a reconnect and renders in whatever
+   * language the resident is reading now.
+   */
+  why?: Why
   /** Set once the resident has seen the card. */
   acknowledged: boolean
 }

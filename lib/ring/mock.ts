@@ -67,18 +67,42 @@ const AR_DEVICE: Record<string, string> = {
 }
 
 /** Swap the demo names inside a live event record. */
-export function localiseEvent<T extends { deviceId: string; deviceName: string; visitorLabel?: string }>(
-  event: T,
-  locale: string,
-): T {
+const arLabel = (label: string) => (label.includes('Pharmacy') ? 'ساعي الصيدلية' : 'أحمد (الجار)')
+
+const AR_POLICY: Record<string, string> = {
+  'Leave prescriptions at the door. Always confirm with a photo.':
+    'اتركوا الأدوية عند الباب. أكّدوا دائماً بصورة.',
+  'Always notify me, never turn away.': 'أبلغوني دائماً، ولا تصرفوه أبداً.',
+}
+
+/**
+ * Localise the parts of an event that are data rather than interface.
+ *
+ * Turns are deliberately not touched: they carry keys now, and the reader
+ * renders them in whatever language is on screen at the time. What is left
+ * here is scripted demo content — a device name, a visitor's label, the
+ * standing instruction a resident would have typed — which has no key because
+ * in production it is typed by a person.
+ */
+export function localiseEvent<
+  T extends {
+    deviceId: string
+    deviceName: string
+    visitorLabel?: string
+    why?: { key: string; label?: string; policy?: string }
+  },
+>(event: T, locale: string): T {
   if (!locale.startsWith('ar')) return event
   return {
     ...event,
     deviceName: AR_DEVICE[event.deviceId] ?? event.deviceName,
-    visitorLabel: event.visitorLabel
-      ? event.visitorLabel.includes('Pharmacy')
-        ? 'ساعي الصيدلية'
-        : 'أحمد (الجار)'
+    visitorLabel: event.visitorLabel ? arLabel(event.visitorLabel) : undefined,
+    why: event.why
+      ? {
+          ...event.why,
+          label: event.why.label ? arLabel(event.why.label) : undefined,
+          policy: event.why.policy ? (AR_POLICY[event.why.policy] ?? event.why.policy) : undefined,
+        }
       : undefined,
   }
 }
@@ -113,32 +137,17 @@ export const MOCK_EVENTS: DoorEvent[] = [
     confidence: 0.94,
     resolution: 'left_at_door',
     acknowledged: false,
+    why: {
+      key: 'recognised',
+      label: 'Pharmacy courier',
+      policy: 'Leave prescriptions at the door. Always confirm with a photo.',
+    },
     turns: [
-      {
-        at: ago(12),
-        from: 'door',
-        text: 'Hello. The resident here is Deaf and cannot come to the door. I can help — are you delivering something?',
-      },
-      {
-        at: ago(12),
-        from: 'visitor',
-        text: 'Nod — yes, go ahead',
-        gesture: 'nod',
-        confidence: 0.93,
-      },
-      {
-        at: ago(11),
-        from: 'door',
-        text: 'Thank you. Please leave it inside the porch, out of the rain, and show me an open hand once it is placed.',
-      },
-      {
-        at: ago(11),
-        from: 'visitor',
-        text: 'Open hand — leaving it here',
-        gesture: 'present',
-        confidence: 0.87,
-      },
-      { at: ago(11), from: 'door', text: 'Got it, I have a photo. Have a good day.' },
+      { at: ago(12), from: 'door', key: 'greetCourier' },
+      { at: ago(12), from: 'visitor', gesture: 'nod', confidence: 0.93 },
+      { at: ago(11), from: 'door', key: 'directToDropPoint' },
+      { at: ago(11), from: 'visitor', gesture: 'present', confidence: 0.87 },
+      { at: ago(11), from: 'door', key: 'confirmed' },
     ],
   },
   {
@@ -151,27 +160,16 @@ export const MOCK_EVENTS: DoorEvent[] = [
     confidence: 0.71,
     resolution: 'message_taken',
     acknowledged: true,
+    why: { key: 'personNotDelivery' },
     turns: [
-      {
-        at: ago(96),
-        from: 'door',
-        text: 'Hello. Nobody can come to the door right now. Are you expected?',
-      },
-      {
-        at: ago(96),
-        from: 'visitor',
-        text: 'Wave — hello, I am a person',
-        gesture: 'wave',
-        confidence: 0.79,
-      },
-      {
-        at: ago(95),
-        from: 'door',
-        text: 'Understood. I have saved a clip and the resident will see it. Thank you for waiting.',
-      },
+      { at: ago(96), from: 'door', key: 'greetStranger' },
+      { at: ago(96), from: 'visitor', gesture: 'wave', confidence: 0.79 },
+      { at: ago(95), from: 'door', key: 'messageSaved' },
     ],
   },
   {
+    // A vehicle with nobody approaching is not a conversation, so there is no
+    // transcript to show — only the reason it was logged and left alone.
     id: 'evt_1040',
     deviceId: 'dev_side_gate',
     deviceName: 'Side Gate',
@@ -181,12 +179,7 @@ export const MOCK_EVENTS: DoorEvent[] = [
     confidence: 0.83,
     resolution: 'resident_notified',
     acknowledged: true,
-    turns: [
-      {
-        at: ago(320),
-        from: 'door',
-        text: 'Vehicle at the side gate. No person approached. Logged, not escalated.',
-      },
-    ],
+    why: { key: 'vehicleOnly' },
+    turns: [],
   },
 ]

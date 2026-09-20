@@ -96,6 +96,34 @@ export interface Strings {
   noVideoLeaves: string
   simSubtitle: string
 
+  /** Relative time. Arabic has its own dual and plural forms for these. */
+  time: {
+    now: string
+    minutes: (n: number) => string
+    hours: (n: number) => string
+    days: (n: number) => string
+  }
+
+  /**
+   * Why WAVE acted. Shown to the resident under "why WAVE did that".
+   *
+   * Functions rather than templates, because Arabic wants the label and the
+   * instruction in a different order from English and a placeholder scheme
+   * quietly forbids that.
+   */
+  why: {
+    vehicleOnly: string
+    recognised: (label: string, policy: string) => string
+    opened: (visitor: string, confidence: number) => string
+    confirmedDelivery: string
+    placed: string
+    personNotDelivery: string
+    askedForMoment: string
+    cancelled: string
+    escalated: string
+    belowThreshold: string
+  }
+
   // what the door says to a visitor
   door: {
     greetCourier: string
@@ -194,6 +222,27 @@ const en: Strings = {
   enabledWhileOpen: 'Enabled while a conversation is open. Start one below to try it.',
   noVideoLeaves: 'Frames are read in the browser. Only the gesture label is sent — no video leaves this page.',
   simSubtitle: 'Stands in for a Playground event.',
+
+  time: {
+    now: 'now',
+    minutes: (n) => `${n}m ago`,
+    hours: (n) => `${n}h ago`,
+    days: (n) => `${n}d ago`,
+  },
+
+  why: {
+    vehicleOnly: 'Vehicle only, no person approached the door. Logged without escalating.',
+    recognised: (label, policy) => `Recognised ${label}. Standing instruction: ${policy}`,
+    opened: (visitor, confidence) =>
+      `Opened with the ${visitor} greeting at ${Math.round(confidence * 100)}% confidence.`,
+    confirmedDelivery: 'Visitor confirmed a delivery. Directed them to the sheltered drop point.',
+    placed: 'Delivery placed and photographed. Resident notified with the snapshot.',
+    personNotDelivery: 'A person, not a delivery. Clip saved and escalated to the resident.',
+    askedForMoment: 'Visitor asked for a moment. Holding the conversation open.',
+    cancelled: 'Visitor cancelled. Closed without disturbing the resident.',
+    escalated: 'No gesture read after two prompts. Escalated instead of looping.',
+    belowThreshold: 'Gesture below confidence threshold. Re-prompted with a clearer instruction.',
+  },
 
   door: {
     greetCourier:
@@ -296,6 +345,31 @@ const ar: Strings = {
   enabledWhileOpen: 'يعمل أثناء المحادثة. ابدأوا واحدة من الأسفل للتجربة.',
   noVideoLeaves: 'تُقرأ الإطارات في المتصفح. تُرسَل تسمية الإشارة فقط — لا يغادر أي فيديو هذه الصفحة.',
   simSubtitle: 'يقوم مقام حدث من الـ Playground.',
+
+  time: {
+    now: 'الآن',
+    // Arabic counts in four shapes, not two: one, two, a few (3-10) and many.
+    minutes: (n) =>
+      n === 1 ? 'قبل دقيقة' : n === 2 ? 'قبل دقيقتين' : n <= 10 ? `قبل ${n} دقائق` : `قبل ${n} دقيقة`,
+    hours: (n) =>
+      n === 1 ? 'قبل ساعة' : n === 2 ? 'قبل ساعتين' : n <= 10 ? `قبل ${n} ساعات` : `قبل ${n} ساعة`,
+    days: (n) =>
+      n === 1 ? 'قبل يوم' : n === 2 ? 'قبل يومين' : n <= 10 ? `قبل ${n} أيام` : `قبل ${n} يوماً`,
+  },
+
+  why: {
+    vehicleOnly: 'مركبة فقط، لم يقترب أحد من الباب. سُجّلت دون تصعيد.',
+    recognised: (label, policy) => `تعرّفتُ على ${label}. التعليمات الدائمة: ${policy}`,
+    opened: (visitor, confidence) =>
+      `بدأتُ بتحية ${visitor} بثقة ${Math.round(confidence * 100)}٪.`,
+    confirmedDelivery: 'أكّد الزائر وجود توصيلة، فوجّهته إلى المكان المحمي.',
+    placed: 'وُضعت التوصيلة وصُوّرت. أُبلغ المقيم مع الصورة.',
+    personNotDelivery: 'شخص لا توصيلة. حُفظ مقطع ورُفع الأمر إلى المقيم.',
+    askedForMoment: 'طلب الزائر لحظة، فأبقيتُ المحادثة مفتوحة.',
+    cancelled: 'ألغى الزائر. أُغلقت المحادثة دون إزعاج المقيم.',
+    escalated: 'لم تُقرأ أي إشارة بعد محاولتين. رُفع الأمر بدل تكرار السؤال.',
+    belowThreshold: 'الإشارة دون حدّ الثقة. أُعيد السؤال بتعليمات أوضح.',
+  },
 
   door: {
     // No religiously-marked greeting: the door does not know who is arriving.

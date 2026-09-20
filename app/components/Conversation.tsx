@@ -37,6 +37,21 @@ function TurnRow({ turn }: { turn: Turn }) {
   const spec = turn.gesture ? gestureSpec(turn.gesture) : undefined
   const loc = turn.gesture ? t.gestures[turn.gesture] : undefined
 
+  /**
+   * What this turn says, in the language on screen right now.
+   *
+   * Door lines and gestures resolve from their key, so a transcript recorded
+   * in English reads as Arabic the moment the resident switches. `turn.text`
+   * is the exception and is left alone: it holds a caption of what someone
+   * actually said, and translating a record of speech would be a lie about
+   * what was spoken.
+   */
+  const body = turn.key
+    ? t.door[turn.key]
+    : loc
+      ? `${loc.label} — ${loc.meaning}`
+      : (turn.text ?? '')
+
   return (
     <div className={`flex gap-3 ${isDoor ? '' : 'flex-row-reverse'}`}>
       <div
@@ -67,7 +82,7 @@ function TurnRow({ turn }: { turn: Turn }) {
             color: isDoor ? 'var(--text)' : 'var(--signal)',
           }}
         >
-          {turn.text}
+          {body}
         </p>
       </div>
     </div>

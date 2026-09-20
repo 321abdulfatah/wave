@@ -52,7 +52,7 @@ export default function Image() {
         </div>
 
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          {['Ring', 'Alexa+', '13 locales', 'Captioned'].map((tag) => (
+          {['Ring', 'Alexa+', '14 locales', 'Captioned'].map((tag) => (
             <div
               key={tag}
               style={{

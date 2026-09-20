@@ -1,5 +1,6 @@
 import { test, describe } from 'node:test'
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import {
   safeIn,
   safeAcross,
@@ -145,4 +146,13 @@ describe('the pan-cultural baseline', () => {
     assert.ok(PAN_CULTURAL.nod.recognition > 0.98)
     assert.ok(PAN_CULTURAL.shake.recognition > 0.98)
   })
+})
+
+// The README states a locale count, and a README that drifts from the data is
+// how a reader stops trusting the rest of it.
+test('the documented locale count matches the data', () => {
+  const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8')
+  const claimed = readme.match(/\*\*(\d+) locales\*\*/)
+  assert.ok(claimed, 'README should state a locale count')
+  assert.equal(Number(claimed[1]), Object.keys(LOCALES).length)
 })

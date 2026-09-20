@@ -55,7 +55,7 @@ correctHandedness(mpLabel, /* frameIsMirrored */ false)
 
 ## What is in the box
 
-- **14 locales**, each with the gestures it withholds and why.
+- **15 locales**, each with the gestures it withholds and why.
 - **A global reject set** — the fist, the OK ring, the *figa* and the Rabia sign.
 - **`safeAcross()`** — the intersection. It shrinks as you add locales, which is the correct
   behaviour rather than a limitation: a system serving visitors from Athens and Cairo genuinely
@@ -94,7 +94,7 @@ eyebrow position.
 npm test
 ```
 
-20 tests. The ones that matter most assert that the fist never leaks into any locale, that
+21 tests. The ones that matter most assert that the fist never leaks into any locale, that
 adding a locale never grows the safe set, and that an unknown locale throws rather than
 silently falling back to a default vocabulary — which is how a product ships the wrong gestures
 to a country it never tested.

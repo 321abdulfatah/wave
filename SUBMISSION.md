@@ -67,9 +67,10 @@ capture it, convert to 16 kHz PCM in the browser, and stream it to Amazon Transc
 render dimmed, finals commit, all inside an `aria-live` region. This is the feature nobody
 ships.
 
-**The visitor answers with their hands.** Ring has no talk-back endpoint, so the reply channel
-is the camera. MediaPipe reads the hand in the browser and posts only the resulting label — no
-video frame ever leaves the page.
+**The visitor answers with their hands.** Ring has no live talk-back: audio out is a chime
+playback, not a voice channel, so a visitor cannot simply be asked to repeat themselves. The
+return channel is the camera. MediaPipe reads the hand in the browser and posts only the
+resulting label — no video frame ever leaves the page.
 
 **And the gestures change by culture.** This is the part we did not expect to matter and which
 ended up defining the project.

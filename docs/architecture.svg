@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 912" width="1240" height="912" role="img" aria-labelledby="ttl desc">
+  <title id="ttl">WAVE architecture</title>
+  <desc id="desc">A visitor arrives at a Ring doorbell. WAVE turns the visitor's speech into captions, the camera frame into a description of the situation, and hand gestures into locale-aware meaning. A deterministic policy engine decides the response, the resident reads the conversation in writing and replies through the doorbell chime, and Alexa+ can ask what happened afterwards over MCP.</desc>
+
+  <style>
+    .ttl  { font: 700 25px "Segoe UI", Inter, system-ui, sans-serif; fill: #2a2420 }
+    .sub  { font: 400 13.5px "Segoe UI", Inter, system-ui, sans-serif; fill: #6e6154 }
+    .eyeb { font: 700 11px "Segoe UI", Inter, system-ui, sans-serif; letter-spacing: 1.3px }
+    .ct   { font: 600 15px "Segoe UI", Inter, system-ui, sans-serif; fill: #2a2420 }
+    .cs   { font: 400 12.5px "Segoe UI", Inter, system-ui, sans-serif; fill: #574c42 }
+    .cf   { font: 400 11.5px "Segoe UI", Inter, system-ui, sans-serif; fill: #6e6154 }
+    .mono { font: 400 11.5px ui-monospace, "Cascadia Mono", Consolas, monospace; fill: #574c42 }
+    .lbl  { font: 600 10.5px "Segoe UI", Inter, system-ui, sans-serif; fill: #6e6154 }
+  </style>
+
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#a3432a"/>
+    </marker>
+    <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#44614a"/>
+    </marker>
+  </defs>
+
+  <rect width="1240" height="912" fill="#faf4ea"/>
+
+  <text class="ttl" x="36" y="46">WAVE — your door, answered without a word</text>
+  <text class="sub" x="36" y="72">Ring for the door, Alexa+ for the recall, and a deterministic core that answers when neither is available.</text>
+
+  <text class="eyeb" x="36" y="128" fill="#a3432a">1 — AT THE DOOR</text>
+
+  <rect x="36" y="144" width="248" height="76" rx="16" fill="#f6e1d5" stroke="#e6c4b2"/>
+  <text class="ct" x="56" y="176">A visitor arrives</text>
+  <text class="cs" x="56" y="197">and speaks, or signs, or just waits.</text>
+
+  <rect x="36" y="244" width="248" height="240" rx="18" fill="#fffcf6" stroke="#e6d9c5"/>
+  <text class="ct" x="56" y="276">Ring Video Doorbell</text>
+  <text class="cf" x="56" y="295">camera · microphone · chime</text>
+  <line x1="56" y1="310" x2="264" y2="310" stroke="#e6d9c5"/>
+  <text class="cs" x="56" y="332">WHEP live view</text>
+  <text class="cf" x="56" y="349">video + OPUS/48000/2 audio</text>
+  <text class="cs" x="56" y="378">Event history</text>
+  <text class="cf" x="56" y="395">polled every 4 s</text>
+  <text class="cs" x="56" y="424">Webhook</text>
+  <text class="cf" x="56" y="441">HMAC-SHA256, constant-time compare</text>
+  <text class="cs" x="56" y="466">Chime playback</text>
+
+  <rect x="36" y="504" width="248" height="76" rx="14" fill="none" stroke="#e6c4b2" stroke-dasharray="4 4"/>
+  <text class="cf" x="56" y="529" fill="#a3432a">Ring's documentation says the live</text>
+  <text class="cf" x="56" y="546" fill="#a3432a">stream carries no audio. It carries</text>
+  <text class="cf" x="56" y="563" fill="#a3432a">Opus. Logged as FL-009.</text>
+
+  <text class="eyeb" x="364" y="128" fill="#815510">2 — WAVE READS IT</text>
+
+  <rect x="364" y="144" width="420" height="146" rx="18" fill="#fffcf6" stroke="#e6d9c5"/>
+  <text class="ct" x="384" y="176">The visitor's words, as text</text>
+  <text class="cs" x="384" y="199">Amazon Transcribe streaming · 16 kHz PCM</text>
+  <text class="cf" x="384" y="219">Fallback: any OpenAI-compatible endpoint (Groq Whisper)</text>
+  <line x1="384" y1="234" x2="764" y2="234" stroke="#e6d9c5"/>
+  <text class="cf" x="384" y="256">No shipping doorbell transcribes the person at the door.</text>
+  <text class="cf" x="384" y="273">Nest describes the sound. Ring describes the picture.</text>
+
+  <rect x="364" y="310" width="420" height="146" rx="18" fill="#fffcf6" stroke="#e6d9c5"/>
+  <text class="ct" x="384" y="342">What is at the door</text>
+  <text class="cs" x="384" y="365">Amazon Bedrock vision</text>
+  <text class="cf" x="384" y="385">Fallback: any OpenAI-compatible endpoint (OpenRouter)</text>
+  <line x1="384" y1="400" x2="764" y2="400" stroke="#e6d9c5"/>
+  <text class="cf" x="384" y="422">Classifies the situation, never the person. No age, gender</text>
+  <text class="cf" x="384" y="439">or identity. Below 0.6 confidence it answers "unknown".</text>
+
+  <rect x="364" y="476" width="420" height="146" rx="18" fill="#fffcf6" stroke="#e6d9c5"/>
+  <text class="ct" x="384" y="508">Hand gestures</text>
+  <text class="cs" x="384" y="531">MediaPipe Hands · 21 landmarks · runs in the browser</text>
+  <text class="cf" x="384" y="551">Handedness corrected — a doorbell frame is not mirrored</text>
+  <line x1="384" y1="566" x2="764" y2="566" stroke="#e6d9c5"/>
+  <text class="cf" x="384" y="588">14 locales. Six signs refused because they are obscene</text>
+  <text class="cf" x="384" y="605">somewhere. Video never leaves the device for this.</text>
+
+  <rect x="364" y="642" width="420" height="66" rx="14" fill="#f9ebd1" stroke="#ebd3a6"/>
+  <text class="ct" x="384" y="670">Budget guard</text>
+  <text class="cf" x="384" y="690">Every model call counted against a daily ceiling before it is sent.</text>
+
+  <text class="eyeb" x="864" y="128" fill="#44614a">3 — THE RESIDENT ANSWERS</text>
+
+  <rect x="864" y="144" width="340" height="164" rx="18" fill="#e7eee4" stroke="#cbdac6"/>
+  <text class="ct" x="884" y="176">Policy engine</text>
+  <text class="cs" x="884" y="199">Deterministic. Not a model.</text>
+  <line x1="884" y1="214" x2="1184" y2="214" stroke="#cbdac6"/>
+  <text class="cf" x="884" y="236">Chooses the greeting, the urgency and the</text>
+  <text class="cf" x="884" y="253">log line from the event alone — so the door</text>
+  <text class="cf" x="884" y="270">still works when every provider is down,</text>
+  <text class="cf" x="884" y="287">or when the budget ceiling has been reached.</text>
+
+  <rect x="864" y="328" width="340" height="164" rx="18" fill="#fffcf6" stroke="#e6d9c5"/>
+  <text class="ct" x="884" y="360">The resident's screen</text>
+  <text class="cf" x="884" y="383">Live captions of what is being said</text>
+  <text class="cf" x="884" y="404">A gesture key drawn for the visitor's locale</text>
+  <text class="cf" x="884" y="425">Colour, type and motion set by that locale too</text>
+  <line x1="884" y1="440" x2="1184" y2="440" stroke="#e6d9c5"/>
+  <text class="cf" x="884" y="462">Nothing flashes faster than 0.83 Hz, and no state</text>
+  <text class="cf" x="884" y="479">is signalled by colour alone.</text>
+
+  <rect x="864" y="512" width="340" height="146" rx="18" fill="#fffcf6" stroke="#cbdac6"/>
+  <text class="ct" x="884" y="544">The reply goes back out</text>
+  <text class="cf" x="884" y="567">The resident picks a phrase.</text>
+  <text class="cf" x="884" y="588">It plays through the Ring chime.</text>
+  <text class="cf" x="884" y="609">The visitor hears an answer.</text>
+  <line x1="884" y1="624" x2="1184" y2="624" stroke="#cbdac6"/>
+  <text class="cf" x="884" y="646" fill="#44614a">The conversation, in writing, both directions.</text>
+
+  <line x1="292" y1="252" x2="356" y2="252" stroke="#a3432a" stroke-width="1.6" marker-end="url(#ar)"/>
+  <text class="lbl" x="324" y="240" text-anchor="middle">media + events</text>
+  <line x1="792" y1="366" x2="856" y2="366" stroke="#44614a" stroke-width="1.6" marker-end="url(#ag)"/>
+  <text class="lbl" x="824" y="352" text-anchor="middle">what happened</text>
+
+  <path d="M 1034 658 L 1034 742 L 310 742 L 310 466 L 292 466" fill="none" stroke="#44614a" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#ag)"/>
+  <rect x="486" y="733" width="238" height="18" fill="#faf4ea"/>
+  <text class="lbl" x="494" y="747" fill="#44614a">the spoken reply, back to the chime</text>
+
+  <text class="eyeb" x="36" y="768" fill="#2a2420">4 — AND ALEXA+ CAN ASK, AFTERWARDS</text>
+
+  <rect x="36" y="784" width="1168" height="106" rx="18" fill="#fffcf6" stroke="#e6d9c5"/>
+  <text class="ct" x="56" y="814">MCP server</text>
+  <text class="cf" x="152" y="814">spec 2025-11-25 · Streamable HTTP · JSON-RPC 2.0 · /api/mcp</text>
+  <text class="mono" x="56" y="840">who_came_today    describe_visit    list_known_visitors    set_visitor_policy    explain_gestures</text>
+  <line x1="56" y1="855" x2="1184" y2="855" stroke="#e6d9c5"/>
+  <text class="cf" x="56" y="876">Read-mostly by design. An assistant may ask what happened at the door, and may set how a known visitor is handled. It cannot open anything.</text>
+</svg>

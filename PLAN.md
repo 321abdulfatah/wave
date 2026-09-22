@@ -131,14 +131,16 @@ this hackathon will have thought about it.
 
 ## Rules compliance
 
-- [ ] Public GitHub repo, OSS license visible in the About section
+- [x] Public GitHub repo, OSS license visible in the About section — both repos MIT, homepage and topics set
 - [ ] Ring track: Ring APIs called at runtime, not just named in the README ✅ already true
-- [ ] Alexa+ track: MCP server spec 2025-11-25+ over Streamable HTTP, imported and called
+- [x] Alexa+ track: MCP server spec 2025-11-25+ over Streamable HTTP, imported and called
 - [ ] Demo video < 3 min, public on YouTube, English, shows the Ring simulator working
-- [ ] Product feedback for every tool, API and SDK used
-- [ ] AWS Builder: AWS services named and documented in the feedback answer
-- [ ] Open Source: contribution URL + repo URL + GitHub username + description
-- [ ] Friction log entries — see FRICTION_LOG.md
+- [x] Product feedback for every tool, API and SDK used — drafted in SUBMISSION-FORM.md
+- [ ] AWS Builder: **decide whether to claim it at all** — Transcribe and Bedrock are
+      integrated and first in the resolution order, but never executed, because AWS would not
+      verify a Syrian national. See SUBMISSION-FORM.md.
+- [x] Open Source: contribution URL + repo URL + GitHub username + description — assembled in SUBMISSION-FORM.md
+- [x] Friction log entries — 10, two rated critical. See FRICTION_LOG.md
 
 ## Open questions
 

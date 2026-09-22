@@ -154,12 +154,21 @@ Read-mostly by design: it can summarise the record and change the resident's own
 policy, but it **cannot speak to a visitor, unlock anything, or resolve an event.** An agent that
 can be talked into opening a door by whoever is standing at it is not a door agent.
 
-**AWS** — **Amazon Transcribe** streaming for captions and **Amazon Bedrock** for visitor
-classification, since Ring's own site says *"Ring provides the pixels — add your own CV or AI
-models."* Bedrock is asked about the **situation** and never the person: is there a parcel, a
-uniform, a vehicle. Never who someone is, their age, gender or race. A confidence below 0.6 is
-forced to `unknown` in code as well as in the prompt, because a wrong confident answer greets a
-neighbour as a courier.
+**AWS, and what actually ran** — captions are written against **Amazon Transcribe** streaming
+and visitor classification against **Amazon Bedrock**, since Ring's own site says *"Ring provides
+the pixels — add your own CV or AI models."* Both are first in the resolution order in
+`lib/ai/provider.ts` and both are the path we wanted.
+
+Neither has ever executed. AWS suspended the account mid-build during identity verification, and
+the deployed build therefore runs the fallbacks — Groq Whisper for speech, OpenRouter for vision —
+through the same interface. We are stating that plainly rather than listing two AWS services the
+judges would find unexercised. The integration is real code on a path we could not open; it is
+FL-010, and it is the reason no vendor in this project is load-bearing.
+
+What is true of the classifier either way: it is asked about the **situation** and never the
+person — is there a parcel, a uniform, a vehicle. Never who someone is, their age, gender or
+race. A confidence below 0.6 is forced to `unknown` in code as well as in the prompt, because a
+wrong confident answer greets a neighbour as a courier.
 
 **Motion** — grounded in WCAG 2.3.1/2.3.2 and the 2025 photosensitive-epilepsy guidance rather
 than in taste. The alert loops at **0.83 Hz, 3.6× under the three-per-second limit**, and buys
@@ -204,6 +213,16 @@ unavailable in 43 territories. A 404 is doing the work of a policy message.
 identical `on_demand` event with empty `cv_detections`, and its single DoorbellPro reports
 `audio: { supported_actions: null }` — so the one documented audio-out endpoint cannot be
 exercised at all.
+
+**The hackathon admits us; the cloud does not.** This competition is open to every country
+except those comprehensively sanctioned by OFAC — which Syria has not been since 1 July 2025.
+AWS's identity verification does not offer Syrian nationality, and the account was suspended
+mid-build. So an entrant Amazon's own rules accept cannot use Amazon's own cloud, and the AWS
+Builder path was closed by the same company running the contest. That is **FL-010, Critical**.
+
+The engineering answer was to stop letting one vendor be load-bearing: every model call moved
+behind `lib/ai/provider.ts`, so a provider is configuration rather than a rewrite. It is a better
+design than the one we started with, and we would rather have arrived at it on purpose.
 
 **Our own bugs, found by measuring rather than looking.** A race started three pollers instead of
 one, hammering Ring every 1.3 s instead of every 4 s — hidden behind a silent `catch`. And the
@@ -270,4 +289,8 @@ green tick.
 ## Built with
 
 Next.js 15 · TypeScript · Ring Partner API (WHEP, webhooks, media) · Model Context Protocol
-2025-11-25 · Amazon Transcribe · Amazon Bedrock · MediaPipe Hands · Vercel
+2025-11-25 · MediaPipe Hands · Vercel
+
+Integrated and first in the resolution order, never executed because the AWS account was
+suspended during identity verification (FL-010): **Amazon Transcribe**, **Amazon Bedrock**.
+Running in the deployed build in their place: Groq Whisper, OpenRouter.

@@ -136,14 +136,21 @@ this hackathon will have thought about it.
 - [x] Alexa+ track: MCP server spec 2025-11-25+ over Streamable HTTP, imported and called
 - [ ] Demo video < 3 min, public on YouTube, English, shows the Ring simulator working
 - [x] Product feedback for every tool, API and SDK used — drafted in SUBMISSION-FORM.md
-- [ ] AWS Builder: **decide whether to claim it at all** — Transcribe and Bedrock are
-      integrated and first in the resolution order, but never executed, because AWS would not
-      verify a Syrian national. See SUBMISSION-FORM.md.
+- [ ] AWS Builder: **reachable without an AWS account.** The rule text accepts Kiro Crew on
+      its own — no runtime AWS service required — and Kiro signs in with GitHub. Bedrock and
+      Transcribe stay in the answer as documented-but-unexecuted integrations. See
+      SUBMISSION-FORM.md.
 - [x] Open Source: contribution URL + repo URL + GitHub username + description — assembled in SUBMISSION-FORM.md
 - [x] Friction log entries — 10, two rated critical. See FRICTION_LOG.md
 
 ## Open questions
 
-- Devpost eligibility reply (emailed 2026-09-19) — Syria residency, prize delivery
+- Devpost eligibility reply (emailed 2026-09-19) — chased 22 Sep, still nothing. The rule
+  text itself does not exclude Syria: it names Brazil, Quebec, Russia, Crimea, Cuba, Iran and
+  North Korea plus anywhere "comprehensively sanctioned" by OFAC, which Syria has not been
+  since E.O. 14312 (30 Jun 2025). The clause keys on residency, which is Kuwait. Amazon's
+  retail and device-export country lists run on EAR export controls instead — a different
+  regime, and the distinction is now written up in FL-010. **Do not hold the submission for
+  this reply.**
 - $150 AWS credits — requested, up to 5 business days
 - G4: whether a chime ever becomes testable, or the step stays labelled as simulated

@@ -20,8 +20,8 @@ closes on the minute and there is no appeal.
 | ✅ Friction log | 10 entries, 2 critical |
 | ✅ Written submission | `SUBMISSION.md` |
 | ❌ **Demo video** | not recorded — script in `docs/demo-script.md` |
-| ⚠️ **AWS Builder mini** | integrated but never executed; read the note below before claiming it |
-| ⏳ Eligibility | emailed 19 Sep, no reply as of 22 Sep |
+| ⚠️ **AWS Builder mini** | reachable via Kiro Crew, which needs no AWS account — see below |
+| ⏳ Eligibility | emailed 19 Sep, no reply yet — but the rule text is quoted below and Syria is not excluded by it |
 | ⏳ $150 AWS credits | requested, blocked behind the same verification |
 
 ---
@@ -40,7 +40,16 @@ Your door, answered without a word.
 
 **Tracks** — Ring, Alexa+
 
-**Mini challenges** — Open Source. AWS Builder only if the note below says yes.
+**Mini challenges** — Open Source, and AWS Builder once Kiro Crew has been used (see below).
+
+**Eligibility, for reference.** The rules exclude residents of countries "where the laws of the
+United States or local law prohibits participating or receiving a prize … including, but not
+limited to, Brazil, Quebec, Russia, Crimea, Cuba, Iran, and North Korea and any other country
+which is comprehensively sanctioned by the U.S. Treasury's Office of Foreign Assets Control."
+Syria is not named, and has not been comprehensively sanctioned since E.O. 14312 on 30 June
+2025; the State Sponsor of Terrorism designation was rescinded on 24 August 2026. The clause
+keys on **residency**, which here is Kuwait. Amazon's retail and device-export country lists run
+on EAR export controls, a different regime — see FL-010.
 
 **Links**
 ```
@@ -88,24 +97,37 @@ that puts a hand shape in front of a stranger.
 
 ---
 
-## The AWS Builder question — read before ticking the box
+## AWS Builder mini — resolved, and reachable
 
-The honest position, which `SUBMISSION.md` now states in the open:
+The rule text was checked rather than guessed at. It asks entrants to incorporate AWS services
+"such as Amazon Bedrock, AgentCore, Strands SDK, Kiro Crew, or SageMaker" **with documented
+integrations**, and it says plainly that **Kiro Crew alone qualifies — a submitter need not also
+call a runtime AWS service.**
 
-- Amazon Transcribe and Amazon Bedrock are **integrated in code** and **first in the
-  resolution order** in `lib/ai/provider.ts`.
-- Neither has **ever executed**. AWS suspended the account during identity verification,
-  which does not offer Syrian nationality.
-- The deployed build runs Groq Whisper and OpenRouter through the same interface.
+That changes the position completely. The blocker was never the mini challenge; it was the
+assumption that it required a working AWS account.
 
-If the mini challenge asks that AWS services be **used**, this does not qualify and claiming
-it invites a judge to check and find nothing. If it asks that AWS services be **integrated and
-documented in the feedback**, it does — and FL-010 is a stronger piece of feedback than a
-working Bedrock call would have been.
+**Where we stand**
 
-**Read the rule text before ticking it.** If it is ambiguous, do not tick it: the submission
-already gains more from the friction log entry than from the mini challenge, and a claim that
-does not survive a check costs more than a mini challenge is worth.
+- Amazon Bedrock and Amazon Transcribe are **integrated and documented**, first in the
+  resolution order in `lib/ai/provider.ts`. Neither has executed, and `SUBMISSION.md` says so.
+- **Kiro Crew is the missing piece, and it does not need an AWS account.** Kiro signs in with
+  GitHub or Google as well as AWS Builder ID, and the free tier needs no card. Kiro Crew itself
+  is open source, and runs from a CLI and a web dashboard as well as the Mac app — which matters
+  on Windows.
+
+**To do**
+
+1. Sign in to Kiro with the GitHub account. No card, no AWS account.
+2. Use Kiro Crew on something real inside the hackathon window — it is well suited to the demo
+   video checklist, or to a pass over the friction log.
+3. Document what it was used for, with a screenshot or a session log. The rule asks for
+   *documented* integration, so the documentation is the deliverable.
+4. Then tick the AWS Builder box, and describe both: Kiro Crew used, Bedrock and Transcribe
+   integrated but blocked at verification.
+
+If Kiro sign-up is itself geo-blocked, that is a second data point for FL-010 and worth logging
+as one. Try it before assuming either outcome.
 
 ---
 
@@ -136,7 +158,7 @@ paste it, or link it and summarise these:
 ## Before submitting
 
 - [ ] Record the video, caption it, upload it, make it public, paste the link
-- [ ] Re-read the rule text for the AWS Builder mini and decide
+- [ ] Use Kiro Crew and document it, then claim the AWS Builder mini
 - [ ] Refresh the Ring Playground token if the demo should show live Ring rather than mock
 - [ ] Check every link in the form actually opens in a private window
 - [ ] Submit on the 22nd, not the 23rd

@@ -285,6 +285,41 @@ and Amazon developer account setup isn't currently supported." The same block re
 
 So the position is: **the contest says come in, and the platform says you do not exist.**
 
+### The obvious rebuttal, and why it does not hold
+
+The reply to all of this is to point at Amazon's own country pages — the ones that list Syria
+alongside Cuba, Iran and North Korea for retail, for seller registration, and in the **Device
+Export Policy**. If Amazon bans Syria outright, a blocked verification is just that policy
+working as designed.
+
+Those pages are real and their legal basis is real. It is simply **not the same legal basis**
+as the one the hackathon's eligibility rule names, and the two regimes have moved apart:
+
+| | Regime | Syria's status now |
+|---|---|---|
+| The rule the contest uses | **OFAC sanctions** (Treasury) | **Not comprehensively sanctioned.** E.O. 14312 revoked the programme on 30 Jun 2025; the State Sponsor of Terrorism designation was rescinded 24 Aug 2026 |
+| The basis for the device pages | **EAR export controls** (Commerce/BIS) | **Still Country Group E:1** and ITAR 126.1, with country-specific licensing under EAR 746.9 — though BIS relaxed this on 2 Sep 2025, adding a licence exception for EAR99 items and a presumption of approval for most civil end-uses |
+
+So an export-control regime that governs **shipping controlled hardware to a destination** is
+being used as the gate on **identity verification for a cloud account**. Those are not the same
+question. A Ring doorbell is a device that gets exported. An AWS account is not.
+
+The gap is sharper still here, because the entrant is a Syrian national **resident in Kuwait**,
+and the hackathon's own eligibility clause keys on residency:
+
+> "Individuals who are residents of, or Organizations domiciled in, a country, state, province
+> or territory where the laws of the United States or local law prohibits participating or
+> receiving a prize in the Hackathon (including, but not limited to, Brazil, Quebec, Russia,
+> Crimea, Cuba, Iran, and North Korea and any other country which is comprehensively sanctioned
+> by the U.S. Treasury's Office of Foreign Assets Control)"
+
+Syria is not named, is not comprehensively sanctioned, and the residency in question is Kuwait.
+The verification flow refused on **nationality** regardless.
+
+None of this claims Amazon is breaking a law. It is the narrower and more useful claim: **one
+blanket list is standing in for several different legal regimes, and it has not been revisited
+since any of them changed.** Blanket lists are cheap to write and expensive to be caught by.
+
 ### The compounding problem with the credits
 
 The rules offer $150 in AWS promotional credits to entrants. AWS's own billing documentation
@@ -310,8 +345,12 @@ vision panels state which provider is active and what that means for where the d
    cannot onboard.
 2. **Re-examine the unsupported-country list.** It predates a documented change in Syria's legal
    status by fourteen months. The list is not a law; it is a list, and it can be updated.
-3. **Return a real message, not a 404.** Anyone in the 43 listed territories currently discovers
+3. **Separate the export-control list from the account-eligibility list.** EAR Country Group
+   E:1 governs where controlled hardware may be sent. Reusing it as the gate on identity
+   verification for a cloud account answers a question nobody asked, and it catches exactly the
+   people the sanctions relief was meant to reach.
+4. **Return a real message, not a 404.** Anyone in the 43 listed territories currently discovers
    this by hitting a dead page and guessing.
-4. **State the Free-plan credit restriction in the hackathon rules**, or grant the credits in a
+5. **State the Free-plan credit restriction in the hackathon rules**, or grant the credits in a
    form a Free-plan account can redeem. Offering credits that a default new account cannot accept
    is a trap laid for exactly the entrants with the least margin.
